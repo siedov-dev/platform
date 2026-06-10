@@ -1,0 +1,55 @@
+.theme-switcher {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.theme-switcher__am,
+.theme-switcher__pm {
+    font-family: "Gotham Pro", sans-serif;
+    font-size: 1rem;
+    color: #8283C0;
+    font-weight: 600;
+}
+.theme-switcher__control {
+    height: 2rem;
+    width: 4rem;
+    background-color: #2C2B63;
+    border-radius: 1rem;
+    margin: 0 0.5rem;
+    position: relative;
+    cursor: pointer;
+}
+body.light .theme-switcher__control {
+    background-color: #f3f3fc;
+}
+.theme-switcher__moon {
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+}
+.theme-switcher__sun {
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+}
+.theme-switcher__knob {
+    position: absolute;
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: #1A1944;
+    border-radius: 1.5rem;
+    top: 0.25rem;
+    left: calc(100% - 1.75rem);
+    z-index: 5;
+    transition: 150ms;
+}
+body.light .theme-switcher__knob {
+    background-color: #d2d2ec;
+}
+.theme-switcher.dark .theme-switcher__knob {
+    left: 0.25rem;
+}
+#layout-wrap.collapsed .theme-switcher {
+    display: none;
+}

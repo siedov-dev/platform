@@ -1,0 +1,9 @@
+env: "local" # environment - local, dev or prod
+http_server: # http-server config
+  address: "localhost:8082"
+  timeout: 4s
+  idle_timeout: 30s
+  token: "G+KrkNip-12-dTgs"
+kusers:
+  address: "http://localhost:23100"
+  token: "Go+KrakeN--256"

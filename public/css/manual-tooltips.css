@@ -1,0 +1,131 @@
+.manual-tooltip {
+}
+
+.manual-tooltip .tooltip-body {
+    display: none;
+    overflow: visible;
+    width: 180px;
+    padding: 12px;
+    background-color: #8283C0;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.5s;
+    position: absolute;
+    z-index: 999;
+    box-shadow: #0a0a17 0 0 5px;
+}
+.manual-tooltip .tooltip-body *{
+    color: #fff;
+    font-size: 16px;
+    text-shadow: #0a0a17 0 0 5px;
+}
+
+.tooltip-shown .tooltip-body{
+    display: block;
+    opacity: 1;
+}
+
+.hover-tooltip:hover .tooltip-body {
+    display: block;
+    opacity: 1;
+}
+
+.tooltip-top {
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip-top::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #8283C0 transparent transparent transparent;
+}
+
+.tooltip-right {
+    top: -5px;
+    left: 110%;
+}
+
+.tooltip-right::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #8283C0 transparent transparent;
+}
+
+.tooltip-bottom {
+    top: 135%;
+    left: 50%;
+    margin-left: -90px;
+}
+
+.tooltip-bottom-right {
+    top: 135%;
+    left: 0;
+    margin-left: 0px;
+}
+
+.tooltip-bottom-left {
+    top: 135%;
+    left: 0;
+    margin-left: -160px;
+}
+
+.tooltip-top-center-arrow::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent #8283C0 transparent;
+}
+
+.tooltip-top-right-arrow::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 85%;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent #8283C0 transparent;
+}
+
+.tooltip-top-left-arrow::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 5%;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent #8283C0 transparent;
+}
+
+.tooltip-left {
+    top: -5px;
+    bottom: auto;
+    right: 110%;
+}
+
+.tooltip-left::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent #8283C0;
+}

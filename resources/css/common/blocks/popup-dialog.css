@@ -1,0 +1,166 @@
+.popup-dialog{
+    display: flex;
+    flex-flow: column;
+    padding: 0;
+    background-color: #181A32;
+    border-radius: 1rem;
+    overflow: hidden;
+    max-width: 23rem;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 100;
+    max-height: 100%;
+    margin: 0 auto;
+}
+.popup-dialog.popup-desktop{
+    z-index: 10;
+    max-width: 100%;
+}
+
+body.light .popup-dialog{
+    background-color: #FFFFFF;
+}
+
+.popup-dialog .inner-content{
+    padding: 1rem;
+    width: 100%;
+}
+
+.popup-dialog img{
+    width: 100%;
+    object-fit: contain;
+}
+
+.popup-dialog .title{
+    font-family: "Gotham Pro", "sans-serif";
+    color: #FFFFFF;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4rem;
+    text-align: center;
+}
+body.light .popup-dialog .title{
+    color: #444444;
+}
+.popup-dialog .message{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.4rem;
+    text-align: center;
+    color: #8186BD;
+}
+
+.popup-dialog .btn-primary{
+    width: 100%;
+    text-decoration: none;
+    text-align: center;
+    background-color: #7582F2;
+    height: 3.5rem;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4rem;
+    border-radius: .5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.popup-dialog .btn-green{
+    width: 100%;
+    text-decoration: none;
+    text-align: center;
+    background-color: #A7DA94;
+    height: 3.5rem;
+    color: #000000;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4rem;
+    border-radius: .5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.popup-dialog .btn-gold{
+    width: 100%;
+    text-decoration: none;
+    text-align: center;
+    background-color: #FFC660;
+    height: 3.5rem;
+    color: #000000;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4rem;
+    border-radius: .5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-dialog .btn-green{
+    width: 100%;
+    text-decoration: none;
+    text-align: center;
+    background-color: var(--color-green);
+    height: 3.5rem;
+    color: #000000;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4rem;
+    border-radius: .5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-dialog .unsub{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: .875rem;
+    font-weight: 500;
+    line-height: 1.4rem;
+    text-align: center;
+    color: #8186BD;
+    cursor: pointer;
+}
+
+
+.desktop-popup-modal{
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    width: 23rem;
+    display: none;
+    border-radius: 1.6rem;
+    box-shadow: #0a0a17 0 0 4px;
+    z-index: 550;
+}
+.desktop-popup-modal.shown{
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-end;
+}
+.desktop-popup-modal .popup-close-btn{
+    position: absolute;
+    top: -3rem;
+    right: 0;
+    border-radius: 50%;
+    background-color: #1B1A47;
+    font-size: 1.6rem;
+    line-height: 1.6rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 2.25rem;
+    width: 2.25rem;
+    box-shadow: #0a0a17 0 0 4px;
+    cursor: pointer;
+}
+
+.popup-dialog .rank-card{
+    height: 270px;
+}
+.popup-dialog .rank-card .rank-info{
+    position: relative;
+}

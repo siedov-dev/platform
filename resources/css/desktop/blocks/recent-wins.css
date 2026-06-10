@@ -1,0 +1,13 @@
+.recent-wins__title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.recent-wins__title-text {
+    color: #fff;
+    font-family: 'Gotham Pro', sans-serif;
+    font-weight: 700;
+    margin-left: 1rem;
+    font-size: 1.3rem;
+}

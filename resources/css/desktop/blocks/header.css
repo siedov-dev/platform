@@ -1,0 +1,148 @@
+.header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 80px;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 500;
+    transition: background-color 150ms, box-shadow 150ms;
+}
+.header.sport{
+    background-color: #1A1944;
+    left: 0;
+    width: 100vw;
+    z-index: 600;
+}
+.header.tv-bet{
+    background-color: black;
+    left: 0;
+    width: 100vw;
+    z-index: 600;
+}
+.header .sport-header-items{
+    display: none;
+}
+.sport-header-items{
+    display: none;
+}
+.header .tv-bet-items{
+    display: none;
+}
+
+body.sport .sport-header-items{
+    display: flex;
+}
+
+body.tv-bet .tv-bet-items{
+    display: flex;
+}
+
+body.sport .sport-hide{
+    display: none;
+}
+
+body.tv-bet .tv-bet-hide{
+    display: none;
+}
+
+.header_scrolled {
+    background-color: #14142FFA;
+    box-shadow: 0 0 1rem #00000040;
+}
+body.light .header_scrolled {
+    background-color: #ffffff;
+}
+#layout-wrap.collapsed .header {
+    width: calc(100% - 80px);
+    left: 80px;
+}
+.header__all-games-btn {
+}
+
+.header__button {
+    margin-right: 1rem;
+}
+
+
+.header__wallet-button {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.header .user-menu {
+    margin-left: 1rem;
+}
+
+
+.header .notifications {
+    margin-left: 1rem;
+}
+
+.header .width-limiter {
+    display: flex;
+    align-items: center;
+}
+
+.header__login-button {
+    margin-left: auto;
+}
+
+.header__reg-button {
+    margin-left: 1rem;
+}
+
+.header__button:hover .button__icon {
+    filter: hue-rotate(155deg) saturate(1.5) brightness(1.25);
+}
+
+@media screen and (max-width: 1100px) {
+    #header .header__bonus-button{
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    #header .wallet-selector{
+        min-width: initial;
+    }
+}
+
+.header__quick-menu{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: var(--baseColor);
+    border-radius: 1rem;
+    margin: 0 1rem;
+    height: 2.4rem;
+    width: 12rem;
+}
+.header__quick-menu-item{
+    width: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 2.4rem;
+    transition: 100ms;
+    position: relative;
+    cursor: pointer;
+}
+.header__quick-menu-item .bottom-menu__link-icon{
+    width: 1rem;
+    height: 1rem;
+    filter: invert(48%) sepia(100%) hue-rotate(180deg);
+}
+.header__quick-menu-item:hover .bottom-menu__link-icon{
+    filter: none;
+}
+.header__quick-menu-item.support{
+    background-color: var(--secondaryBtn);
+    border-radius: 1rem;
+    width: 3.5rem;
+}
+.header__quick-menu-item.support .bottom-menu__link-icon{
+    filter: none;
+}

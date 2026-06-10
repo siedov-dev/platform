@@ -1,0 +1,45 @@
+<?php
+return [
+    'LittleChest' => 'Маленький сундук',
+    'MiddleChest' => 'Средний сундук',
+    'BigChest' => 'Большой сундук',
+    'LostContainer' => 'Потерянный контейнер',
+    'BlackBox' => 'Черная жемчужина',
+    'BermudaChest' => 'Бермудский сундук',
+
+    'LittleChest_short-info' => 'Заходите в игру каждый день и получайте ваш бесплатный сундук',
+    'MiddleChest_short-info' => 'Заходите в игру каждый день и получайте ваш бесплатный сундук',
+    'BigChest_short-info' => 'Заходите в игру каждый день и получайте ваш бесплатный сундук',
+    'LostContainer_short-info' => 'Заходите в игру каждый день и получайте ваш бесплатный сундук',
+    'BlackBox_short-info' => 'Заходите в игру каждый день и получайте ваш бесплатный сундук',
+    'BermudaChest_short-info' => 'Заходите в игру каждый день и получайте ваш бесплатный сундук',
+
+    'next-key-in' => 'The new key will appear through',
+    'next-quest-in' => 'Next mission on',
+
+    'KeyLittle' => 'Маленький ключ',
+    'KeyMiddle' => 'Средний ключ',
+    'KeyBig' => 'Большой ключ',
+    'KeyLost' => 'Потерянный ключ',
+    'KeyBlack' => 'Черный ключ',
+    'KeyBermuda' => 'Бермудский ключ',
+
+    'lost_treasures' => 'Lost treasures',
+    'treasure_common' => 'Common',
+    'treasure_legendary' => 'Legendary',
+    'key_price' => 'Цена ключа',
+    'open' => 'Открыть',
+    'you_have' => 'У вас есть',
+    'keys' => 'ключей',
+    'congratz' => 'Поздравляем!',
+    'open-next' => 'Открыть еще',
+    'contains' => 'Сундук содержит',
+    'SmallKeyPiece' => 'Осколок ключа малого сундука',
+    'MiddleKeyPiece' => 'Осколок ключа среднего сундука',
+    'BigKeyPiece' => 'Осколок ключа большого сундука',
+    'LostKeyPiece' => 'Осколок потерянного ключа',
+    'BlackKeyPiece' => 'Осколок ключа черного сундука',
+    'BermudaKeyPiece' => 'Осколок ключа бермудского сундука',
+
+    'not_enough_keys' => 'Отсутствует ключ',
+];

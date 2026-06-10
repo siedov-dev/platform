@@ -1,0 +1,129 @@
+.breadcrumbs {
+    display: flex;
+}
+.article__banner {
+    border-radius: 1rem;
+}
+.breadcrumbs__item {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #8283C0;
+    font-weight: 700;
+}
+.breadcrumbs__item + .breadcrumbs__item {
+    margin-left: 0.5rem;
+}
+.breadcrumbs__item + .breadcrumbs__item::before {
+    content: '';
+    display: inline-block;
+    width: 0.4rem;
+    height: 0.4rem;
+    transform: rotate(45deg);
+    border-right: 1px solid #8283C0;
+    border-top: 1px solid #8283C0;
+    margin-right: 0.6rem;
+}
+
+.article {
+    display: flex;
+}
+
+.article__sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 13.25rem;
+    flex-shrink: 0;
+}
+
+.article__sidebar-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #2f2d6d;
+    cursor: pointer;
+    text-decoration: none;
+}
+.article__sidebar-item:hover {
+    border-color: #393785;
+}
+.article__sidebar-item + .article__sidebar-item {
+    margin-top: 0.5rem;
+}
+.article__sidebar-item_active:hover,
+.article__sidebar-item_active {
+    border-color: var(--color-green);
+}
+
+.article__sidebar-item-date {
+    font-size: 0.75rem;
+    color: var(--color-orange);
+    margin-bottom: 0.5rem;
+}
+.article__sidebar-item-title {
+    font-size: 0.875rem;
+    color: #8283C0;
+    line-height: 1.25rem;
+}
+
+.article__sidebar-item_active .article__sidebar-item-title {
+    color: #fff;
+}
+body.light .article__sidebar-item_active .article__sidebar-item-title {
+    color: #313278;
+}
+.article__date {
+    font-size: 0.75rem;
+    margin: 2rem 0 1rem 0;
+    color: var(--color-orange);
+}
+
+.article__title {
+    font-size: 1.875rem;
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+body.light .article__title {
+    color: #313278;
+}
+.article__text {
+    color: #C8C9FF;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+body.light .article__text {
+    color: #242558;
+    margin-bottom: 3rem;
+}
+.article__text h2 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin: 2rem 0 1.5rem 0;
+    font-weight: 400;
+}
+body.light .article__text h2 {
+    color: #313278;
+}
+.article__text p + p {
+    margin-top: 1rem;
+}
+.article__text ul {
+    list-style: none;
+    color: #fff;
+}
+body.light .article__text ul {
+    color: #313278;
+}
+.article__text ul li::before {
+    content: '';
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: #FEC30C;
+    margin-right: 0.5rem;
+    top: 1px;
+    position: relative;
+}

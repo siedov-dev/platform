@@ -1,0 +1,120 @@
+name: kraken
+
+services:
+  ### PHP-FPM Container #######################################
+
+  php-fpm:
+    container_name: php-fpm
+    build:
+      context: ./php-fpm
+      dockerfile: Dockerfile
+    depends_on:
+      - nginx
+      - mysql
+      - redis
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www
+    volumes:
+      - ./kraken:/var/www/kraken
+      - ./php/additional.ini:/usr/local/etc/php-fpm/conf.d/additional.ini
+    networks:
+      - app-network
+
+  ### PHP-CLI Container #######################################
+
+  #php:
+  #  build:
+  #    context: ./php
+  #    dockerfile: Dockerfile
+  #  container_name: php
+  #  depends_on:
+  #    - mysql
+  #    - redis
+  #  restart: unless-stopped
+  #  tty: true
+  #  ports:
+  #    - "606:606"
+  #  working_dir: /var/www
+  #  volumes:
+  #    - ./microservice-main:/var/www
+  #    - ./php/additional.ini:/usr/local/etc/php/conf.d/additional.ini
+  #  networks:
+  #   - app-network
+
+  ### Nginx Server Container ##################################
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    depends_on:
+      - php-fpm
+      #- php
+    restart: unless-stopped
+    tty: true
+    ports:
+      #- "80:80"
+      #- "443:443"
+      #- "8000:8000"
+      - "600:600"
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+      TZ: UTC
+    working_dir: /var/www
+    volumes:
+      - ./kraken:/var/www/kraken
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx/log:/var/log/nginx
+    networks:
+      - app-network
+
+  ### MySQL Container #########################################
+
+  mysql:
+    image: mysql/mysql-server:latest-aarch64
+    container_name: mysql
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+      TZ: UTC
+    volumes:
+      - mysqldata:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    restart: always
+    networks:
+      - app-network
+
+  ### Redis Container #########################################
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_PASSWORD: 00000000
+    volumes:
+      - redisdata:/data
+      - ./redis/conf:/usr/local/etc/redis
+      - ./redis/log:/log
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    restart: always
+    networks:
+      - app-network
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+
+#Volumes
+volumes:
+  mysqldata:
+    driver: local
+  redisdata:
+    driver: local
+  apidata:
+
+

@@ -1,0 +1,32 @@
+.user-avatar {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+.user-avatar__progress {
+    position: absolute;
+    left: -4px;
+    top: -4px;
+}
+.user-avatar__image-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 70px;
+    /*background-color: #5B4CF1;*/
+    flex-shrink: 0;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    border-radius: 50px;
+}
+.user-avatar__image {
+    max-width: 100%;
+    max-height: 100%;
+    min-width: 45px;
+}

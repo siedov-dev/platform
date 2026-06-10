@@ -1,0 +1,141 @@
+<?php
+
+return [
+    'wallet' => 'Wallet',
+    'deposit' => 'Deposit',
+    'payout' => 'Withdraw funds',
+    'choosePaymentMethod' => 'Choose a payment method',
+    'chooseDepositSum' => 'Enter the deposit amount',
+    'fee' => 'Commission',
+    'processPayment' => 'Proceed to payment',
+
+    'payoutNotAvailable' => 'No output available!',
+    'payoutRequirements' => 'To be able to withdraw from this wallet, you need to make :n bets in the games',
+    'choosePayoutSum' => 'Enter the withdrawal amount',
+    'requisites' => 'Requisites',
+    'makePayout' => 'Withdraw funds',
+
+    'cardNumber' => 'Card number',
+    'walletNumberPiastrix' => 'Wallet number',
+    'walletNumberFK' => 'Wallet number of FkWalet (F111111112)',
+    'walletNumberQiwi' => 'Wallet number of Qiwi (phone without +)',
+    'walletNumberYandex' => 'Wallet number of Yandex',
+    'bankAccount' => 'Bank account number',
+
+    'invalid_req_params' => 'Wrong request params',
+    'phone_not_verified' => 'Phone is not verified',
+    'email_not_verified' => 'email is not verified',
+    'empty_address' => 'empty address',
+    'empty_name' => 'empty name',
+    'wrong_inr_phone' => 'wrong phone number. (+91(6,7,8 или 9)123456789) or (6,7,8 или 9)123456789)',
+    'wrong_10_phone' => 'wrong phone number, enter 10 numbers after +91',
+    'not_enough_data' => 'not all required data provided',
+    'ifsc_required' => 'empty ifsc field',
+    'email_required' => 'valid email required',
+
+    'invalid_account_no' => 'invalid account number.',
+    'required_other_payins' => 'To use this payment system make :pay_count deposits in other systems',
+    'required_other_payins_with_sum' => 'To use this payment system make :count deposits with amount of :amount :curr in other systems',
+    'refill_account' => 'Account refill',
+    'amount_should_be_more' => 'Amount should be greater than :amount',
+    'minimum_refill_amount' => ' Minimal refill amount is :amount :curr',
+    'minimum_payout_amount' => ' Minimal payout amount is :amount :curr',
+    'max_refill_amount' => '  Maximum refill amount is :amount :curr',
+    'max_payout_amount' => ' Maximum payout amount is :amount :curr',
+    'currency_convert_err' => 'currency convert error, please contact the administrator',
+
+    'paysystem_balance_error' => 'System balance error, please contact the administrator',
+    'payout_not_available' => 'Payout temporally unavailable ',
+    'account_not_found' => 'Provided account is not found',
+    'not_enough_money' => 'Not enough balance.',
+
+    'paysystem_error' => 'Pay system error',
+    'payout_application_created' => 'Your payout application is created.',
+    'request_error_retry' => 'Request error. Please try again later.',
+
+    'pay_success' => 'Payment successfully completed.',
+    'pay_error' => 'Payment error.',
+    'payout_canceled' => 'Payout cancelled, money have been returned',
+    'payout_not_found' => 'Payout application not found',
+
+    'transferred_to_wallet' => 'Successfully transfer to wallet :amount :curr',
+    'reff_not_enough_money' => "Not enough money on wallets. Required to payout: \n",
+    'reff_not_enough_bonus_money' => "Not enough money on bonus wallets. Required to payout: \n",
+    'reff_request_error' => 'Processing error during request.',
+    'reff_bonus_created' => 'Bonus \"Active no deposit\" was created for amount of :amount :curr. ',
+    'back' => 'Back',
+
+    'payoutVerification' => 'The payment will become available after passing the verification',
+    'payoutVerificationLink' => 'To pass the verification, you need to go to the settings menu',
+    'payoutVerificationDescr1' => 'Fill and verify your email or phone',
+    'payoutVerificationDescr2' => 'Fill in full name',
+    'payoutVerificationDescr3' => 'Attach documents that prove your identity',
+    'payoutVerificationDescr4' => 'Save',
+    'payoutVerificationDescr5' => 'Wait for confirmation',
+    'successfullyFilledUp' => 'successfully filled up',
+
+    'add_currency' => 'Add currency',
+    'choose_currency' => 'Choose currency',
+    'add' => 'Add',
+    'sum_available' => 'Available amount',
+    'maximum' => 'Maximum',
+    'continue' => 'Continue',
+
+    'without_bonus' => 'Without bonus',
+    'choose_bonus' => 'Choose a bonus',
+    'change_method' => 'Change payment method',
+    'balance' => 'Balance',
+    'amount_lower_bonus' => 'Amount lower than required to activate the selected bonus.',
+
+    'del_currency' => 'Currency deactivation',
+    'sure_del_currency' => 'Do you want to disable the specified currency? All data will be saved and will be available after reactivation',
+
+    'wait_pay_not_close' => 'Waiting for payment, do not close the page.',
+    'wait-message_1' => 'Waiting',
+    'wait-message_2' => 'Payment error',
+    'wait-message_3' => 'Payment successful',
+    'wait-message_4' => '3ds redirect',
+    'wait-message_5' => '3ds redirect',
+
+    'card_holder' => 'Card holder',
+    'month' => 'Month',
+    'year' => 'Year',
+    'cvc' => 'CVC',
+
+    'address1' => 'Address line 1',
+    'address2' => 'Address line 2',
+
+    'deposit_title' => "Deposit :currency",
+    'deposit_crypto_info' => "To make a payment, send :amount :currency to the specified wallet address",
+    'address_copied' => "Wallet address copied",
+
+    'header' => 'Wallet',
+    'total-balance' => 'Total balance',
+    'withdraw' => 'Payout',
+    'buy' => 'Buy crypto',
+    'your_assets' => 'Your assets',
+    'history' => 'Transaction history',
+    'depositAmount' => 'Deposit amount:',
+    'payoutAmount' => 'Payout amount:',
+
+    'currency_rub' => 'Russian Ruble',
+    'currency_uah' => 'Ukrainian hryvnia',
+    'currency_eur' => 'Euro',
+    'currency_usd' => 'US dollar',
+    'currency_inr' => 'Indian Rupee',
+    'currency_mbtc' => 'mBTC',
+    'currency_usdt' => 'Tether',
+    'currency_kzt' => 'Kazakh Tenge',
+
+    'from' => 'From',
+    'your_get' => 'Get',
+    'your_give' => 'Give',
+    'crypto_address' => 'Wallet address',
+    'add_new_wallet' => 'Add new wallet',
+    'autosave_address' => 'Save this wallet',
+    'crypto_pay_warning' => 'The specified wallet number accepts transfers on the :sub_name network. If you use another network, you may lose your money.',
+
+
+
+
+];

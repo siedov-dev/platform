@@ -1,0 +1,47 @@
+.img-drop-down{
+    position: relative;
+    display: flex;
+    flex-flow: row;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    cursor: pointer;
+    overflow: visible;
+    align-items: center;
+}
+.img-drop-down__value,.img-drop-down__current-value{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    color: #0e0e0e;
+    font-size: 0.625rem;
+    font-weight: 500;
+}
+.img-drop-down__value{
+    padding: 0.3rem 1rem;
+}
+.img-drop-down__value:hover{
+    background-color: #4a556830;
+}
+.img-drop-down__values{
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: #FFFFFF;
+    z-index: 4;
+}
+.img-drop-down.shown .img-drop-down__values{
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+}
+
+
+.img-drop-down .currency-icon{
+    margin-right: .5rem;
+}
+.img-drop-down .arrow-down{
+    position: absolute;
+    top: calc(50% - .5rem);
+    right: .5rem;
+}

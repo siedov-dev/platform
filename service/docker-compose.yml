@@ -1,0 +1,174 @@
+services:
+    # NATS service
+    knats:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./nats
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "4222:4222"
+        volumes:
+            - ./nats/storage:/app/storage
+        container_name: knats
+        restart: "always"
+
+    kusers:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./user_manager
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "23100:23100"
+        volumes:
+            - ./user_manager/logs:/app/logs
+        container_name: kusers
+        restart: "always"
+        depends_on:
+            knats:
+                condition: service_started
+
+    ktournaments:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./k_tournaments
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "23101:23101"
+        volumes:
+            - ./k_tournaments/logs:/app/logs
+        container_name: ktournaments
+        restart: "always"
+        depends_on:
+            knats:
+                condition: service_started
+
+    kgames:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./games_manager
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "8095:8095"
+        container_name: kgames
+        restart: "always"
+
+    kipinfo:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./kipinfo
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "23105:23105"
+        container_name: kipinfo
+        restart: "always"
+
+    kreferrals:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./kreferrals
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        container_name: kreferrals
+        volumes:
+            - ./kreferrals/logs:/app/logs
+        restart: "always"
+        depends_on:
+            knats:
+                condition: service_started
+            kusers:
+                condition: service_started
+
+    kbonus:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./kbonus
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "23102:23102"
+        container_name: kbonus
+        volumes:
+            - ./kbonus/logs:/app/logs
+        restart: "always"
+        depends_on:
+            knats:
+                condition: service_started
+            kusers:
+                condition: service_started
+
+    kcms:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./kcms
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "23098:23098"
+        container_name: kcms
+        volumes:
+            - ./kcms/logs:/app/logs
+        restart: "always"
+
+    ksocket:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./ksocket
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "8082:8082"
+        container_name: ksocket
+        restart: "always"
+
+    kslc:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./kslc
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "23104:23104"
+        container_name: kslc
+        volumes:
+            - ./kslc/logs:/app/logs
+        restart: "always"
+
+    kpay:
+        environment:
+            - TZ=Europe/Kyiv
+        build:
+            context: ./kpay
+            dockerfile: Dockerfile
+            network: host
+        network_mode: "host"
+        ports:
+            - "23106:23106"
+        container_name: kpay
+        volumes:
+            - ./kpay/logs:/app/logs
+        restart: "always"

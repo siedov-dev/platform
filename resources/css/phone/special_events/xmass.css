@@ -1,0 +1,71 @@
+body.xmass-event::before{
+    content: "";
+    background-image: url("/img/special_events/xmass/snowflakes-t.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 1;
+    top: 55px;
+    right: 10px;
+    position: fixed;
+    z-index: 400;
+    width:  280px;
+    height: 120px;
+    pointer-events: none;
+}
+body.light.xmass-event::before {
+    filter: contrast(.1);
+}
+body.xmass-event #games-search-form::before{
+    content: "";
+    background-image: url("/img/special_events/xmass/snowflakes.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 1;
+    top: 370px;
+    right: 30px;
+    position: absolute;
+    z-index: 0;
+    width:  70%;
+    height: 240px;
+    pointer-events: none;
+}
+body.light.xmass-event #games-search-form::before {
+    filter: contrast(.1);
+}
+
+body.xmass-event .logo__image{
+    background-image: url("/img/special_events/xmass/logo.svg");
+}
+body.light.xmass-event .logo__image{
+    background-image: url("/img/special_events/xmass/logo-dark.svg");
+}
+body.xmass-event #menu-button{
+    background-image: url("/img/special_events/xmass/Ball_on_the_tree.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-color: transparent;
+    width: 50px;
+    height: 50px;
+}
+body.xmass-event #menu-button .menu-button__line{
+    display: none;
+}
+body.xmass-event .bottom-menu__green-button {
+    background-color: transparent;
+    box-shadow: none;
+}
+body.xmass-event .bottom-menu__close-button{
+    background-image: url("/img/special_events/xmass/Ball_on_the_tree.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-color: transparent;
+    color: transparent;
+}
+body.xmass-event #games-search-form .gradient-background{
+    z-index: 20;
+}
+body.xmass-event #games-search-form .custom-select{
+    z-index: 20;
+}

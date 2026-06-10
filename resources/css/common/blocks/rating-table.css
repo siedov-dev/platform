@@ -1,0 +1,101 @@
+.rating-table {
+    width: 100%;
+    border-spacing: 0 0.5rem;
+}
+
+.rating-table td:first-child {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #8283C0;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.rating-table td:first-child::before {
+    content: attr(data-index);
+}
+
+.rating-table thead th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    color: #8283C0;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+
+.rating-table tbody td {
+    background-color: #272660;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+body.light .rating-table tbody td {
+    background-color: #ffffff;
+    color: #272660;
+}
+body.light .rating-table tbody tr:first-child td {
+    color: #ffffff;
+}
+.rating-table tbody td:first-child {
+    /*border-radius: 0.5rem 0 0 0.5rem;*/
+}
+.rating-table tbody td:last-child {
+    /*border-radius: 0 0.5rem 0.5rem 0;*/
+}
+.rating-table tbody td .currency-icon {
+    margin-right: 0.5rem;
+}
+.rating-table tbody tr {
+    background-color: #272660;
+    border: 1px solid #3C3C71;
+}
+body.light .rating-table tbody tr {
+    background-color: #fff;
+    border: none;
+}
+.rating-table tbody tr:first-child {
+    border: none;
+}
+.rating-table tbody tr:first-child td {
+    background-color: transparent;
+}
+.rating-table tbody tr[data-index="1"] td:first-child::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    background-image: url(/img/tournaments/leader-cup-icon.svg);
+    background-repeat: no-repeat;
+    background-position: 0.5rem center;
+}
+.rating-table tbody tr[data-index="2"] td:first-child::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    background-image: url(/img/tournaments/leader-cup-icon.svg);
+    background-repeat: no-repeat;
+    background-position: 0.5rem center;
+    filter: hue-rotate(-146deg);
+    opacity: 0.5;
+}
+
+.rating-table tbody tr[data-index="3"] td:first-child::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    background-image: url(/img/tournaments/leader-cup-icon.svg);
+    background-repeat: no-repeat;
+    background-position: 0.5rem center;
+    filter: hue-rotate(326deg) brightness(0.5);
+}
+body.light .rating-table tbody tr[data-index="3"] td:first-child::before {
+    filter: hue-rotate(326deg) brightness(0.95);
+}
+.table__text_white {
+    font-size: 0.75rem;
+}

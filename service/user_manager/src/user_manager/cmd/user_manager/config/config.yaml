@@ -1,0 +1,25 @@
+env: "local" # environment - local, dev or prod
+http_server: # http-server config
+  address: "localhost:23100"
+  timeout: 4s
+  idle_timeout: 30s
+db: #database config
+  connection_string: "admin:128821@tcp(127.0.0.1:3306)/slotmashine?parseTime=true&interpolateParams=true&loc=Europe%2FKyiv"
+  max_open_conns: 20
+  max_iddle_conns: 5
+slotegrator:
+  merchant_id: "f409d3517e094d60cac45462a9b347f0"
+  key: "702411089f962240d408b5d041baf806cc4747a3"
+pragplay:
+  login: "krkn_krakencasino"
+  key: "p2uS8DP2d8y4s7ZA"
+qt:
+  key: "BV4h48aMLRLLH96S"
+kraken:
+  key: "Go+KrakeN--256"
+nats:
+  url: "nats://127.0.0.1:4222"
+  token: "KrNts48Reo:451--dSc"
+kbonus:
+  api_url: "http://localhost:23102"
+  token: "G+KrkNip-12-dTgs"

@@ -1,0 +1,71 @@
+body.halloween-event::before{
+    content: "";
+    background-image: url("/img/special_events/halloween/halloween-m-rt.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 1;
+    top: 60px;
+    right: 0;
+    position: fixed;
+    z-index: 400;
+    width:  135px;
+    height: 135px;
+    pointer-events: none;
+}
+body.light.halloween-event::before {
+    background-image: url("/img/special_events/halloween/halloween-m-rt-light.svg");
+}
+body.halloween-event #games-search-form::before{
+    content: "";
+    background-image: url("/img/special_events/halloween/halloween-m-rb.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 1;
+    top: 250px;
+    right: 0;
+    position: absolute;
+    z-index: 0;
+    width:  70%;
+    height: 240px;
+    pointer-events: none;
+}
+body.light.halloween-event::after {
+    background-image: url("/img/special_events/halloween/halloween-m-rb-light.svg");
+}
+
+body.halloween-event .logo__image{
+    background-image: url("/img/special_events/halloween/logo.svg");
+}
+body.light.halloween-event .logo__image{
+    background-image: url("/img/special_events/halloween/logo-dark.svg");
+}
+body.halloween-event #menu-button{
+    background-image: url("/img/special_events/halloween/eye.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-color: transparent;
+    width: 50px;
+    height: 50px;
+}
+body.halloween-event #menu-button .menu-button__line{
+    display: none;
+}
+body.halloween-event .bottom-menu__green-button {
+    background-color: transparent;
+    box-shadow: none;
+}
+body.halloween-event .bottom-menu__close-button{
+    background-image: url("/img/special_events/halloween/eye.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-color: transparent;
+    color: transparent;
+}
+body.halloween-event #games-search-form .gradient-background{
+    z-index: 20;
+}
+body.halloween-event #games-search-form .custom-select{
+    z-index: 20;
+}

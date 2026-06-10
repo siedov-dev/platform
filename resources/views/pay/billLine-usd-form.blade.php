@@ -1,0 +1,21 @@
+<form id="bl_form" name="bl_form" method="POST" action="{{$url}}/payment/form">
+    <input type="hidden" name="merchant" value="{{$merchant}}" />
+    <input type="hidden" name="item_name" value="Пополнение" />
+    <input type="hidden" name="order" value="{{$order}}" />
+    <input type="hidden" name="amount" value="{{$amount}}" />
+    <input type="hidden" name="email" value="{{$email??''}}" />
+    <input type="hidden" name="from_first_name" value="{{$from_first_name??''}}" />
+    <input type="hidden" name="from_last_name" value="{{$from_last_name??''}}" />
+    <input type="hidden" name="billing_street" value="{{$billing_street??''}}" />
+    <input type="hidden" name="billing_town" value="{{$billing_town??''}}" />
+    <input type="hidden" name="from_country" value="{{$from_country??''}}" />
+    <input type="hidden" name="billing_post_code" value="{{$billing_post_code??''}}" />
+    <input type="hidden" name="currency" value="{{$currency}}" />
+    <input type="hidden" name="user_id" value="{{\Illuminate\Support\Facades\Auth::id()}}" />
+    <input type="hidden" name="ip" value="{{request()->ip()}}" />
+    <input type="hidden" name="custom" value="{{$custom??''}}" />
+    <input type="hidden" name="payment_url" value="{{action('IndexController@index')}}" />
+    <input type="hidden" name="success_url" value="{{action('PayController@success')}}" />
+    <input type="hidden" name="fail_url" value="{{action('PayController@fail')}}" />
+    <input type="hidden" name="lang" value="{{\Illuminate\Support\Facades\App::getLocale()}}" />
+</form>

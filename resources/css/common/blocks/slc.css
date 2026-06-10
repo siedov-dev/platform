@@ -1,0 +1,783 @@
+.slc__item-icon{
+    /*width: 100%;*/
+    /*height: 100%;*/
+    position: relative;
+    min-height: 5rem;
+    min-width: 5rem;
+    z-index: 2;
+}
+.slc__item-icon .icon-background{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.slc__item-icon .info{
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.slc__item-icon .info h3{
+    color: #FFF;
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 2rem;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-shadow: -2.182px 2.182px 2.182px rgba(0, 0, 0, 0.08);
+}
+.slc__item-icon .info p{
+    color: #FFF;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
+    text-shadow: -2.182px 2.182px 2.182px rgba(0, 0, 0, 0.08);
+}
+
+
+.chest__dialog{
+    position: relative;
+    width: clamp(20rem, 100vw, 45rem);
+    height: clamp(300px, 80dvh, 50rem);
+    background-color: var(--color-overlay-background);
+    border-radius: 1rem;
+    padding: 1rem;
+}
+.chest__dialog .chest-animation{
+    position: absolute;
+    width: 100%;
+    height: 90%;
+    bottom: 0;
+}
+.chest__dialog .chest__items{
+    /*margin-top: 5rem;*/
+    position: absolute;
+    z-index: 5;
+    width: 90%;
+    height: 60%;
+    transform: scale(1) translateY(0);
+    transition: all 1s;
+    overflow-y: auto;
+}
+.chest__dialog .chest__items.invisible{
+    transform: scale(.3) translateY(60dvh);
+}
+.shine-item{
+    padding: 1.5rem;
+    position: relative;
+}
+.shine-item .shine-img{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    animation: shine-round;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    z-index: 1;
+}
+@keyframes shine-round {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(180deg) scale(.8);
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+.scale-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+.scale-wrapper.scale-01 > *{
+    transform: scale(0.1);
+}
+.scale-wrapper.scale-02 > *{
+    transform: scale(0.2);
+}
+.scale-wrapper.scale-03 > *{
+    transform: scale(0.3);
+}
+.scale-wrapper.scale-04 > *{
+    transform: scale(0.4);
+}
+.scale-wrapper.scale-05 > *{
+    transform: scale(0.5);
+}
+.scale-wrapper.scale-06 > *{
+    transform: scale(0.6);
+}
+.scale-wrapper.scale-07 > *{
+    transform: scale(0.7);
+}
+.scale-wrapper.scale-08 > *{
+    transform: scale(0.8);
+}
+.scale-wrapper.scale-09 > *{
+    transform: scale(0.9);
+}
+
+
+.lost-treasures .chest-card{
+    position: relative;
+    padding: 2rem 1rem;
+    height: 404px;
+    width: clamp(20rem, 100dvw, 394px);
+    margin: 1rem;
+    display: flex;
+    flex-flow: column;
+    color: #FFF;
+}
+.lost-treasures .chest-card{
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.lost-treasures .chest-card.key_little{
+    background-image: url("/img/chests/little_bg.png");
+}
+.lost-treasures .chest-card.key_middle{
+    background-image: url("/img/chests/middle_bg.png");
+}
+.lost-treasures .chest-card.key_big{
+    background-image: url("/img/chests/big_bg.png");
+}
+.lost-treasures .chest-card.key_black{
+    background-image: url("/img/chests/black_bg.png");
+}
+.lost-treasures .chest-card.key_bermuda{
+    background-image: url("/img/chests/bermuda_bg.png");
+}
+.lost-treasures .chest-card.key_lost{
+    background-image: url("/img/chests/lost_bg.png");
+}
+
+.lost-treasures .key-price div:first-child{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 0.875rem;
+    letter-spacing: 0;
+    text-align: left;
+    color: #8C90CA;
+}
+.lost-treasures .key-price div:last-child{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25rem;
+    letter-spacing: 0;
+    text-align: left;
+    color: #FFFFFF;
+}
+.lost-treasures .short-info{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+    letter-spacing: 0;
+    text-align: left;
+    color: #8C90CA;
+}
+.lost-treasures .chest-img{
+    flex-shrink: 0;
+}
+.lost-treasures .chest-card .items{
+    width: calc(100% - 120px);
+    height: 80px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 40px);
+    direction: rtl;
+}
+.lost-treasures .chest-card .items .slc__item-icon{
+    transform: scale(.6);
+    margin-left: -40px;
+}
+.lost-treasures .bottom-info{
+    margin-top: auto;
+    margin-bottom: 1rem;
+}
+.lost-treasures .bottom-info p{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: .75rem;
+    font-weight: 400;
+    line-height: .875rem;
+    letter-spacing: 0;
+    text-align: left;
+    color: #8C90CA;
+}
+.lost-treasures .bottom-info .timer{
+    margin-top: 1rem;
+}
+.lost-treasures .timer span{
+    margin: 0 2px;
+    background: #2B2F5B;
+    border-radius: 5px;
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0;
+    text-align: center;
+    padding: 3px;
+    width: 2.5rem;
+}
+.lost-treasures .button{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    letter-spacing: 0;
+    text-align: left;
+    color: #FFFFFF;
+}
+.lost-treasures .keys-amount{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: .675rem;
+    font-weight: 500;
+    line-height: 0.75rem;
+    letter-spacing: 0;
+    text-align: left;
+    color: #8C90CA;
+}
+.lost-treasures .keys-amount img{
+    width: .75rem;
+    height: .75rem;
+}
+.lost-treasures .keys-amount span{
+    padding: 0 5px;
+}
+.lost-treasures .key-price img{
+    width: 20px;
+    height: 20px;
+}
+.lost-treasures .tabs{
+    width: clamp(20rem, 100%, 25rem);
+}
+.lost-treasures .tabContent > div{
+    justify-content: space-around;
+}
+
+.chest__dialog .open-next{
+    position: absolute;
+    bottom: 10%;
+    left: 0;
+    right: 0;
+    color: #FFFFFF;
+}
+
+.lost-treasures .chest-card .chest-info{
+    display: none;
+    background: #181a30f0;
+    border-radius: 1rem;
+    position: absolute;
+}
+.lost-treasures .chest-card.info-shown .chest-info{
+    height: 80%;
+    overflow-y: auto;
+    top: 3rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-flow: column;
+    z-index: 20;
+    padding-right: 2rem;
+}
+.lost-treasures .chest-info .chance-items{
+    width: 100%;
+    justify-items: left;
+    align-items: center;
+    display: grid;
+    grid-template-columns: 3.5rem 3fr 1fr 2rem;
+    grid-auto-rows: 3rem;
+    font-weight: 500;
+    font-size: .75rem;
+    grid-gap: 0 .3rem;
+}
+
+.lost-treasures .chest-card .chest-info .slc__item-icon{
+    transform: scale(.6);
+}
+
+.lost-treasures .chest-card .chest-info-btn{
+    position: absolute;
+    right: .5rem;
+    z-index: 30;
+    transition: transform .5s;
+}
+
+.lost-treasures .chest-card.info-shown .chest-info-btn{
+    transform: rotate(180deg);
+}
+.lost-treasures .key-img img{
+    max-width: 20px;
+    max-height: 20px;
+}
+
+@media (max-width: 800px) {
+    .lost-treasures{
+        background-image: url("/img/chests/treasures-bg.png");
+        background-repeat: repeat;
+    }
+}
+
+@media (max-width: 1060px) {
+    .lost-treasures .tabContent > div{
+        flex-wrap: wrap;
+    }
+}
+
+.shop__item .estimated div{
+    font-size: .75rem;
+    font-weight: 400;
+    line-height: 1rem;
+    text-align: left;
+}
+.shop__item .estimated div:first-child{
+    color: #7A82B4;
+}
+.shop__item .estimated div:last-child{
+    font-weight: 600;
+}
+.shards-count{
+    position: absolute;
+    color: #7A82B4;
+    right: .5rem;
+    bottom: .5rem;
+    font-weight: 500;
+    font-size: .75rem;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background-color: #7A82B430;
+}
+
+p.next-task-in{
+    color: #7A82B4;
+    font-weight: 500;
+    font-size: .75rem;
+}
+.page-info-icon::after {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "serif";
+    content: "i";
+    font-size: 1rem;
+    line-height: 1rem;
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 50%;
+    border: #7A82B4 1px solid;
+    color: #7A82B4;
+}
+.popup__body .popup__content{
+    border-radius: 1rem;
+}
+
+.popup .achievements__popup .popup__content{
+    min-height: 500px;
+}
+
+.page-info{
+    max-width: 30rem;
+    /*margin-top: 4rem;*/
+    color: var(--primaryText);
+}
+.page-info.no-padding{
+    padding: 0;
+}
+.page-info p{
+    margin: 1rem 0;
+    color: var(--secondaryText);
+}
+.my-tasks__block-task .button-shade{
+    background: linear-gradient(90deg, rgba(0,0,0, 0) 0%, #1C1F3EE0 5%, #1C1F3EE0 100%);
+}
+.achievements__popup-block-image{
+    overflow: visible;
+}
+
+.task-gradient-wrapper-0{
+    margin: 8px 0;
+    padding: 1px;
+    border-bottom: 2px solid;
+    border-image: linear-gradient(to right, rgba(0, 0, 0, 0) 30%, #fff, rgba(0, 0, 0, 0) 70%) 1;
+}
+
+.task-gradient-wrapper-2{
+    margin: 8px 0;
+    padding: 1px;
+    border-top: 2px solid;
+    border-image: linear-gradient(to right, rgba(0, 0, 0, 0) 30%, #fff, rgba(0, 0, 0, 0) 70%) 1;
+}
+
+.task-gradient-wrapper-1{
+    margin: 8px 0;
+    padding: 2px;
+    border-radius: 8px;
+    background:
+        linear-gradient(
+            to right,
+            #FFFFFF,
+            rgba(0, 0, 0, 0) 40%
+        ) border-box;
+}
+
+.task-gradient-wrapper-3{
+    margin: 8px 0;
+    padding: 2px;
+    border-radius: 8px;
+    background:
+        linear-gradient(
+            to left,
+            #FFFFFF,
+            rgba(0, 0, 0, 0) 40%
+        ) border-box;
+}
+
+.modal-block{
+    background: #181A32;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.content .pad{
+    background-color: var(--bgMainColor);
+    border-radius: 1rem;
+    padding: 1rem;
+}
+.content .pad .text-white{
+    color: var(--primaryText);
+}
+
+.popup__content.achievement-popup{
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.slc__achievement-items{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    grid-gap: 2rem;
+}
+
+.slc__achievement-item{
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.slc__achievement-item .achievement-name{
+    font-weight: 500;
+    color: #FFF;
+    font-size: .75rem;
+    text-align: center;
+}
+body.light .slc__achievement-item .achievement-name{
+    color: #0B0D31;
+}
+
+.slc__achievement-item.not-completed .achievement-name{
+    color: #FFFFFF90;
+}
+.slc__achievement-item img{
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+}
+
+.slc__popup-icon{
+    max-width: 150px;
+    max-height: 150px;
+    margin: 0 auto;
+}
+.slc__achievement-name{
+    font-size: 2rem;
+    color: #FFF;
+    text-align: center;
+    font-weight: 600;
+    width: 100%;
+}
+
+.slc__achievement-item .label {
+    border-radius: 99px;
+    background: linear-gradient(180deg, #E350F0 2.03%, #787BF7 100%);
+    font-size: 8px;
+    line-height: 8px;
+    padding: 2.5px 4px 1.5px;
+    position: absolute;
+    pointer-events: none;
+    right: 0.5px;
+    transform: translateY(-50%);
+    text-transform: uppercase;
+    top: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    z-index: 1;
+    color: #FFF;
+}
+
+.achievement-popup .shine-item{
+    height: 160px;
+    width: 100%;
+}
+.achievement-popup .shine-item .slc__popup-icon{
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+
+.achievement-popup .shine-img{
+    top: -50px;
+    left: calc(50% - 120px);
+    width: 240px;
+}
+
+.achievement-popup .achievements__popup-above-progress-bar{
+    width: 100%;
+    padding-right: 0;
+}
+
+.achievement-popup .achievement_rewards{
+    width: 100%;
+    font-size: .75rem;
+}
+
+.slc-shop .tabs{
+    margin-bottom: 0;
+    min-width: 280px;
+}
+
+.slc__exchange-items{
+    --textColor: #FFFFFF;
+    --bgMainColor: #1C1F3E;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    align-content: space-between;
+    grid-gap: 1rem;
+    padding: 0 1rem;
+}
+
+body.light .slc__exchange-items{
+    --textColor: #000000;
+    --bgMainColor: #F3F3FB;
+}
+
+.page-ad-text{
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 2rem;
+}
+@media screen and (max-width: 1000px) {
+    .page-ad-text{
+        font-size: .8rem;
+        font-weight: 500;
+        line-height: 1.5rem;
+    }
+}
+
+.exchange-ad-text{
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 2rem;
+    margin-top: -1rem;
+    margin-left: 30px;
+    margin-bottom: .5rem;
+}
+
+.exchange-ad-banner{
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    padding: 1rem 4rem 1rem 1rem;
+    background-position: center;
+    background-image: var(--img);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    max-width: 320px;
+    color: #FFFFFF;
+}
+.exchange-ad-banner p:first-child{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+}
+.exchange-ad-banner p:nth-child(2){
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+}
+.exchange-ad-banner p:last-child{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    white-space: break-spaces;
+}
+
+.exchange-item{
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    padding: 1rem;
+    max-width: 320px;
+    background-color: var(--bgMainColor);
+    border-radius: 1rem;
+    box-shadow: 0 0 3px #000000;
+}
+.exchange-item .icon-wrapper{
+    width: 72px;
+    height: 72px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    background-color: #2B2F5B;
+    border: 2px solid rgba(255, 255, 255, 0.20);
+    border-radius: 1rem;
+}
+
+.exchange-item .icon-wrapper img{
+    object-fit: contain;
+}
+
+.exchange-item .title{
+    font-size: .75rem;
+    font-weight: 400;
+    line-height: 1.1rem;
+    color: var(--textColor);
+}
+
+.exchange-item .amount{
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.8rem;
+}
+.exchange-item .page__head-wrap-price{
+    display: flex;
+    align-items: center;
+}
+.exchange-item .page__head-wrap-price p{
+    color: var(--textColor);
+}
+
+.exchange-item .amount span{
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: .875rem;
+    padding: 4px;
+    color: #A7DA94;
+    background: #A7DA9426;
+    border-radius: 10px;
+}
+.exchange-item .amount span.prc-2{
+    color: #309BE0;
+    background: #309BE026;
+}
+.exchange-item .amount span.prc-3{
+    color: #BE4CEE;
+    background: #BE4CEE26;
+}
+.exchange-item .amount span.prc-4{
+    color: #F1C40F;
+    background: #F1C40F26;
+}
+.exchange-item .amount span.prc-5{
+    color: #D35400;
+    background: #D3540026;
+}
+.exchange-item .amount span.prc-6{
+    color: #F11400;
+    background: #F1140026;
+}
+
+@media screen and (max-width: 600px) {
+    .slc__exchange-items{
+        grid-gap: .5rem 0;
+        padding: 0;
+    }
+    .exchange-ad-banner{
+        width: 100%;
+        aspect-ratio: 2.3;
+        max-width: 100%;
+        padding: 1rem 7rem 1rem 1rem;
+    }
+    .exchange-item{
+        width: 100%;
+        max-width: 100%;
+    }
+    .exchange-item .icon-wrapper {
+        width: 44px;
+        height: 44px;
+        padding: 4px;
+        border-radius: 10px;
+    }
+    .exchange-item .title{
+        font-size: .65rem;
+        font-weight: 400;
+        line-height: 1.1rem;
+        color: var(--textColor);
+    }
+    .exchange-item .amount{
+        font-size: .875rem;
+        font-weight: 700;
+        line-height: 1.2rem;
+    }
+    .exchange-ad-text{
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: 1.2rem;
+        margin: .5rem 0;
+    }
+}
+@media screen and (max-width: 335px) {
+    .page__title{
+        font-size: 1rem;
+    }
+    .exchange-ad-banner p:first-child{
+        font-size: 10px;
+        font-weight: 400;
+        line-height: 18px;
+    }
+    .exchange-ad-banner p:nth-child(2){
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 24px;
+    }
+    .exchange-ad-banner p:last-child{
+        font-size: 10px;
+        font-weight: 400;
+        line-height: 18px;
+        white-space: break-spaces;
+    }
+    .exchange-ad-text{
+        font-size: .875rem;
+        line-height: 1rem;
+    }
+}

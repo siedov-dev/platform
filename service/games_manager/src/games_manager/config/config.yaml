@@ -1,0 +1,9 @@
+env: "local" # environment - local, dev or prod
+main_langs: [ru,ua,en,hi,kz,test] # main languages
+all_langs: [ru,ua,en,hi,kz,de,fr,it,pt,es,sk,uz] # all languages
+http_server: # http-server config
+  address: "localhost:8095"
+  timeout: 4s
+  idle_timeout: 30s
+db: #database config
+  connection_string: "admin:128821@tcp(127.0.0.1:3306)/slotmashine"

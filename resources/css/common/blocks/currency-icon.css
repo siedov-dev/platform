@@ -1,0 +1,173 @@
+.currency-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 100%;
+    position: relative;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+}
+
+.currency-icon::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 100%;
+    left: 0.2rem;
+    top: 0.2rem;
+}
+
+
+.currency-icon_uah {
+    background-color: #FCC339;
+}
+.currency-icon_uah::before {
+    background-color: #FFC660;
+    background-image: linear-gradient(to bottom, #d39c17, transparent);
+}
+
+.currency-icon_rub {
+    background-color: #EF8E8B;
+}
+.currency-icon_rub::before {
+    background-color: #e68683;
+    background-image: linear-gradient(to bottom, #dd706d, transparent);
+}
+
+.currency-icon_usd {
+    background-color: #A2DC8D;
+}
+.currency-icon_usd::before {
+    background-color: #9cd587;
+    background-image: linear-gradient(to bottom, #83c66a, transparent);
+}
+
+.currency-icon_eur {
+    background-color: #787BF7;
+}
+.currency-icon_eur::before {
+    background-color: #6f72f0;
+    background-image: linear-gradient(to bottom, #5c5fd1, transparent);
+}
+
+.currency-icon_inr {
+    background-color: #b000db;
+}
+.currency-icon_inr::before {
+    background-color: #c200f2;
+    background-image: linear-gradient(to bottom, #8000a0, transparent);
+}
+
+.currency-icon_btc {
+    background-color: #FD9C0D;
+}
+.currency-icon_btc::before {
+    background-color: #FD9C0D;
+    background-image: linear-gradient(to bottom, #b16d09, transparent);
+}
+.currency-icon_mbtc {
+    background-color: #FD9C0D;
+}
+.currency-icon_mbtc::before {
+    background-color: #FD9C0D;
+    background-image: linear-gradient(to bottom, #b16d09, transparent);
+}
+
+.currency-icon_usdt {
+    background-color: #81b070;
+}
+.currency-icon_usdt::before {
+    background-color: #749e64;
+    background-image: linear-gradient(to bottom, #5a7b4e, transparent);
+}
+
+.currency-icon_kzt {
+    background-color: #00a8c9;
+}
+.currency-icon_kzt::before {
+    background-color: #0097b4;
+    background-image: linear-gradient(to bottom, #007890, transparent);
+}
+
+.currency-icon_uzs {
+    background-color: #5ccbec;
+}
+.currency-icon_uzs::before {
+    background-color: #107fa0;
+    background-image: linear-gradient(to bottom, #17b6e5, transparent);
+}
+
+.currency-color_uah {
+    color: #FCC339;
+}
+.currency-color_rub {
+    color: #EF8E8B;
+}
+.currency-color_usd {
+    color: #A2DC8D;
+}
+.currency-color_eur {
+    color: #787BF7;
+}
+.currency-color_inr {
+    color: #b000db;
+}
+.currency-color_btc {
+    color: #FD9C0D;
+}
+.currency-color_mbtc {
+    color: #FD9C0D;
+}
+.currency-color_usdt {
+    color: #81b070;
+}
+.currency-color_kzt {
+    color: #00a8c9;
+}
+.currency-color_uzs {
+    color: #5ccbec;
+}
+
+.currency-icon:after {
+    z-index: 0;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    font-family: 'Gotham Pro', sans-serif;
+    line-height: 1rem;
+}
+
+.currency-icon_uah:after {
+    content: '₴';
+}
+.currency-icon_rub:after {
+    content: '₽';
+}
+.currency-icon_usd:after {
+    content: '$';
+}
+.currency-icon_eur:after {
+    content: '€';
+}
+.currency-icon_inr:after {
+    content: '₹';
+}
+.currency-icon_btc:after {
+    content: '₿';
+}
+.currency-icon_mbtc:after {
+    content: '₿';
+}
+.currency-icon_usdt:after {
+    content: '₮';
+}
+.currency-icon_kzt:after {
+    content: '₸';
+}
+.currency-icon_uzs:after {
+    content: 'S';
+}

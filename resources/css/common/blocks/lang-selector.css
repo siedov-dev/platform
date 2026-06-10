@@ -1,0 +1,95 @@
+.lang-selector {
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    position: relative;
+    padding: 0 1rem 0 0.5rem;
+    border-radius: 0.5rem;
+    background-color: transparent;
+    transition: 250ms;
+    cursor: pointer;
+}
+#layout-wrap.collapsed .lang-selector {
+    justify-content: center;
+    padding: 0 0.5rem 0 0.5rem;
+}
+.lang-selector.expanded,
+.lang-selector:hover {
+    background-color: #1e1d4b;
+}
+body.light .lang-selector.expanded,
+body.light .lang-selector:hover {
+    background-color: #d5d5e8;
+}
+.lang-selector__flag {
+    width: 1.5rem;
+    /*border-radius: 1.5rem;*/
+}
+.lang-selector__dropdown {
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transform: scale(0);
+    position: absolute;
+    bottom: 3rem;
+    left: 0;
+    width: 10rem;
+    border-radius: 0.5rem;
+    background-color: #28285f;
+    z-index: 10;
+}
+body.light .lang-selector__dropdown {
+    background-color: #ffffff;
+    box-shadow: 0 0 1rem #00000030;
+}
+#layout-wrap.collapsed .lang-selector__dropdown {
+    width: 10rem;
+}
+.lang-selector__dropdown::before {
+    content: '';
+    display: block;
+    width: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #28285f;
+    position: absolute;
+    bottom: -10px;
+    left: calc(50% - 5px);
+}
+body.light .lang-selector__dropdown::before {
+    border-top: 10px solid #fff;
+}
+#layout-wrap.collapsed .lang-selector__dropdown::before {
+    left: 0.6rem;
+}
+.lang-selector__value {
+    margin-left: 0.5rem;
+    color: #8283C0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-right: auto;
+}
+#layout-wrap.collapsed .lang-selector__value,
+#layout-wrap.collapsed .arrow-down {
+    display: none;
+}
+.lang-selector__option {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.75rem;
+    color: #8283C0;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+}
+.lang-selector__option:hover {
+    background-color: #2e2e6d;
+}
+body.light .lang-selector__option:hover {
+    background-color: #eee;
+}
+.lang-selector__option:first-child {
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+.lang-selector__option:last-child {
+    border-radius: 0 0 0.5rem 0.5rem;
+}

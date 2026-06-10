@@ -1,0 +1,81 @@
+.games-search-form {
+    margin-top: 2rem;
+    display: flex;
+}
+
+.games-search-form__name {
+    margin-right: 1.5rem;
+    flex-grow: 1;
+}
+
+.games-search-form__name .input__field {
+    border-color: #2C2B63;
+    padding: 0 .5rem 0 2rem;
+}
+
+.games-search-form__name .input__field:focus {
+    border: 1px solid #3c3b8c;
+}
+
+.games-search-form__provider {
+    margin-right: 1.5rem;
+    border-color: #2C2B63;
+    position: static;
+}
+
+.games-search-form__provider .custom-select__dropdown_wide{
+    left: 0;
+    top: 6rem;
+    width: 100%;
+}
+
+.arrow-position{
+    position: relative;
+}
+.arrow-position .arrow-down{
+    top: -.3rem;
+}
+
+.games-search-form__category {
+    border-color: #2C2B63;
+}
+
+.games-search-form__orders {
+    display: flex;
+    align-items: center;
+}
+
+.games-search-form__order {
+    display: flex;
+    align-items: center;
+    font-family: 'Gotham Pro', sans-serif;
+    font-size: 0.7rem;
+    color: #8283C0;
+    font-weight: 600;
+    padding: 0 0.25rem;
+    margin: 0 0.25rem;
+    height: 3rem;
+}
+
+.games-search-form__order_active {
+    color: #fff;
+    border-bottom: 1px solid #5B4CF1;
+}
+/*@media screen and (max-width: 1000px) {*/
+    /*.games-search-form {*/
+    /*    display: grid;*/
+    /*    grid-template-columns: 1fr 1fr;*/
+    /*    grid-gap: 1rem 0;*/
+    /*}*/
+    /*.games-search-form .games-search-form__name{*/
+    /*    grid-column: 1/3;*/
+    /*    margin-right: 0;*/
+    /*}*/
+/*}*/
+
+.game-search-form__games-type-header{
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

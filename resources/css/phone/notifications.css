@@ -1,0 +1,51 @@
+.notifications {
+
+}
+
+
+.notifications__icon-image {
+    width: 1rem;
+}
+body.light .notifications__icon-image {
+    filter: invert(0.6);
+}
+
+.notifications__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 3rem;
+    background-color: transparent;
+    transition: 250ms;
+    cursor: pointer;
+}
+.ntf__item-desc .gold-text{
+    text-decoration: none;
+    color: #bf9e00;
+    font-size: 0.675rem;
+    margin-top: 0.25rem;
+}
+
+.notifications__icon:hover {
+    background-color: #ffffff06;
+}
+.notifications__icon-status {
+    display: none;
+    width: 10px;
+    height: 10px;
+    background: #eb2d2d;
+    border-radius: 5px;
+    position: absolute;
+    top: 11px;
+    right: 12px;
+    box-shadow: 0 0 5px #00000080;
+}
+.notifications__icon.active .notifications__icon-status {
+    display: block;
+}
+.notifications__no-records {
+    display: flex;
+    padding: 1rem 8rem 2rem 8rem;
+}

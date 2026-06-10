@@ -1,0 +1,30 @@
+<?php
+return [
+    'slc-1' => 'Slotcoin (SLC)',
+     'slc-2' => " is the in-game currency of KrakenCasino which can be used in the store, buying various bonuses (including no deposit ones), exchange for money, buy chests, unique game suggestions, and other internal interactive items that will be implemented in the future to get even more pleasure from the game.",
+     'slc-3' => "How to get slotcoins?",
+     'slc-4' => "For daily login, for completing daily tasks, for receiving new achievements, in the wheel of fortune.",
+     'slc-5' => "For your activity, KrakenCasino gives you the opportunity to spend time with pleasure and get maximum emotions!",
+     
+     'cashback-plus1' => 'Quest-ce que le cashback+',
+'cashback-plus2' => "et comment ça marche ?",
+'cashback-plus3' => "-Le Cashback+ est un pourcentage supplémentaire à votre cashback actuel",
+'cashback-plus4' => "-Pour tirer avec le canon, vous devez cliquer sur l'un des boulets",
+'cashback-plus5' => "-Venez et tirez avec le canon chaque jour pour augmenter votre cashback jusqu'à 100%",
+'cashback-plus6' => "-100% est le pourcentage maximum de cashback+",
+'cashback-plus7' => "-Après avoir cassé un tonneau, vous recevrez un objet cashback+ de 10% à 100% et également un bonus sans dépôt avec une probabilité de 5%! Les objets apparaîtront dans votre inventaire, après quoi vous devrez les activer!",
+'cashback-plus8' => "-Probabilité de casser un tonneau",
+'cashback-plus9' => "* Boulet doré - 5% de chance de casser un tonneau en un seul coup",
+'cashback-plus10' => " - 100% de chance de faire une fissure dans le tonneau",
+'cashback-plus11' => " * Boulet noir - 20% de chance de faire une fissure dans le tonneau",
+'cashback-plus12' => "* Les boulets peuvent être obtenus dans les coffres, en accomplissant des quêtes, en les achetant dans la boutique et dans d'autres activités du Kraken Casino",
+'cashback-plus13' => "-Tant que vous avez des boulets, vous pouvez tirer sans restriction. Après avoir cassé un tonneau et récupéré votre récompense, vous recevrez un nouveau tonneau",
+'cashback-plus14' => "-Après avoir reçu un objet Cashback+, vous devez l'activer dans votre compte personnel pour augmenter votre cashback actuel!",
+'cashback-plus15' => "Comment fonctionne le cashback?",
+'cashback-plus16' => "-Le cashback est attribué uniquement aux joueurs qui ont misé de l'argent réel et qui n'ont pas encore eu de chance (les bonus ne sont pas pris en compte).",
+'cashback-plus17' => "-Le cashback est calculé sur les pertes de la semaine précédente (la semaine est comptée du lundi 00:01 au dimanche 23:59).",
+'cashback-plus18' => "-Pour récupérer le bonus (s'il vous a été attribué), vous devez aller dans la section des bonus et cliquer sur le bouton récupérer sur la tuile du bonus (CashBack).",
+'cashback-plus19' => "-Une notification de l'attribution du bonus est envoyée par e-mail ou par bot Telegram (pour recevoir la notification, vous devez être abonné à la newsletter).",
+'cashback-plus20' => "-Le bonus Cashback n'a pas de condition de mise, il peut être retiré immédiatement ou utilisé pour jouer à n'importe quel jeu.",
+
+];

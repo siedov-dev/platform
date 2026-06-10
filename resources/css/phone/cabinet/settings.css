@@ -1,0 +1,91 @@
+.cabinet__sett {
+    display: flex;
+    flex-direction: column;
+}
+
+.cabinet__sett-top {
+    display: grid;
+    grid-gap: 2rem;
+}
+
+.cabinet__sett-personal {
+    margin-top: 2rem;
+}
+
+.cabinet__sett-pass-fields {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.cabinet__sett-submit-btn {
+    height: 3rem;
+    border-radius: 0.625rem;
+    border: none;
+    background-color: #4E7CFF;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    outline: none;
+    cursor: pointer;
+}
+
+.cabinet__sett-personal-cols {
+    display: grid;
+    grid-gap: 2rem;
+}
+
+.cabinet__sett-personal-user {
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    grid-gap: 1rem;
+}
+
+.cabinet__sett-personal-passport {
+    display: grid;
+    grid-template-rows: auto auto auto;
+    grid-gap: 1rem;
+}
+
+.cabinet__sett-address {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
+}
+
+.input__file-hint {
+    color: #8283C0;
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    max-width: 12rem;
+}
+
+.input__file-hint-link {
+    color: #2281F6;
+    border-bottom: 1px solid #3e69fa63;
+}
+
+.cabinet__prtn-submit-btn {
+    margin-top: 2rem;
+    height: 2.5rem;
+    margin-right: auto;
+    padding: 0 2rem;
+    border-radius: 0.5rem;
+    background-color: transparent;
+    border: 2px solid #787BF7;
+    color: #fff;
+    font-size: 0.75rem;
+    cursor: pointer;
+    outline: none;
+}
+body.light .cabinet__prtn-submit-btn {
+    color: #1a1944;
+}
+.cabinet__verify-link {
+    margin-top: 0.5rem;
+    margin-right: auto;
+}

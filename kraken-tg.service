@@ -1,0 +1,11 @@
+[Unit]
+Description=kraken telegram bot service
+
+[Service]
+User=www-root
+WorkingDirectory=/var/www/www-root/data/www/krakencassino.com/
+ExecStart=/var/www/www-root/data/www/krakencassino.com/tg_update.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

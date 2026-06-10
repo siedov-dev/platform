@@ -1,0 +1,302 @@
+.bottom-menu {
+    display: flex;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 5rem;
+    /*background-image: url(/img/ui/phone-bottom.svg);*/
+    background-color: #1A1943;
+    z-index: 400;
+    background-size: 100% auto;
+    background-position: 0 bottom;
+    background-repeat: no-repeat;
+}
+body.no-panels .bottom-menu {
+    display: none;
+}
+body.light .bottom-menu {
+    /*background-image: url(/img/ui/phone-bottom_white.svg);*/
+    background-color: #FFFFFF;
+    border-top: #E9E9E9 1px solid;
+}
+.bottom-menu__green-button {
+    width: 3.125rem;
+    height: 3.125rem;
+    border-radius: 3rem;
+    background-color: var(--color-green);
+    position: absolute;
+    left: 50%;
+    margin-left: -1.51rem;
+    top: 0.8rem;
+    box-shadow: 0 0 1rem #a3dc8ea6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bottom-menu__green-button-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.7rem;
+    width: 1.5rem;
+    height: auto;
+}
+.bottom-menu__left {
+    display: grid;
+    width: calc(50% - 4rem);
+    grid-template-columns: 1fr 1fr;
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    grid-gap: 0.75rem;
+}
+.not-auth .bottom-menu__left{
+    grid-template-columns: 1fr;
+}
+
+.bottom-menu__right {
+    display: grid;
+    width: calc(50% - 4rem);
+    grid-template-columns: 1fr 1fr;
+    position: absolute;
+    left: calc(50% + 3rem);
+    top: 1rem;
+    grid-gap: 0.75rem;
+}
+.not-auth .bottom-menu__right{
+    grid-template-columns: 1fr;
+}
+
+.bottom-menu__link-icon {
+    margin-bottom: 0.5rem;
+    filter: saturate(0) brightness(1.5);
+    transition: 250ms;
+}
+#header .bottom-menu__link-icon {
+    margin-bottom: 0;
+    margin-right: 3px;
+    height: 1.2rem;
+    width: 1.2rem;
+}
+body.light .bottom-menu__link {
+    color: #0c0c30;
+}
+body.light .bottom-menu__link-icon {
+    filter: saturate(0) brightness(0.85) invert(1);
+}
+.bottom-menu__link {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.75rem;
+    position: relative;
+    cursor: pointer;
+}
+.bottom-menu .bottom-menu__left.sport{
+    display: none;
+}
+/*.bottom-menu.show-sport .bottom-menu__left.sport {*/
+/*    display: grid;*/
+/*}*/
+/*.bottom-menu.show-sport .bottom-menu__left {*/
+/*    display: none;*/
+/*}*/
+#ntf-dropdown {
+    display: none;
+    flex-direction: column;
+    width: calc(100% - 2rem);
+    max-height: 24rem;
+    padding: 1.5rem 0.75rem;
+    background-color: #191944f3;
+    -webkit-backdrop-filter: blur(50px);
+    backdrop-filter: blur(50px);
+    border-radius: 1rem;
+    position: fixed;
+    left: 1rem;
+    z-index: 50;
+    box-shadow: 0 0 1rem #00000026;
+}
+
+#ntf-backdrop {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #67639f4d;
+    backdrop-filter: blur(10px);
+    z-index: 49;
+}
+
+.ntf__dd-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 1.5rem;
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 700;
+    margin: 0 0.75rem 1rem 0.75rem;
+}
+
+.ntf__dd-close-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 2rem;
+    border: 1px solid #5752a5;
+    font-weight: 400;
+    cursor: pointer;
+}
+.ntf__dd-close-btn:hover {
+    border-color: #746ed0;
+}
+
+.bottom-menu__link_enabled .bottom-menu__link-icon {
+    filter: saturate(1) brightness(1);
+}
+
+.bottom-menu__indicator {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 0.5rem;
+    background-color: #2DDC4B;
+    position: absolute;
+    left: 50%;
+    top: -0.15rem;
+    z-index: 5;
+}
+
+.ntf__list {
+    display: grid;
+    grid-gap: 0.5rem;
+    margin-left: 0.75rem;
+    padding-right: 0.75rem;
+    overflow-y: auto;
+}
+
+.ntf__item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+.ntf__item:nth-child(odd) {
+    background-color: #18163359;
+}
+.ntf__item:nth-child(odd) .ntf__del-button {
+    background-color: transparent;
+}
+.ntf__item-icon-wrap {
+    margin-right: 0.75rem;
+}
+
+.ntf__item-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.ntf__item-title {
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+}
+
+.ntf__item-desc {
+    color: #fff;
+    font-size: 0.675rem;
+    margin-top: 0.25rem;
+}
+.ntf__del-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 0.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.75rem;
+    background-color: #21204B;
+    color: #ffffffd9;
+    font-size: 0.9rem;
+}
+body.light .ntf__del-button {
+    background-color: #dbd7d7;
+    color: #020202d9;
+}
+#ntf-button{
+    cursor: pointer;
+}
+.ntf__del-btn-wrap {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: center;
+    margin-top: 1rem;
+    cursor: pointer;
+}
+.ntf__del-btn {
+    display: flex;
+    align-items: center;
+    height: 1.75rem;
+    padding: 0 1rem;
+    border-radius: 1rem;
+    border: 1px solid #FA305C;
+    background-color: #fa305c2e;
+    color: #fff;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.bottom-menu__close-button {
+    width: 3.125rem;
+    height: 3.125rem;
+    border-radius: 3rem;
+    background-color: var(--color-green);
+    position: relative;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 1rem #a3dc8ea6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    line-height: 2rem;
+    font-weight: 500;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.bottom-menu .sidebar-user-info{
+    margin: 0 -.5rem;
+}
+
+.bottom-menu__link.quick-games-menu .has-new,
+.bottom-menu__link.support .has-new{
+    display: none;
+    position: absolute;
+    right: -2px;
+    top: -2px;
+    background-color: #f29b49;
+    border-radius: 50%;
+    color: #FFFFFF;
+    width: 1rem;
+    height: 1rem;
+    justify-content: center;
+    align-items: center;
+    font-size: .875rem;
+    line-height: 1rem;
+    font-weight: 700;
+    font-family: "Gotham Pro", "sans-serif";
+}
+.bottom-menu__link.support.notify .has-new{
+    display: flex;
+}
+
+.bottom-menu:has(.bottom-modals__games-nav > .menu__item.notify) .quick-games-menu .has-new{
+    display: flex;
+}

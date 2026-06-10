@@ -1,0 +1,284 @@
+html, body {
+    height: 100%;
+}
+
+#layout-wrap {
+    display: flex;
+    background-color: #eee;
+    min-height: 100%;
+    background-image: url(/img/ui/wave-bg.svg), linear-gradient(to bottom, #14142FFA, #14142FFA);
+    background-position: 0 0, 0 0;
+    background-size: 100%, 100%;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+#layout-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 210px;
+    height: 100%;
+    background-color: #14142F;
+    flex-shrink: 0;
+    z-index: 501;
+    position: fixed;
+    left: 0;
+    top: 0;
+    /*border-right: 1px solid #ffffff1a;*/
+    /*transition: 250ms;*/
+}
+body.light #layout-wrap {
+    /*background-color: #f3f3fc;*/
+    background-color: #ffffff;
+    background-image: none;
+}
+#layout-sidebar-button {
+    display: flex;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 1rem;
+    background-color: #2C2B63;
+    position: absolute;
+    top: 4rem;
+    right: -1rem;
+    box-shadow: 0 0 0.5rem #0000001a;
+    cursor: pointer;
+    transition: 150ms;
+}
+body.light #layout-sidebar-button {
+    background-color: #f3f3fc;
+    box-shadow: 0 0 0.5rem #00000009;
+}
+#layout-sidebar-button:hover {
+    background-color: #31306f;
+}
+#layout-sidebar-button::before {
+    content: '';
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-top: 1px solid #fff;
+    border-right: 1px solid #fff;
+    transform: rotate(-135deg);
+    position: absolute;
+    left: 0.8rem;
+    top: 0.7rem;
+}
+
+body.light #layout-sidebar-button::before {
+    border-top: 1px solid #8d8dcd;
+    border-right: 1px solid #8d8dcd;
+}
+
+#layout-wrap.collapsed #layout-sidebar-button::before {
+    transform: rotate(45deg);
+    left: 0.55rem;
+    top: 0.7rem;
+}
+
+#layout-wrap.collapsed #layout-sidebar {
+    width: 80px;
+}
+
+#layout-content-wrap {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: clamp(600px, 100vw, 1230px);
+    height: auto;
+    padding-top: 80px;
+    margin-left: auto;
+    margin-right: auto;
+    /*overflow-x: hidden;*/
+}
+body.light #layout-content-wrap {
+    background-image: none;
+    /*background-color: #f3f3fc;*/
+    background-color: #ffffff;
+}
+#layout-content-wrap .spinner .roller {
+    top: 25rem !important;
+}
+
+#layout-content {
+    position: relative;
+}
+body.light #layout-content {
+    padding-top: 1rem;
+}
+#layout-wrap.collapsed #layout-content-wrap {
+    max-width: calc(100% - 80px);
+    margin-left: 80px;
+}
+
+
+.width-limiter {
+    width: 1230px;
+    max-width: calc(100% - 2rem);
+    margin: 0 auto;
+}
+
+@media screen and (max-width: 1230px) {
+    .width-limiter {
+        width: 100vw;
+        max-width: calc(100% - 2rem - 55px);
+        margin: 0 auto;
+    }
+}
+
+.flex {
+    display: flex;
+}
+.games-content {
+    background-size: 100% 27rem;
+    background-repeat: no-repeat;
+    min-height: 27rem;
+    margin-top: 1rem;
+    padding-top: 0rem;
+}
+
+.recent-wins-content {
+    /*background: linear-gradient(180deg, #1E1D4E 0%, rgba(30, 29, 78, 0) 100%);*/
+    background-size: 100% 27rem;
+    background-repeat: no-repeat;
+    min-height: 20rem;
+    margin-top: 2rem;
+    padding-top: 3rem;
+}
+body.light .recent-wins-content {
+    background: none;
+    padding-top: 0;
+}
+
+body.light .recent-wins-content .width-limiter {
+    padding: 2rem;
+    /*background-color: #fff;*/
+    border-radius: 1rem;
+    /*box-shadow: 0 0 1rem #0000000d;*/
+}
+
+
+#layout-overlay {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    left: 00px;
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    background-color: var(--color-overlay-background);
+    padding-top: 5rem;
+    z-index: 400;
+    opacity: 0;
+    overflow-y: auto;
+}
+
+@media screen and (max-width: 1100px) {
+    #layout-overlay {
+        max-width: calc(100vw - 55px);
+        left: 55px;
+        z-index: 551;
+    }
+}
+
+body.light #layout-overlay {
+    background-color: #f3f3fc;
+}
+
+#layout-overlay .spinner {
+    background-color: #14142FFA;
+}
+body.light #layout-overlay .spinner {
+    background-color: #f3f3fc;
+}
+
+#layout-wrap.collapsed #layout-overlay {
+    max-width: calc(100% - 80px);
+    left: 80px;
+}
+
+#layout-overlay-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+}
+#layout-overlay-content-wrap {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+#layout-overlay-content {
+    flex-grow: 1;
+    padding-bottom: 2rem;
+}
+#layout-overlay-title {
+    font-family: 'Gotham Pro', sans-serif;
+    font-size: 1.5625rem;
+    font-weight: 700;
+    color: #fff;
+}
+body.light #layout-overlay-title {
+    color: #2c2b63;
+}
+
+#layout-overlay-close-button {
+    display: flex;
+    align-items: center;
+}
+
+#layout-overlay-close-button {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #8283C0;
+    cursor: pointer;
+}
+
+#layout-overlay-close-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: 2rem;
+    border: 1px solid #8283C0;
+    margin-left: 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 300;
+    padding-left: 1px;
+}
+
+#layout-overlay-close-button:hover {
+    color: #abacff;
+}
+#layout-overlay-close-button:hover #layout-overlay-close-icon {
+    border-color: #abacff;
+}
+
+
+* {
+    /*scrollbar-width: thin;*/
+    scrollbar-color: #2c2b63 var(--color-overlay-background);
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: none;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #2c2b63;
+    border-radius: 20px;
+    border: none;
+}
+
+*::-webkit-scrollbar-button {
+    display: none;
+}

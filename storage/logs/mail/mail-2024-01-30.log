@@ -1,0 +1,64 @@
+[2024-01-30 16:13:34] local.INFO: message blank send mail #73 name registration_mail  
+[2024-01-30 16:13:34] local.INFO: message blanks send mail to ids:array (
+  0 => 274133,
+)  
+[2024-01-30 16:13:34] local.INFO: message blanks send mail by locals:array (
+  'en' => 
+  array (
+    0 => 'admin@asdasd.pross',
+  ),
+  'ru' => 
+  array (
+  ),
+  'ua' => 
+  array (
+  ),
+  'hi' => 
+  array (
+  ),
+  'kz' => 
+  array (
+  ),
+  'de' => 
+  array (
+  ),
+  'fr' => 
+  array (
+  ),
+  'it' => 
+  array (
+  ),
+  'pt' => 
+  array (
+  ),
+  'es' => 
+  array (
+  ),
+  'sk' => 
+  array (
+  ),
+  'empty' => 
+  array (
+  ),
+)  
+[2024-01-30 16:13:34] local.INFO: blank 73 registration_mail sending locale en  
+[2024-01-30 16:13:35] local.INFO: Subj:Welcome!  
+[2024-01-30 16:13:35] local.INFO: Unisend Email: send list: array (
+  0 => 'admin@asdasd.pross',
+)  
+[2024-01-30 16:13:35] local.INFO: sendblock:["admin@asdasd.pross"]  
+[2024-01-30 16:13:56] local.INFO: Unisender import:{"result":{"total":1,"inserted":0,"updated":0,"deleted":0,"new_emails":0,"invalid":1,"log":[{"index":"0","code":"e_address__e_syntax","message":"Error (email was ignored). Invalid format for the email address: \"admin@asdasd.pross\""}]}}  
+[2024-01-30 16:13:57] local.INFO: bad emails:["admin@asdasd.pross"]  
+[2024-01-30 16:13:57] local.INFO: new mail list:[]  
+[2024-01-30 16:13:57] local.INFO: empty send list skip  
+[2024-01-30 16:13:57] local.INFO: locale ru email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale ua email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale hi email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale kz email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale de email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale fr email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale it email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale pt email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale es email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale sk email list is empty  
+[2024-01-30 16:13:57] local.INFO: locale empty email list is empty  

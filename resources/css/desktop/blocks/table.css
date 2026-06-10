@@ -1,0 +1,223 @@
+.table {
+    width: 100%;
+    border-spacing: 0 0.5rem;
+}
+
+.table thead th {
+    text-align: left;
+    padding: 1rem;
+    color: #8283C0;
+    font-size: 0.875rem;
+}
+.user-wallet .table thead th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    color: #8283C0;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+
+.user-wallet .table tbody td {
+    background-color: #272660;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+
+.table tbody td {
+    background-color: #272660;
+    padding: 1rem;
+    font-size: 0.875rem;
+    max-height: 4.25rem;
+}
+body.light .table tbody td {
+    background-color: #e0e0f1;
+}
+.table tbody td:first-child {
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+.table tbody td:last-child {
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.table tbody tr:nth-child(even) td {
+    background-color: transparent;
+    border-top: 1px solid #3C3C71;
+    border-bottom: 1px solid #3C3C71;
+}
+.table tbody tr:nth-child(even) td:first-child {
+    border-left: 1px solid #3C3C71;
+}
+.table tbody tr:nth-child(even) td:last-child {
+    border-right: 1px solid #3C3C71;
+}
+
+
+body.light .table tbody tr:nth-child(even) td {
+    background-color: #fbfbfb;
+    border-top: 1px solid #f3f3fc;
+    border-bottom: 1px solid #f3f3fc;
+}
+body.light .table tbody tr:nth-child(even) td:first-child {
+    border-left: 1px solid #f3f3fc;
+}
+body.light .table tbody tr:nth-child(even) td:last-child {
+    border-right: 1px solid #f3f3fc;
+}
+
+
+
+.table__text_white {
+    color: #fff;
+}
+body.light .table__text_white {
+    color: #2c2b63;
+}
+.table__image {
+    margin-right: 0.5rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 1rem;
+    flex-shrink: 0;
+}
+.table__image-small {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+.table__icon {
+    margin-right: 0.5rem;
+}
+.table__money {
+    display: flex;
+    align-items: center;
+}
+
+.table__money .money_int {
+    color: #ffffff;
+    font-family: Roboto, sans-serif;
+}
+.table__money .money__rest {
+    color: #8283C0;
+    font-family: Roboto, sans-serif;
+}
+
+.table__money_green .money__int {
+    color: var(--color-green);
+    font-weight: 700;
+}
+
+.table__money_green .money__rest {
+    font-weight: 700;
+}
+
+.table__multiplier {
+    background-color: rgba(162, 220, 141, 0.12);
+    padding: 0.35rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--color-green);
+}
+
+
+.table td.table__rating-index {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #8283C0;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.table__rating-index::before {
+    content: attr(data-index);
+}
+.table__rating-index[data-index="1"]::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    background-image: url(/img/tournaments/leader-cup-icon.svg);
+    background-repeat: no-repeat;
+    background-position: 0.5rem center;
+}
+.table__rating-index[data-index="2"]::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    background-image: url(/img/tournaments/leader-cup-icon.svg);
+    background-repeat: no-repeat;
+    background-position: 0.5rem center;
+    filter: hue-rotate(-146deg);
+    opacity: 0.5;
+}
+
+.table__rating-index[data-index="3"]::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    background-image: url(/img/tournaments/leader-cup-icon.svg);
+    background-repeat: no-repeat;
+    background-position: 0.5rem center;
+    filter: hue-rotate(326deg) brightness(0.5);
+}
+.table__date {
+    color: #8283C0;
+}
+.table__link {
+    color: #2281F6;
+    font-family: 'Gotham Pro', sans-serif;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+}
+.table thead th.table__cell-right,
+.table tbody td.table__cell-right {
+    text-align: right;
+}
+.table tbody td.table__cell-right .table__money {
+    text-align: right;
+    justify-content: flex-end;
+}
+
+
+.table__sort-arrows {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    position: relative;
+    margin-left: 5px;
+}
+.table__sort-arrows::before {
+    content: '';
+    display: block;
+    position: absolute;
+    border-top: 5px solid #8283C0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    top: 9px;
+    width: 0;
+    height: 0;
+    cursor: pointer;
+}
+
+.table__sort-arrows::after {
+    content: '';
+    display: block;
+    position: absolute;
+    border-bottom: 5px solid #8283C0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    top: 2px;
+    width: 0;
+    height: 0;
+    cursor: pointer;
+}
+
+.table__game-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 1rem;
+    object-fit: cover;
+}

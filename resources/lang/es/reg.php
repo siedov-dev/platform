@@ -1,0 +1,61 @@
+<?php
+
+return [
+    'byClickingIAgreeWith' => 'Al hacer clic en el botón, acepta los términos y condiciones',
+    'privacyPolicy' => 'políticas de privacidad',
+    'registration' => 'Inscripción',
+    'phone' => 'Teléfono',
+    'yourPass' => 'Tu contraseña',
+    'yourEmail' => 'Su correo electrónico',
+    'yourPhone' => 'Su número de teléfono',
+    'inputPass' => 'Introduzca su contraseña',
+    'chooseCurrency' => 'Seleccione la moneda principal',
+    'uah' => 'UAH',
+    'rub' => 'RUB',
+    'usd' => 'USD',
+    'eur' => 'EUR',
+    'inr' => 'INR',
+    'mbtc' => 'mBTC',
+    'usdt' => 'USDT',
+    'kzt' => 'Tenge',
+    'createAccount' => 'Crear una cuenta',
+    'orUsing' => 'o a través de',
+    'haveAccount' => '¿Tienes una cuenta?',
+    'login' => 'Iniciar sesión',
+
+    'invalid_email' => 'Correo electrónico incorrecto',
+    'invalid_phone' => 'Número de teléfono incorrecto',
+    'email_already_exists' => 'Ya existe un usuario con esta dirección de correo electrónico. Usted desea <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">iniciar sesión</a> o <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">restablecer contraseña</a>?',
+    'phone_already_exists' => 'Ya existe un usuario con este número de teléfono. Usted desea <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">войти</a> o <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">restablecer contraseña</a>?',
+    
+    'iam18' => 'tengo 18 años o más',
+    'currency_required' => 'Seleccionar moneda',
+    'password_required' => 'Introduzca su contraseña',
+    'password_min' => 'La contraseña debe contener un mínimo de 6 caracteres',
+    'phone_or_email_required' => 'Introduzca el número de teléfono o la dirección de correo electrónico',
+
+    'email_required' => 'Introducir correo electrónico',
+    'phone_required' => 'Introduzca el número de teléfono',
+    'address_required' => 'Introduzca la dirección',
+    'postcode_required' => 'Introducir índice',
+    'city_required' => 'Introduzca la ciudad',
+    'state_required' => 'Introduzca el Estado',
+    'postcode_integer' => 'Sólo los números',
+    'state_min_max' => '2 caracteres',
+
+    'name_surname' => 'Nombre Apellido',
+    'address' => 'Dirección',
+    'post_code' => 'Índice',
+    'city' => 'Ciudad',
+    'state' => 'Personal',
+
+    'name_required' => 'Introduzca el nombre',
+    'surname_required' => 'Introduzca el apellido',
+    'name' => 'Nombre',
+    'surname' => 'Apellido',
+
+    'personal-info' => 'Información personal',
+    'next' => 'Siguiente',
+    
+    'captcha_error' => 'Confirmar recaptcha',
+];

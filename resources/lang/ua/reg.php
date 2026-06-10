@@ -1,0 +1,63 @@
+<?php
+
+return [
+    'byClickingIAgreeWith' => 'Натискаючи кнопку, ви приймаєте умови',
+    'privacyPolicy' => 'політики конфіденційності',
+    'registration' => 'Реєстрація',
+    'phone' => 'Телефон',
+    'yourPass' => 'Ваш пароль',
+    'yourEmail' => 'Ваш Email',
+    'yourPhone' => 'Ваш телефон',
+    'inputPass' => 'Введіть пароль',
+    'chooseCurrency' => 'Оберіть основну валюту',
+    'uah' => 'UAH',
+    'rub' => 'RUB',
+    'usd' => 'USD',
+    'eur' => 'EUR',
+    'inr' => 'INR',
+    'mbtc' => 'mBTC',
+    'usdt' => 'USDT',
+    'kzt' => 'KZT',
+    'createAccount' => 'Зареєструватись',
+    'orUsing' => 'або через',
+    'haveAccount' => 'Є аккаунт?',
+    'login' => 'Увійти',
+
+    'invalid_email' => 'Неправильний email',
+    'iam18' => 'Мені 18 років або більше',
+    'invalid_phone' => 'Неправильний номер телефону',
+    'email_already_exists' => 'Користувач з таким email вже існує. Ви хочете <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">увійти</a> або <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">відновити Ваш пароль</a>?',
+    'phone_already_exists' => 'Користувач з таким номером телефону вже існує. Ви хочете <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">войти</a> або <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">відновити Ваш пароль</a>?',
+
+    'currency_required' => 'Виберіть валюту',
+    'password_required' => 'Введіть пароль',
+    'password_min' => 'Пароль повинен містити мінімум 6 символів',
+    'phone_or_email_required' => 'Введіть телефон або email',
+
+    'email_required' => 'Введіть email',
+    'phone_required' => 'Введіть телефон',
+    'names_required' => 'Введіть Им\'я та Фамілію',
+    'address_required' => 'Введіть Адресу',
+    'postcode_required' => 'Введіть Індекс',
+    'city_required' => 'Введіть Місто',
+    'state_required' => 'Введіть Штат',
+    'postcode_integer' => 'Тільки числа',
+    'state_min_max' => '2 символи',
+
+    'name_surname' => 'Ім\'я та Прізвище',
+    'address' => 'Адреса',
+    'post_code' => 'Індекс',
+    'city' => 'Місто',
+    'state' => 'Штат',
+
+    'name_required' => 'Введіть Ім\'я',
+    'surname_required' => 'Введіть прізвище',
+    'name' => 'Ім\'я',
+    'surname' => 'Прізвище',
+
+    'personal information' => 'Особиста інформація',
+    'next' => 'Далі',
+    
+    'captcha_error' => 'Підтвердіть recaptcha',
+    'user_already_exists' => 'Користувач вже існує',
+];

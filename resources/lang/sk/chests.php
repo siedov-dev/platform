@@ -1,0 +1,45 @@
+<?php
+return [
+    'LittleChest' => 'Little chest',
+     'MiddleChest' => 'Middle Hrudník',
+     'BigChest' => 'Big Hrudník',
+     'LostContainer' => 'Stratený kontajner',
+     'BlackBox' => 'Black Pearl',
+     'BermudaChest' => 'Bermuda Chest',
+
+     'LittleChest_short-info' => 'Prihlás sa do hry každý deň a získaj hru zadarmo',
+     'MiddleChest_short-info' => 'Prihlás sa do hry každý deň a získaj hru zadarmo',
+     'BigChest_short-info' => 'Prihlás sa do hry každý deň a získaj hru zadarmo',
+     'LostContainer_short-info' => 'Prihlás sa do hry každý deň a získaj hru zadarmo',
+     'BlackBox_short-info' => 'Prihlás sa do hry každý deň a získaj hru zadarmo',
+     'BermudaChest_short-info' => 'Prihlás sa do hry každý deň a získaj hru zadarmo',
+
+     'next-key-in' => 'Nový kľúč sa zobrazí',
+     'next-quest-in' => 'Ďalšia misia na',
+
+     'KeyLittle' => 'Malý kľúč',
+     'KeyMiddle' => 'Middle Key',
+     'KeyBig' => 'Veľký kľúč',
+     'KeyLost' => 'Stratený kľúč',
+     'KeyBlack' => 'Black Key',
+     'KeyBermuda' => 'Kľúč Bermudy',
+
+     'lost_treasures' => 'Stratené poklady',
+     'treasure_common' => 'Bežné',
+     'treasure_legendary' => 'Legendárne',
+     'key_price' => 'Kľúčová cena',
+     'open' => 'Open',
+     'you_have' => 'Máš',
+     'keys' => 'keys',
+     'congratz' => 'Blahoželáme!',
+     'open-next' => 'Otvoriť viac',
+     'contains' => 'Hrudník obsahuje',
+     'SmallKeyPiece' => 'Small Chest Key Piece',
+     'MiddleKeyPiece' => 'Middle Key Piece',
+     'BigKeyPiece' => 'BigKeyPiece',
+     'LostKeyPiece' => 'Lost Key Piece',
+     'BlackKeyPiece' => 'Black Key Piece',
+     'BermudaKeyPiece' => 'Bermuda Chest Key Piece',
+
+     'not_enough_keys' => 'Žiadny kľúč',
+];

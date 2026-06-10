@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'ru' => 'Rusia',
+    'ua' => 'Ucrania',
+    'by' => 'Bielorrusia',
+    'in' => 'India',
+    'tj' => 'Tayikistán',
+    'kz' => 'Kazajstán',
+    'pl' => 'Polonia',
+    'cz' => 'República Checa',
+    'ro' => 'Rumanía',
+    'hu' => 'Hungría',
+    'sk' => 'Eslovaquia',
+    'de' => 'Alemania',
+    'md' => 'Moldavia',
+    'uz' => 'Uzbekistán',
+    'lv' => 'Letonia',
+    'ee' => 'Estonia',
+    'kg' => 'Kirguistán',
+    'am' => 'Armenia',
+    'tm' => 'Turkmenistán',
+    'lt' => 'Lituania',
+    'ge' => 'Georgia',
+    'az' => 'Azerbaiyán',
+];

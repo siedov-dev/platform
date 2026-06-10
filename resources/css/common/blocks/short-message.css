@@ -1,0 +1,45 @@
+.short-message_wrapper{
+    position: fixed;
+    top: 6rem;
+    right: 3rem;
+    display: flex;
+    flex-flow: column;
+    overflow: hidden;
+    pointer-events: none;
+    height: 6rem;
+    width: 10rem;
+    z-index: 1100;
+}
+.short-message_wrapper .message{
+    width: 100%;
+    background-color: #00FF00a0;
+    border-radius: 1rem;
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: .75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: #FFFFFF;
+    padding: 1rem;
+    animation: show-up;
+    animation-duration: .5s;
+}
+.short-message_wrapper .message.error{
+    background-color: #e3342fa0;
+}
+
+@keyframes show-up {
+    0% {
+        margin-top: 6rem;
+        opacity: 0;
+    }
+    100% {
+        margin-top: 0;
+        opacity: 1;
+    }
+}
+
+@media (max-width: 800px) {
+    .short-message_wrapper{
+        right: 1rem;
+    }
+}

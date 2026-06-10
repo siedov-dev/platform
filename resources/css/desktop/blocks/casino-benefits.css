@@ -1,0 +1,26 @@
+.casino-benefits {
+    display: flex;
+    width: 100%;
+    background: linear-gradient(93.23deg, rgba(120, 123, 247, 0.0945) -4.91%, rgba(120, 123, 247, 0.054) 97.3%);
+    border-radius: 0.5rem;
+    margin: 3rem 0;
+}
+
+.casino-benefits__item {
+    display: flex;
+    align-items: center;
+    width: 33.33%;
+    padding: 1.5rem;
+}
+
+.casino-benefits__text {
+    margin-left: 1.5rem;
+    color: #fff;
+    font-family: 'Gotham Pro', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.casino-benefits__text-yellow {
+    color: #FFEB81;
+}

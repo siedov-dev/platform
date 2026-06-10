@@ -1,0 +1,228 @@
+time=2025-09-10T12:04:52.337+03:00 level=INFO msg="Starting app"
+time=2025-09-10T12:04:52.339+03:00 level=INFO msg="Initializing service..."
+time=2025-09-10T12:04:52.349+03:00 level=INFO msg="Bonus currency configs loaded"
+time=2025-09-10T12:04:52.404+03:00 level=INFO msg="Service successfully initialized"
+time=2025-09-10T12:04:52.405+03:00 level=INFO msg=request subject=bonus.ping
+time=2025-09-10T12:04:52.405+03:00 level=INFO msg=request data=""
+time=2025-09-10T12:04:52.406+03:00 level=INFO msg="request duration" subject=bonus.ping duration=18.686µs
+time=2025-09-10T12:04:52.406+03:00 level=INFO msg="ping request duration" duration=507.207µs
+time=2025-09-10T12:04:52.428+03:00 level=INFO msg="Stream created" stream=userevents consumer=bonus
+time=2025-09-10T12:04:52.428+03:00 level=INFO msg="NATS broker initialized"
+time=2025-09-10T12:05:07.114+03:00 level=INFO msg=request subject=bonus.getFirstNotActiveBonus
+time=2025-09-10T12:05:07.114+03:00 level=INFO msg=request data="{\"user_id\":12,\"currency_id\":0}"
+time=2025-09-10T12:05:07.162+03:00 level=DEBUG msg=GetAvailableBonuses UserID=12 currency_id=0
+time=2025-09-10T12:05:07.162+03:00 level=DEBUG msg=AvailableBonusesParams params=[]
+time=2025-09-10T12:05:07.166+03:00 level=INFO msg="request duration" subject=bonus.getFirstNotActiveBonus duration=51.584235ms
+time=2025-09-10T12:05:07.655+03:00 level=INFO msg=request subject=bonus.getAvailableBonusCount
+time=2025-09-10T12:05:07.655+03:00 level=INFO msg=request data="{\"user_id\":12,\"currency_id\":0}"
+time=2025-09-10T12:05:07.655+03:00 level=DEBUG msg=GetAvailableBonuses UserID=12 currency_id=0
+time=2025-09-10T12:05:07.655+03:00 level=DEBUG msg=AvailableBonusesParams params=[]
+time=2025-09-10T12:05:07.655+03:00 level=INFO msg="request duration" subject=bonus.getAvailableBonusCount duration=348.755µs
+time=2025-09-10T12:05:10.347+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.347+03:00 level=INFO msg=request data="{\"currency\":\"RUB\",\"type\":\"dep_bonus\",\"num\":1}"
+time=2025-09-10T12:05:10.347+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=111.081µs
+time=2025-09-10T12:05:10.394+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.394+03:00 level=INFO msg=request data="{\"currency\":\"RUB\",\"type\":\"fd_fs\",\"num\":1}"
+time=2025-09-10T12:05:10.394+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=58.971µs
+time=2025-09-10T12:05:10.437+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.437+03:00 level=INFO msg=request data="{\"currency\":\"RUB\",\"type\":\"dep_bonus\",\"num\":2}"
+time=2025-09-10T12:05:10.438+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=350.518µs
+time=2025-09-10T12:05:10.482+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.482+03:00 level=INFO msg=request data="{\"currency\":\"RUB\",\"type\":\"fd_fs\",\"num\":2}"
+time=2025-09-10T12:05:10.491+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=8.337965ms
+time=2025-09-10T12:05:10.534+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.534+03:00 level=INFO msg=request data="{\"currency\":\"RUB\",\"type\":\"dep_bonus\",\"num\":3}"
+time=2025-09-10T12:05:10.534+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=38.694µs
+time=2025-09-10T12:05:10.576+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.576+03:00 level=INFO msg=request data="{\"currency\":\"RUB\",\"type\":\"fd_fs\",\"num\":3}"
+time=2025-09-10T12:05:10.576+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=41.384µs
+time=2025-09-10T12:05:10.617+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.617+03:00 level=INFO msg=request data="{\"currency\":\"RUB\",\"type\":\"fd_fs\",\"num\":4}"
+time=2025-09-10T12:05:10.617+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=53.656µs
+time=2025-09-10T12:05:10.659+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.659+03:00 level=INFO msg=request data="{\"currency\":\"RUB\",\"type\":\"fd_fs\",\"num\":5}"
+time=2025-09-10T12:05:10.659+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=47.21µs
+time=2025-09-10T12:05:10.701+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.701+03:00 level=INFO msg=request data="{\"currency\":\"UAH\",\"type\":\"dep_bonus\",\"num\":1}"
+time=2025-09-10T12:05:10.702+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=53.485µs
+time=2025-09-10T12:05:10.745+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.745+03:00 level=INFO msg=request data="{\"currency\":\"UAH\",\"type\":\"fd_fs\",\"num\":1}"
+time=2025-09-10T12:05:10.745+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:10.745+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=50.678µs
+time=2025-09-10T12:05:10.790+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.790+03:00 level=INFO msg=request data="{\"currency\":\"UAH\",\"type\":\"dep_bonus\",\"num\":2}"
+time=2025-09-10T12:05:10.790+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=46.462µs
+time=2025-09-10T12:05:10.832+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.832+03:00 level=INFO msg=request data="{\"currency\":\"UAH\",\"type\":\"fd_fs\",\"num\":2}"
+time=2025-09-10T12:05:10.832+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:10.832+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=55.153µs
+time=2025-09-10T12:05:10.875+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.875+03:00 level=INFO msg=request data="{\"currency\":\"UAH\",\"type\":\"dep_bonus\",\"num\":3}"
+time=2025-09-10T12:05:10.875+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=147.717µs
+time=2025-09-10T12:05:10.918+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.918+03:00 level=INFO msg=request data="{\"currency\":\"UAH\",\"type\":\"fd_fs\",\"num\":3}"
+time=2025-09-10T12:05:10.918+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:10.918+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=64.363µs
+time=2025-09-10T12:05:10.960+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:10.960+03:00 level=INFO msg=request data="{\"currency\":\"UAH\",\"type\":\"fd_fs\",\"num\":4}"
+time=2025-09-10T12:05:10.960+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:10.960+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=55.392µs
+time=2025-09-10T12:05:11.002+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.002+03:00 level=INFO msg=request data="{\"currency\":\"UAH\",\"type\":\"fd_fs\",\"num\":5}"
+time=2025-09-10T12:05:11.004+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:11.004+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=121.168µs
+time=2025-09-10T12:05:11.047+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.047+03:00 level=INFO msg=request data="{\"currency\":\"EUR\",\"type\":\"dep_bonus\",\"num\":1}"
+time=2025-09-10T12:05:11.051+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=3.258021ms
+time=2025-09-10T12:05:11.092+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.092+03:00 level=INFO msg=request data="{\"currency\":\"EUR\",\"type\":\"fd_fs\",\"num\":1}"
+time=2025-09-10T12:05:11.094+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=162.668µs
+time=2025-09-10T12:05:11.139+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.139+03:00 level=INFO msg=request data="{\"currency\":\"EUR\",\"type\":\"dep_bonus\",\"num\":2}"
+time=2025-09-10T12:05:11.139+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=53.968µs
+time=2025-09-10T12:05:11.186+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.186+03:00 level=INFO msg=request data="{\"currency\":\"EUR\",\"type\":\"fd_fs\",\"num\":2}"
+time=2025-09-10T12:05:11.186+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=57.198µs
+time=2025-09-10T12:05:11.228+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.228+03:00 level=INFO msg=request data="{\"currency\":\"EUR\",\"type\":\"dep_bonus\",\"num\":3}"
+time=2025-09-10T12:05:11.228+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=43.403µs
+time=2025-09-10T12:05:11.270+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.270+03:00 level=INFO msg=request data="{\"currency\":\"EUR\",\"type\":\"fd_fs\",\"num\":3}"
+time=2025-09-10T12:05:11.271+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=51.114µs
+time=2025-09-10T12:05:11.317+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.317+03:00 level=INFO msg=request data="{\"currency\":\"EUR\",\"type\":\"fd_fs\",\"num\":4}"
+time=2025-09-10T12:05:11.319+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=69.793µs
+time=2025-09-10T12:05:11.364+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.364+03:00 level=INFO msg=request data="{\"currency\":\"EUR\",\"type\":\"fd_fs\",\"num\":5}"
+time=2025-09-10T12:05:11.365+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=67.765µs
+time=2025-09-10T12:05:11.407+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.407+03:00 level=INFO msg=request data="{\"currency\":\"INR\",\"type\":\"dep_bonus\",\"num\":1}"
+time=2025-09-10T12:05:11.409+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=100.423µs
+time=2025-09-10T12:05:11.451+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.451+03:00 level=INFO msg=request data="{\"currency\":\"INR\",\"type\":\"fd_fs\",\"num\":1}"
+time=2025-09-10T12:05:11.451+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:11.452+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=794.907µs
+time=2025-09-10T12:05:11.493+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.493+03:00 level=INFO msg=request data="{\"currency\":\"INR\",\"type\":\"dep_bonus\",\"num\":2}"
+time=2025-09-10T12:05:11.494+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=296.748µs
+time=2025-09-10T12:05:11.536+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.536+03:00 level=INFO msg=request data="{\"currency\":\"INR\",\"type\":\"fd_fs\",\"num\":2}"
+time=2025-09-10T12:05:11.536+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:11.536+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=75.224µs
+time=2025-09-10T12:05:11.580+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.580+03:00 level=INFO msg=request data="{\"currency\":\"INR\",\"type\":\"dep_bonus\",\"num\":3}"
+time=2025-09-10T12:05:11.580+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=229.978µs
+time=2025-09-10T12:05:11.625+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.625+03:00 level=INFO msg=request data="{\"currency\":\"INR\",\"type\":\"fd_fs\",\"num\":3}"
+time=2025-09-10T12:05:11.625+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:11.625+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=87.033µs
+time=2025-09-10T12:05:11.669+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.669+03:00 level=INFO msg=request data="{\"currency\":\"INR\",\"type\":\"fd_fs\",\"num\":4}"
+time=2025-09-10T12:05:11.669+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:11.669+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=64.458µs
+time=2025-09-10T12:05:11.712+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.712+03:00 level=INFO msg=request data="{\"currency\":\"INR\",\"type\":\"fd_fs\",\"num\":5}"
+time=2025-09-10T12:05:11.712+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:11.712+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=91.576µs
+time=2025-09-10T12:05:11.754+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.754+03:00 level=INFO msg=request data="{\"currency\":\"USDT\",\"type\":\"dep_bonus\",\"num\":1}"
+time=2025-09-10T12:05:11.754+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=57.76µs
+time=2025-09-10T12:05:11.796+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.796+03:00 level=INFO msg=request data="{\"currency\":\"USDT\",\"type\":\"fd_fs\",\"num\":1}"
+time=2025-09-10T12:05:11.796+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:11.796+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=149.965µs
+time=2025-09-10T12:05:11.838+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.838+03:00 level=INFO msg=request data="{\"currency\":\"USDT\",\"type\":\"dep_bonus\",\"num\":2}"
+time=2025-09-10T12:05:11.838+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=139.321µs
+time=2025-09-10T12:05:11.879+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.879+03:00 level=INFO msg=request data="{\"currency\":\"USDT\",\"type\":\"fd_fs\",\"num\":2}"
+time=2025-09-10T12:05:11.879+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:11.880+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=72.601µs
+time=2025-09-10T12:05:11.921+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.921+03:00 level=INFO msg=request data="{\"currency\":\"USDT\",\"type\":\"dep_bonus\",\"num\":3}"
+time=2025-09-10T12:05:11.921+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=54.852µs
+time=2025-09-10T12:05:11.964+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:11.964+03:00 level=INFO msg=request data="{\"currency\":\"USDT\",\"type\":\"fd_fs\",\"num\":3}"
+time=2025-09-10T12:05:11.964+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:11.964+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=80.232µs
+time=2025-09-10T12:05:12.005+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.005+03:00 level=INFO msg=request data="{\"currency\":\"USDT\",\"type\":\"fd_fs\",\"num\":4}"
+time=2025-09-10T12:05:12.005+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.005+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=72.47µs
+time=2025-09-10T12:05:12.046+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.046+03:00 level=INFO msg=request data="{\"currency\":\"USDT\",\"type\":\"fd_fs\",\"num\":5}"
+time=2025-09-10T12:05:12.046+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.047+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=78.153µs
+time=2025-09-10T12:05:12.090+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.090+03:00 level=INFO msg=request data="{\"currency\":\"KZT\",\"type\":\"dep_bonus\",\"num\":1}"
+time=2025-09-10T12:05:12.091+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=56.845µs
+time=2025-09-10T12:05:12.133+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.133+03:00 level=INFO msg=request data="{\"currency\":\"KZT\",\"type\":\"fd_fs\",\"num\":1}"
+time=2025-09-10T12:05:12.133+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.133+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=165.448µs
+time=2025-09-10T12:05:12.135+03:00 level=INFO msg=request subject=bonus.createFromParams
+time=2025-09-10T12:05:12.135+03:00 level=INFO msg=request data="{\"bonus_type\":24,\"user_id\":12,\"params\":\"{\\\"wager\\\":\\\"10\\\",\\\"min_sum\\\":\\\"100\\\",\\\"max_sum\\\":\\\"1000\\\",\\\"max_win\\\":\\\"0\\\",\\\"max_x_win\\\":\\\"2\\\",\\\"multiplier\\\":\\\"200\\\",\\\"min_wager\\\":\\\"0\\\",\\\"max-multiplier\\\":\\\"0\\\"}\",\"currency\":1,\"keep_params\":false,\"tmp\":true,\"pattern_id\":0,\"creator_type\":0,\"creator_id\":0,\"title\":\"\",\"img_url\":\"\",\"marker\":0,\"allowed_games\":\"\"}"
+time=2025-09-10T12:05:12.135+03:00 level=INFO msg="request duration" subject=bonus.createFromParams duration=223.715µs
+time=2025-09-10T12:05:12.175+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.175+03:00 level=INFO msg=request data="{\"currency\":\"KZT\",\"type\":\"dep_bonus\",\"num\":2}"
+time=2025-09-10T12:05:12.175+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=64.264µs
+time=2025-09-10T12:05:12.177+03:00 level=INFO msg=request subject=bonus.createFromParams
+time=2025-09-10T12:05:12.177+03:00 level=INFO msg=request data="{\"bonus_type\":34,\"user_id\":12,\"params\":\"{\\\"freespins\\\":\\\"10\\\",\\\"wager\\\":\\\"30\\\",\\\"min_sum\\\":\\\"100\\\",\\\"max_sum\\\":\\\"1000\\\",\\\"max_win\\\":\\\"1000\\\",\\\"max_x_win\\\":\\\"2\\\",\\\"min_wager\\\":\\\"20\\\"}\",\"currency\":1,\"keep_params\":false,\"tmp\":true,\"pattern_id\":0,\"creator_type\":0,\"creator_id\":0,\"title\":\"\",\"img_url\":\"\",\"marker\":0,\"allowed_games\":\"\"}"
+time=2025-09-10T12:05:12.177+03:00 level=INFO msg="request duration" subject=bonus.createFromParams duration=169.852µs
+time=2025-09-10T12:05:12.219+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.219+03:00 level=INFO msg=request data="{\"currency\":\"KZT\",\"type\":\"fd_fs\",\"num\":2}"
+time=2025-09-10T12:05:12.219+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.219+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=133.728µs
+time=2025-09-10T12:05:12.237+03:00 level=INFO msg=request subject=bonus.createFromParams
+time=2025-09-10T12:05:12.237+03:00 level=INFO msg=request data="{\"bonus_type\":54,\"user_id\":12,\"params\":\"{\\\"wager\\\":\\\"30\\\",\\\"money\\\":\\\"5\\\",\\\"max_win_k\\\":\\\"1\\\",\\\"max_win_sum\\\":\\\"0\\\",\\\"active_days\\\":\\\"3\\\",\\\"min_wager\\\":\\\"0\\\"}\",\"currency\":1,\"keep_params\":false,\"tmp\":true,\"pattern_id\":0,\"creator_type\":0,\"creator_id\":0,\"title\":\"\",\"img_url\":\"\",\"marker\":0,\"allowed_games\":\"\"}"
+time=2025-09-10T12:05:12.237+03:00 level=INFO msg="request duration" subject=bonus.createFromParams duration=120.375µs
+time=2025-09-10T12:05:12.262+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.262+03:00 level=INFO msg=request data="{\"currency\":\"KZT\",\"type\":\"dep_bonus\",\"num\":3}"
+time=2025-09-10T12:05:12.262+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=42.645µs
+time=2025-09-10T12:05:12.305+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.305+03:00 level=INFO msg=request data="{\"currency\":\"KZT\",\"type\":\"fd_fs\",\"num\":3}"
+time=2025-09-10T12:05:12.305+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.306+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=1.294508ms
+time=2025-09-10T12:05:12.348+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.348+03:00 level=INFO msg=request data="{\"currency\":\"KZT\",\"type\":\"fd_fs\",\"num\":4}"
+time=2025-09-10T12:05:12.348+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.348+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=62.263µs
+time=2025-09-10T12:05:12.391+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.391+03:00 level=INFO msg=request data="{\"currency\":\"KZT\",\"type\":\"fd_fs\",\"num\":5}"
+time=2025-09-10T12:05:12.392+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.392+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=120.105µs
+time=2025-09-10T12:05:12.433+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.433+03:00 level=INFO msg=request data="{\"currency\":\"UZS\",\"type\":\"dep_bonus\",\"num\":1}"
+time=2025-09-10T12:05:12.433+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.433+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=137.3µs
+time=2025-09-10T12:05:12.476+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.476+03:00 level=INFO msg=request data="{\"currency\":\"UZS\",\"type\":\"fd_fs\",\"num\":1}"
+time=2025-09-10T12:05:12.476+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.476+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=103.565µs
+time=2025-09-10T12:05:12.517+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.517+03:00 level=INFO msg=request data="{\"currency\":\"UZS\",\"type\":\"dep_bonus\",\"num\":2}"
+time=2025-09-10T12:05:12.517+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.517+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=91.736µs
+time=2025-09-10T12:05:12.559+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.559+03:00 level=INFO msg=request data="{\"currency\":\"UZS\",\"type\":\"fd_fs\",\"num\":2}"
+time=2025-09-10T12:05:12.559+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.559+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=88.96µs
+time=2025-09-10T12:05:12.567+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.567+03:00 level=INFO msg=request data="{\"currency\":\"UZS\",\"type\":\"dep_bonus\",\"num\":3}"
+time=2025-09-10T12:05:12.567+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.567+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=89.042µs
+time=2025-09-10T12:05:12.609+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.609+03:00 level=INFO msg=request data="{\"currency\":\"UZS\",\"type\":\"fd_fs\",\"num\":3}"
+time=2025-09-10T12:05:12.609+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.609+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=175.588µs
+time=2025-09-10T12:05:12.652+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.652+03:00 level=INFO msg=request data="{\"currency\":\"UZS\",\"type\":\"fd_fs\",\"num\":4}"
+time=2025-09-10T12:05:12.652+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.652+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=71.021µs
+time=2025-09-10T12:05:12.697+03:00 level=INFO msg=request subject=bonus.getRegPattern
+time=2025-09-10T12:05:12.697+03:00 level=INFO msg=request data="{\"currency\":\"UZS\",\"type\":\"fd_fs\",\"num\":5}"
+time=2025-09-10T12:05:12.697+03:00 level=ERROR msg="Failed to get registration pattern" error="bonus pattern not found"
+time=2025-09-10T12:05:12.697+03:00 level=INFO msg="request duration" subject=bonus.getRegPattern duration=78.07µs
+time=2025-09-10T12:05:41.718+03:00 level=INFO msg="Unloading bonus" bonusID=8878509
+time=2025-09-10T12:05:41.718+03:00 level=INFO msg="Service stopped"
+time=2025-09-10T12:05:41.718+03:00 level=INFO msg="Service stopped"

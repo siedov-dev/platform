@@ -1,0 +1,53 @@
+#recovery-token-form,
+#verify-email-form,
+#verify-phone-form {
+    flex-direction: column;
+    padding: 3rem;
+    background-color: #fff;
+    border-radius: 1rem;
+    width: 27rem;
+    max-width: 100%;
+}
+.cabinet__vrf-hint {
+    text-align: center;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    color: #0B0D31;
+}
+.cabinet__vrf-label {
+    display: flex;
+    font-size: 0.75rem;
+    color: #999;
+    margin-bottom: 0.5rem;
+}
+.cabinet__vrf-code-input {
+    height: 3rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    outline: none;
+    padding: 0 0.5rem;
+    font-size: 1rem;
+    color: #333;
+    width: 100%;
+}
+.cabinet__vrf-code-input:focus {
+    border-color: #4E7CFF;
+}
+.cabinet__vrf-button {
+    height: 3rem;
+    border-radius: 0.625rem;
+    border: none;
+    background-color: #4E7CFF;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    outline: none;
+    cursor: pointer;
+    margin-top: 2rem;
+}
+
+.cabinet__vrf-button:disabled{
+    background-color: #4E7CFF30;
+}

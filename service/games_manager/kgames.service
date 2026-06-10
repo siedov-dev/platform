@@ -1,0 +1,13 @@
+[Unit]
+Description=kraken games manager service
+
+[Service]
+User=root
+Type=exec
+WorkingDirectory=/var/www/kraken8/service/games_manager/
+ExecStart=/var/www/kraken8/service/games_manager/games_manager
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

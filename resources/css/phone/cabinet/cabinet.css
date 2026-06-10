@@ -1,0 +1,239 @@
+.cabinet {
+    display: flex;
+    margin-top: 1rem;
+}
+
+.cabinet__link {
+    color: #2281F6;
+    font-size: 0.75rem;
+    font-family: 'Gotham Pro', sans-serif;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+}
+.cabinet__link:hover {
+    border-bottom: 1px solid #3e69fa63;
+}
+.cabinet__link::after {
+    content: '';
+    display: inline-block;
+    width: 0.25rem;
+    height: 0.25rem;
+    border-top: 1px solid #2281F6;
+    border-right: 1px solid #2281F6;
+    transform: rotate(45deg);
+    margin-left: 0.15rem;
+    margin-bottom: 0.05rem;
+}
+
+.cabinet__content-wrap {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.cabinet__content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.cabinet__content-title {
+    font-size: 1.3125rem;
+    color: #fff;
+    font-weight: 700;
+    font-family: "Gotham Pro", sans-serif;
+    margin: 3rem 0 1rem 0;
+}
+body.light .cabinet__content-title {
+    color: #2c2b63;
+    margin: 1rem 0 1rem 0;
+}
+.cabinet__pad {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background-color: #272660;
+    border-radius: 1.25rem;
+}
+body.light .cabinet__pad {
+    background-color: #ffffff;
+    box-shadow: 0 0 1rem #0000000d;
+}
+.cabinet__pad .spinner {
+    border-radius: 1rem;
+}
+.cabinet__pad .message {
+    color: #fff;
+}
+body.light .message{
+    color: #1a1944;
+}
+
+.cabinet__pad-head {
+    display: flex;
+    margin-bottom: 2rem;
+}
+
+.cabinet__pad-title {
+    font-family: 'Gotham Pro', sans-serif;
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+body.light .cabinet__pad-title{
+    color: #1a1944;
+}
+
+.custom-table__money {
+    font-weight: 700;
+}
+
+.cabinet__pad-status_fail,
+.cabinet__pad-status_warn,
+.cabinet__pad-status_success {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.cabinet__pad-status_success {
+    color: var(--color-green);
+}
+.cabinet__pad-status_warn::before,
+.cabinet__pad-status_fail::before,
+.cabinet__pad-status_success::before {
+    content: '';
+    display: inline-block;
+    height: 0.8rem;
+    width: 0.8rem;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-right: 0.25rem;
+}
+.cabinet__pad-status_fail {
+    color: var(--color-red);
+}
+.cabinet__pad-status_warn {
+    color: var(--color-orange);
+}
+.cabinet__pad-status_success::before {
+    background-image: url("/img/ui/icons/check-green.svg");
+}
+.cabinet__pad-status_fail::before {
+    background-image: url("/img/ui/icons/stop-red.svg");
+}
+
+.cabinet__pad-status_warn::before {
+    background-image: url("/img/ui/icons/check-green.svg");
+    filter: hue-rotate(303deg) saturate(1.5);
+}
+
+.cabinet__pad p{
+    color: #8186BD;
+    font-family: "Gotham Pro", "sans-serif";
+    /*font-size: 13px;*/
+    font-weight: 400;
+    line-height: 20px;
+    text-align: left;
+}
+
+.cabinet__select{
+    background: #1C1F3E;
+    color: #FFF;
+    height: 2.625rem;
+    border-radius: .5rem;
+    border: none;
+    outline: none;
+    padding: .5rem;
+    font-size: 0.75rem;
+    font-family: 'Gotham Pro', sans-serif;
+    font-weight: 500;
+}
+
+.self-lock-modal{
+    width: 100%;
+    text-align: center;
+    background: #171B31;
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+.self-lock-modal div{
+    text-align: center;
+}
+.self-lock-modal p{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: .75rem;
+    font-weight: 400;
+    line-height: 16px;
+    text-align: center;
+    color: #8186BD;
+}
+
+.self-lock-modal > img{
+    width: 96px;
+    height: 96px;
+}
+
+.red-title{
+    color: #C40E1B;
+    font-size: 1.2rem;
+    line-height: 1.4rem;
+    font-weight: 500;
+}
+
+.self-lock-modal .locked_to{
+    color: #C40E1B;
+    font-weight: 500;
+}
+
+.red-title > img {
+    width: 40px;
+    height: 40px;
+}
+
+.danger-pad{
+    border: 1px solid #C40E1B;
+    border-radius: 1rem;
+    color: #C40E1B;
+    background: #00000029;
+    padding: 1rem;
+    font-weight: 500;
+    font-size: .875rem;
+    line-height: 1rem;
+}
+
+.self-lock-modal p{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: .875rem;
+    font-weight: 400;
+    line-height: 1.2rem;
+    text-align: left;
+}
+
+
+.cabinet__bottom-controls{
+    position: fixed;
+    bottom: 5.5rem;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: #1C1F3ECC;
+    border-radius: 2rem;
+    padding: .5rem;
+    display: flex;
+    z-index: 5;
+}
+.cabinet__bottom-controls .use-promocode-btn{
+    border-radius: 2rem;
+    background: #F29C49;
+    color: #000;
+    margin-right: 1rem;
+}
+.cabinet__bottom-controls .button_green{
+    border-radius: 2rem;
+    background: #A3DC8F;
+    color: #000;
+}

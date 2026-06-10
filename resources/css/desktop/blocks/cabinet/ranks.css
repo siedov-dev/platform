@@ -1,0 +1,305 @@
+.ranks-wrapper{
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    margin: 1.8rem;
+    padding: 2rem 2rem;
+}
+.rank-card{
+    scroll-snap-align: start;
+    margin: 0 .5rem;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    background: linear-gradient(180deg, #2B2F5B 20%, #2B2F5BA0 50%, #181A3200 90%);
+
+    width: clamp(360px, 33%, 400px);
+    /*height: 590px;*/
+    height: min-content;
+    border-radius: 1rem;
+
+    transform: scale(.9);
+    transition: all .5s;
+}
+.rank-card .veil {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background-color: #0c0c30C0;
+    border-radius: 1rem;
+}
+.rank-card.selected{
+    transform: none;
+}
+.rank-card.selected .veil{
+    display: none;
+}
+.rank-card.rank-1{
+    background: linear-gradient(180deg, #2B2F5B 20%, #2B2F5BA0 40%, #181A3200 80%);
+}
+.rank-card.rank-2{
+    background: linear-gradient(180deg, #004D2C 20%, #004D2C 40%, #181A3200 80%);
+}
+.rank-card.rank-3{
+    background: linear-gradient(180deg, #044360 20%, #044360 40%, #181A3200 80%);
+}
+.rank-card.rank-4{
+    background: linear-gradient(180deg, #783001 20%, #783001 40%, #181A3200 80%);
+}
+.rank-card.rank-5{
+    background: linear-gradient(180deg, #2D6206 20%, #2D6206 40%, #181A3200 80%);
+}
+.rank-card.rank-6{
+    background: linear-gradient(180deg, #B26D0A 20%, #B26D0A 40%, #181A3200 80%);
+}
+.rank-card.rank-7{
+    background: linear-gradient(180deg, #000000 20%, #000000 40%, #181A3200 80%);
+}
+.rank-card.rank-8{
+    background: linear-gradient(180deg, #963126 20%, #963126 40%, #181A3200 80%);
+}
+.rank-card.rank-9{
+    background: linear-gradient(180deg, #FF7300 20%, #FF7300 40%, #181A3210 80%);
+}
+
+
+.rank-card .rank-bg{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    object-fit: contain;
+}
+
+.rank-card .rank-info{
+    position: absolute;
+    top: 30px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    color: #FFFFFF7A;
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: .875rem;
+    font-weight: 400;
+    line-height: 1rem;
+    letter-spacing: 0.01em;
+    height: 380px;
+    justify-content: space-around;
+}
+.rank-info .rank-icon{
+    width: 196px;
+    height: 196px;
+}
+.rank-info .rank-name{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 2rem;
+    text-align: center;
+    color: #FFF;
+}
+
+.rank-info .current-value{
+    color: #FFF;
+    font-size: 1rem;
+    line-height: 2rem;
+    letter-spacing: 0.01em;
+}
+.rank-info .achievements__popup-progress-bar{
+    background-color: #00000033;
+}
+.rank-info .achievements__popup-progress{
+    background-color: #A7DA94;
+}
+
+.rank-card .rewards{
+    /*position: absolute;*/
+    /*bottom: 0;*/
+    /*left: 0;*/
+    /*right: 0;*/
+    margin-top: 420px;
+    width: 100%;
+    /*margin: 0 .5rem;*/
+    background: #2C2B64;
+    border-radius: 1rem;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem;
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: .875rem;
+    font-weight: 700;
+    line-height: 1rem;
+    letter-spacing: 0.03em;
+    text-align: left;
+    color: #FFF;
+}
+.rewards .items{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    /*overflow-x: auto;*/
+    /*scroll-behavior: smooth;*/
+    /*scroll-snap-type: x mandatory;*/
+}
+.rewards .reward-item{
+    /*scroll-snap-align: start;*/
+    flex-shrink: 0;
+    position: relative;
+    width: calc(50% - 10px);
+    background: #211F5E;
+    border-radius: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: .5rem 5px;
+    height: 90px;
+}
+.reward-item .title{
+    font-size: .75rem;
+    position: absolute;
+    top: 5px;
+    text-align: center;
+    z-index: 3;
+}
+.reward-item > img{
+    height: 90px;
+    padding: 30px 10px 10px 10px;
+}
+.reward-item .amount{
+    position: absolute;
+    bottom: 12px;
+    z-index: 2;
+    font-weight: 600;
+    font-size: 1rem;
+    text-shadow: #FFF 0 0 2px;
+}
+.ranks{
+    position: relative;
+}
+.ranks .scroll-control{
+    position: absolute;
+    top: 40%;
+    background-color: #2B2F5B;
+    width: 3rem;
+    height: 3rem;
+    border-radius: .5rem;
+    cursor: pointer;
+}
+.ranks .scroll-control.left{
+    left: -20px;
+}
+.ranks .scroll-control.right{
+    right: -20px;
+}
+.ranks .scroll-control .arrow-right,
+.ranks .scroll-control .arrow-left{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+}
+.ranks .scroll-control .arrow-right{
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+.ranks .scroll-control .arrow-left{
+    transform: translate(-50%, -50%) rotate(135deg);
+}
+.rank-card .current-rank{
+    display: none;
+    position: absolute;
+    top: -1.5rem;
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: .85rem;
+    font-weight: 500;
+    line-height: 1rem;
+}
+.rank-card.current .current-rank{
+    display: block;
+}
+
+.rank-card.selected .rewards.highlighted{
+    border: 2px solid #A3DC8F
+}
+
+.ranks .rewards .scroll-control{
+    top: 0;
+    background: none;
+    width: 3rem;
+    height: 3rem;
+}
+.ranks .rewards .scroll-control.left{
+    left: 0;
+}
+.ranks .rewards .scroll-control.right{
+    right: 0;
+}
+.ranks .rewards .button{
+    margin: .5rem 0;
+    width: 100%;
+    height: 2rem;
+    font-size: 1rem;
+    border-radius: 1rem;
+}
+
+.rank-card .rank-required{
+    font-family: "Gotham Pro", "sans-serif";
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.2rem;
+    text-align: center;
+    color: #FFF;
+    max-width: 20rem;
+}
+
+.rank-card.reqired-modal{
+    width: 24rem;
+    height: 450px;
+}
+.reqired-modal.rank-card.rank-1{
+    background: linear-gradient(180deg, #2B2F5B 20%, #2B2F5BA0 40%, #181A32 80%);
+}
+.reqired-modal.rank-card.rank-2{
+    background: linear-gradient(180deg, #004D2C 20%, #004D2C 40%, #181A32 80%);
+}
+.reqired-modal.rank-card.rank-3{
+    background: linear-gradient(180deg, #044360 20%, #044360 40%, #181A32 80%);
+}
+.reqired-modal.rank-card.rank-4{
+    background: linear-gradient(180deg, #783001 20%, #783001 40%, #181A32 80%);
+}
+.reqired-modal.rank-card.rank-5{
+    background: linear-gradient(180deg, #2D6206 20%, #2D6206 40%, #181A32 80%);
+}
+.reqired-modal.rank-card.rank-6{
+    background: linear-gradient(180deg, #B26D0A 20%, #B26D0A 40%, #181A32 80%);
+}
+.reqired-modal.rank-card.rank-7{
+    background: linear-gradient(180deg, #000000 20%, #000000 40%, #181A32 80%);
+}
+.reqired-modal.rank-card.rank-8{
+    background: linear-gradient(180deg, #963126 20%, #963126 40%, #181A32 80%);
+}
+.reqired-modal.rank-card.rank-9{
+    background: linear-gradient(180deg, #FF7300 20%, #FF7300 40%, #181A32 80%);
+}
+
+.ranks .button.disabled{
+    background: #555474;
+    color: #b5b4c8;
+    font-size: .875rem;
+    font-weight: 500;
+}

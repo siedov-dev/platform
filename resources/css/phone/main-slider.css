@@ -1,0 +1,294 @@
+.main-slider {
+    position: relative;
+    width: 100%;
+}
+
+.main-slider__arrow-left {
+    display: none;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 3rem;
+    background-color: transparent;
+    position: absolute;
+    left: 1.25rem;
+    top: calc(50% - 2rem);
+    z-index: 20;
+    transition: 500ms;
+    cursor: pointer;
+    user-select: none;
+}
+.main-slider__arrow-left:hover {
+    background-color: #00000020;
+}
+.main-slider__arrow-left::before {
+    content: '';
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(45deg);
+    position: absolute;
+    left: 1.65rem;
+    top: 1.3rem;
+    z-index: 5;
+}
+
+.main-slider__arrow-right {
+    display: none;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 3rem;
+    background-color: transparent;
+    position: absolute;
+    right: 1.25rem;
+    top: calc(50% - 2rem);
+    z-index: 20;
+    transition: 500ms;
+    cursor: pointer;
+    user-select: none;
+}
+.main-slider__arrow-right:hover {
+    background-color: #00000020;
+}
+.main-slider__arrow-right::before {
+    content: '';
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-right: 2px solid #fff;
+    border-top: 2px solid #fff;
+    transform: rotate(45deg);
+    position: absolute;
+    left: 1rem;
+    top: 1.3rem;
+    z-index: 5;
+}
+
+.main-slider__slides {
+    height: 100%;
+    position: relative;
+    margin: 1rem;
+}
+
+
+.main-slider__slide {
+    width: 100%;
+    /*background-color: #5b4cf0;*/
+    box-shadow: 0 0 1rem #00000009;
+    /*border-radius: 2rem;*/
+    position: absolute;
+    left: 0;
+    transform: scale(0.5);
+    opacity: 0;
+    z-index: 0;
+    transition: 500ms;
+    border-radius: 1rem;
+    overflow: hidden;
+    height: calc(100% - 45px);
+}
+.main-slider__slide-bg {
+    width: 100%;
+    object-fit: fill;
+    height: 100%;
+}
+
+.main-slider__slide_active {
+    z-index: 5;
+    transform: scale(1);
+    opacity: 1;
+}
+
+
+.main-slider__slide_prev {
+    transform: scale(0.85);
+    opacity: 0.4;
+}
+
+
+.main-slider__slide_next {
+    transform: scale(0.85);
+    opacity: 0.4;
+}
+
+.main-slider__buttons-wrap {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    height: 1.5rem;
+    border-radius: 1.5rem;
+    width: 100%;
+    left: 0;
+    bottom: -0.5rem;
+    z-index: 48;
+}
+.main-slider__buttons {
+    background-color: #1d1c4c;
+    border-radius: 1.5rem;
+    display: flex;
+    width: auto;
+    padding: 0.5rem;
+}
+body.light .main-slider__buttons {
+    background-color: #f8f8fa;
+}
+.main-slider__button {
+    width: 0.625rem;
+    height: 0.625rem;
+    border: 3px solid #8283C0;
+    border-radius: 1rem;
+    position: relative;
+}
+.main-slider__button + .main-slider__button {
+    margin-left: 0.25rem;
+}
+.main-slider__button_active::before {
+    content: '';
+    display: block;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 1rem;
+    position: absolute;
+    background-color: var(--color-orange);
+    left: -3px;
+    top: -3px;
+}
+.main-slider__slide-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 2rem;
+    height: 3rem;
+    background-image: linear-gradient(to bottom, #04B58A, #09B680);
+    color: #1A1944;
+    font-size: 0.875rem;
+    font-weight: 700;
+    border-radius: 2rem;
+    position: absolute;
+    top: 8rem;
+    left: 50%;
+    width: 12rem;
+    margin-left: -6rem;
+    cursor: pointer;
+    transition: 250ms;
+    text-decoration: none;
+    box-shadow: inset 0 0 15px #82d386, 0 3px 15px #8d55e980;
+}
+
+.welcome-bonus-wrapper{
+    max-height: 80px;
+    position: relative;
+    width: 100%;
+}
+.welcome-bonus-wrapper .banner-img{
+    position: relative;
+}
+.welcome-bonus-wrapper .ext-info-btn{
+    position: absolute;
+    right: 1rem;
+    top: calc(50% - 9px);
+    width: 18px;
+    height: 18px;
+    transition: all .5s;
+    transform: rotate(180deg);
+}
+.welcome-bonus-wrapper.shown .ext-info-btn{
+    transform: rotate(0deg);
+}
+.welcome-bonus-wrapper .ext-info-btn img{
+    width: 18px;
+    height: 18px;
+}
+.welcome-bonus-wrapper .ext-info:after{
+    content: "";
+}
+.welcome-bonus-wrapper img{
+    height: 80px;
+    width: 100%;
+}
+.welcome-bonus-wrapper .ext-info{
+    position: absolute;
+    overflow: hidden;
+    top: 100%;
+    z-index: 60;
+    background: linear-gradient(to bottom, #0c0c30FF, #0c0c3000);
+    height: 0;
+    padding: 0;
+    transition: height 0.5s;
+}
+body.light .welcome-bonus-wrapper .ext-info{
+    background: linear-gradient(to bottom, #eaeaf6FF, #eaeaf650);
+}
+.welcome-bonus-wrapper .ext-info .info{
+    padding: 1rem 0.5rem;
+}
+.welcome-bonus-wrapper .info div{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    color: #FFFFFF;
+    background-color: #0c0c30;
+}
+body.light .welcome-bonus-wrapper .info div{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    color: #000000;
+    background-color: #eaeaf6;
+}
+.welcome-bonus-wrapper .ext-info .auth-buttons__reg{
+    height: 3rem;
+    font-family: 'Gotham Pro';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 0.8rem;
+    line-height: 1rem;
+    color: #000000;
+    margin-top: 1rem;
+}
+.welcome-bonus-wrapper.shown .ext-info{
+    height: 150vh;
+}
+
+.bonus-slider-wrapper{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column;
+}
+.bonus-slider-wrapper > .main-slider{
+    max-width: 600px;
+    aspect-ratio: 16 / 7;
+    height: calc(100vw * 0.43);
+}
+
+.main-slider__dots{
+    position: absolute;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    bottom: 1rem;
+    z-index: 20;
+}
+
+.main-slider__dot{
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 2px #888888 solid;
+    background-color: #888888;
+    margin: 0 4px;
+    transition: width .5s;
+}
+
+.main-slider__dot.active{
+    border-radius: 25%;
+    border: 2px #D9D9D9 solid;
+    background-color: #D9D9D9;
+    width: 12px;
+}

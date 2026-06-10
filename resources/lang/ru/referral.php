@@ -1,0 +1,38 @@
+<?php
+
+return [
+    'goToPromo' => 'Перейти к нашим промо-материалам',
+    'share' => 'Поделиться',
+    'myReferralLink' => 'Моя реферальная ссылка',
+    'myReferralBonusLink' => 'Моя бонусная ссылка',
+    'referralsTotal' => 'Рефералов',
+    'activeWithDeposit' => 'Активных с депозитом',
+    'profitPerDay' => 'Доход в сутки',
+    'realMoney' => 'Моментальные выплаты',
+    'bonusMoney' => 'Накопительный счет',
+    'withdrawMoney' => 'Вывести средства',
+    'referralsHistory' => 'История рефералов',
+    'referralsList' => 'Список рефералов',
+    'noRefsAtTheMoment' => 'На данный момент у вас нет рефералов',
+    'hereRefsWillBeDisplayed' => 'Здесь будут отображены все ваши рефералы',
+    'date' => 'Дата',
+    'user' => 'Пользователь',
+    'profit' => 'Доход',
+    'payout' => 'Выплата',
+    'registration' => 'Регистрация',
+    'moneySpent' => 'Проигрыш',
+
+    'not_enough_money' => "Недостаточно денег на счетах.",
+    'request_error' => 'Во время обработки запроса возникла ошибка.',
+    'fd_profit' => 'Доход за первый депозит рефералов',
+    'ach_reward' => 'За достижение',
+
+    'event.Click' => 'Переход',
+    'event.Register' => 'Регистрация',
+    'event.MoneySpent' => 'Игра',
+    'event.Deposit' => 'Депозит',
+    'event.FirstDeposit' => 'Первый депозит',
+    'event.AchievementCompleted' => 'Завершено достижение',
+    'event.ReferralMoneyTransferred' => 'Перевод реферальных средств',
+    'event.AccumulationMoneyTransferred' => 'Перевод накопительных средств',
+];

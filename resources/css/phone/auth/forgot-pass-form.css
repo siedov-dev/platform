@@ -1,0 +1,11 @@
+#forgot-pass-form {
+    display: flex;
+    flex-direction: column;
+    background-color: #181A32;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+#forgot-pass-form .spinner {
+    background-color: #ffffffbf;
+    border-radius: 1rem;
+}

@@ -1,0 +1,55 @@
+.confirm-modal {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+.confirm-modal__msg {
+    max-width: 17rem;
+    font-size: 1.315rem;
+    font-weight: 700;
+    color: #3D3E6D;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+.confirm-modal__buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+.confirm-modal__no-btn {
+    background-color: #EF8E8B;
+    min-width: 7rem;
+    height: 2.75rem;
+    border: none;
+    padding: 0 2rem;
+    border-radius: 0.5rem;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+}
+.confirm-modal__no-btn:hover {
+    background-color: #f5837f;
+}
+.confirm-modal__yes-btn {
+    margin-left: 1rem;
+    padding: 0 2rem;
+    min-width: 7rem;
+    height: 2.75rem;
+    border-radius: 0.5rem;
+    background-color: transparent;
+    border: 2px solid #787BF7;
+    color: #787BF7;
+    font-weight: 700;
+    font-size: 0.875rem;
+    outline: none;
+    cursor: pointer;
+}
+.confirm-modal__yes-btn:hover {
+    border-color: #6367ff;
+    color: #6367ff;
+}

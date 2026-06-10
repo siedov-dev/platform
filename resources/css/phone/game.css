@@ -1,0 +1,143 @@
+.game {
+    display: block;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background-color: #323274;
+    position: relative;
+}
+.game.test-mode{
+    border: #bf9e00 3px dashed;
+}
+.game::before {
+    content: '';
+    display: block;
+    width: 100%;
+    /*padding-top: 7rem;*/
+    aspect-ratio: 1;
+}
+.game__veil {
+    position: absolute;
+    left: 0;
+    top: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    background-color: #00000020;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    z-index: 10;
+    display: none;
+    opacity: 0;
+    transition: 150ms;
+}
+.game.veil-shown .game__veil {
+    opacity: 1;
+    display: flex;
+}
+.game__name {
+    position: absolute;
+    top: .5rem;
+    color: #fff;
+    font-weight: 600;
+    font-size: .875rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+.game__play-real {
+    position: absolute;
+    top: calc(50% - 1.2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    font-size: 0.875rem;
+    font-weight: 700;
+    background-color: #5344E6;
+    cursor: pointer;
+    transform: scale(1) rotate(90deg);
+
+}
+.games .game__play-real{
+    transform: scale(.8) rotate(90deg);
+}
+.games .game__name{
+    font-size: .75rem;
+}
+
+.triangle {
+    position: relative;
+    background-color: #FFF;
+    text-align: left;
+    margin-bottom: 6px;
+}
+.triangle:before,
+.triangle:after {
+    content: '';
+    position: absolute;
+    background-color: inherit;
+}
+.triangle,
+.triangle:before,
+.triangle:after {
+    width:  .75rem;
+    height: .75rem;
+    border-top-right-radius: 30%;
+}
+.triangle {
+    transform: rotate(-60deg) skewX(-30deg) scale(1,.866);
+}
+.triangle:before {
+    transform: rotate(-135deg) skewX(-45deg) scale(1.414,.707) translate(0,-50%);
+}
+.triangle:after {
+    transform: rotate(135deg) skewY(-45deg) scale(.707,1.414) translate(50%);
+}
+
+.game__play-demo {
+    position: absolute;
+    bottom: .4rem;
+    right: .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: #FFFFFF30;
+    height: 1.2rem;
+    padding: .5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+.game__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.game__badge {
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    background-color: var(--color-green);
+    padding: 0.25rem 1rem;
+    border-radius: 1rem;
+    color: #1a1944;
+    font-weight: 700;
+    font-size: 0.75rem;
+    z-index: 1;
+}
+.loader-img{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}

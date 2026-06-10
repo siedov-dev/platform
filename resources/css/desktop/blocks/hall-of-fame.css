@@ -1,0 +1,41 @@
+.hof__title {
+    font-size: 1.3rem;
+    color: #fff;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+}
+body.light .hof__title {
+    color: #1A1944;
+}
+.hof__buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+    grid-gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.hof__button {
+    height: 3.25rem;
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px solid #3D3E6D;
+    border-radius: 0.5rem;
+    justify-content: center;
+    color: #8283C0;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.hof__button_active {
+    border-color: #787BF7;
+    box-shadow: 0 0 0 1px #787bf7;
+    color: #fff;
+    font-weight: 700;
+}
+body.light .hof__button_active {
+    color: #1A1944;
+}
+#hof__table-wrap .spinner {
+    background-color: rgba(29, 29, 74, 0.75);
+}

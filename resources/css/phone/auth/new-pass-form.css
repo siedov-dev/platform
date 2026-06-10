@@ -1,0 +1,12 @@
+.new-pass-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+.new-pass-form .spinner {
+    background-color: #ffffffbf;
+    border-radius: 1rem;
+}

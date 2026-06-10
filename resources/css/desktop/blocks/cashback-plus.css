@@ -1,0 +1,226 @@
+.cashback-shoot{
+    background-image: url("/img/cashback/bg_w.png");
+    background-position-x: left;
+    background-position-y: bottom;
+    background-repeat: no-repeat;
+    border-radius: 1rem;
+}
+
+.cashback-shoot .bg-image{
+    width: 900px;
+    height: 600px;
+}
+.cashback-shoot .info-flag{
+    background-image: url("/img/cashback/flag.png");
+    position: absolute;
+    bottom: 180px;
+    left: 50px;
+    width: 200px;
+    height: 350px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.cashback-shoot .info-flag .cashback-info{
+    position: absolute;
+    right: 10px;
+    top: 60px;
+    width: 120px;
+    white-space: nowrap;
+    text-align: center;
+}
+.info-flag .cashback-info p{
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.4rem;
+    line-height: 2.6rem;
+    letter-spacing: 1px;
+    text-align: center;
+}
+.info-flag .cashback-info .info-icon{
+    right: 0;
+    top: initial;
+    bottom: -10px;
+    background-image: url("/img/icons/info-icon2.svg");
+    width: 25px;
+    height: 25px;
+    transform: scale(.8);
+}
+.cashback-shoot .title{
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: linear-gradient(180deg, #181A32FF, #181A32F5 90%, #181A3200);
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    height: 5rem;
+}
+.cashback-shoot .health-bar{
+    position: absolute;
+    right: 60px;
+    top: 20px;
+    z-index: 2;
+}
+.cashback-shoot .health-bar > img{
+    display: none;
+}
+.cashback-shoot .health-bar[data-state="0"] > img:nth-child(1) {
+    display: block;
+}
+.cashback-shoot .health-bar[data-state="1"] > img:nth-child(2) {
+    display: block;
+}
+.cashback-shoot .health-bar[data-state="2"] > img:nth-child(3) {
+    display: block;
+}
+
+.cashback-shoot .animation-scene{
+    position: absolute;
+    bottom: 0;
+    width: 550px;
+    height: 300px;
+    left: 0;
+    right: 0;
+}
+.cashback-shoot .animation-scene #cannon{
+    position: absolute;
+    left: 0;
+    z-index: 10;
+    transform: scale(.85) translateY(20px);
+}
+.cashback-shoot .animation-scene .ball{
+    position: absolute;
+    left: 130px;
+    z-index: 5;
+    bottom: 70px;
+}
+.cashback-shoot .animation-scene .barrel{
+    position: absolute;
+    left: 250px;
+    bottom: 120px;
+    z-index: 2;
+    transform: scale(.7);
+}
+
+.cashback-shoot .animation-scene .cannonball{
+    position: absolute;
+    z-index: 21;
+    bottom: 20px;
+}
+.cashback-shoot .animation-scene .cannonball img{
+    height: 100px;
+    width: 100px;
+}
+.cashback-shoot .cannonball .ball-amount{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    color: #FFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: .875rem;
+    background: url("/img/cashback/counter.svg");
+    background-size: cover;
+}
+
+.cashback-shoot .animation-scene .golden_ball{
+    left: 350px;
+}
+.cashback-shoot .animation-scene .black_ball{
+    left: 450px;
+}
+
+.cashback-shoot .win-text{
+    font-family: "Gotham Pro", "sans-serif";
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3rem;
+    top: 7rem;
+    left: 0;
+    right: 0;
+    font-size: 1.8rem;
+    line-height: 2rem;
+    font-weight: 700;
+    color: #e2d712;
+    text-shadow: #000000 0 0 4px;
+    background: radial-gradient(#FFFFFFD0 20%, #C2920000 80%);
+    transition: all .5s;
+    transform: scale(1);
+    pointer-events: none;
+    z-index: 35;
+}
+
+.win-text.invisible{
+    font-size: 1rem;
+    transform: scale(.4);
+    transition: none;
+}
+
+.cashback-shoot .win-item{
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 4rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    backdrop-filter: blur(3px);
+}
+.cashback-shoot .win-item .shine-item .shine-img{
+    bottom: initial;
+    left: initial;
+    right: -25px;
+    top: -25px;
+}
+.win-item .slc__popup-icon{
+    transition: all .5s;
+    transform: scale(1);
+}
+.win-item.invisible .slc__popup-icon{
+    transform: scale(.4);
+    pointer-events: none;
+    transition: none;
+}
+
+
+.cashback-shoot .bottom-controls{
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 0;
+    right: 0;
+    bottom: 4rem;
+    z-index: 40;
+    transition: all .5s;
+}
+
+.cashback-shoot .bottom-controls.invisible{
+    transform: scale(0);
+    transition: none;
+}
+
+.popup-img-wrapper{
+    max-width: 6rem;
+    max-height: 6rem;
+}
+
+
+.text-implication{
+    font-family: "Gotham Pro", "sans-serif";
+    font-style: italic;
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.6rem;
+    color: #FFF;
+    text-shadow: #000 0 0 2px;
+}

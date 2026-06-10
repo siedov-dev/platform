@@ -1,0 +1,114 @@
+.cabinet__prtn-ref-title {
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75em;
+}
+body.light .cabinet__prtn-ref-title{
+    color: #1a1944;
+}
+
+.cabinet__prtn-ref {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+.cabinet__prtn-ref-link {
+    display: flex;
+    align-items: center;
+    border: 1px solid #4E7CFF;
+    background-color: #262558;
+    position: relative;
+    padding: 0 3rem 0 1rem;
+    height: 2.5rem;
+    color: #fff;
+    font-size: 0.875rem;
+    border-radius: 0.625rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    overflow: hidden;
+}
+body.light .cabinet__prtn-ref-link {
+    background-color: #fff;
+    color: #1a1944;
+}
+.cabinet__prtn-ref-copy {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.625rem;
+    background-color: #4E7CFF;
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    right: -1px;
+    top: -1px;
+    cursor: pointer;
+}
+
+.cabinet__prtn-share {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-top: 2rem;
+}
+
+.cabinet__prtn-share-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 2.25rem);
+    grid-gap: 0.75rem;
+}
+
+.cabinet__prtn-digests {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
+}
+
+.cabinet__prtn-digest-item {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #3b3a75;
+    background-color: #292861;
+    padding: 1rem;
+    border-radius: 0.95rem;
+    position: relative;
+}
+body.light .cabinet__prtn-digest-item {
+    background-color: #fff;
+    border: 1px solid #e0e0ef;
+}
+.cabinet__prtn-digest-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.75rem;
+}
+body.light .cabinet__prtn-digest-icon {
+    filter: brightness(0.75);
+}
+.cabinet__prtn-digest-name {
+    color: #aaaace;
+    font-size: 0.75rem;
+    max-width: calc(100% - 1.5rem);
+}
+
+.cabinet__prtn-digest-value {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 1rem;
+}
+body.light .cabinet__prtn-digest-value {
+    color: #2c2b63;
+}
+.cabinet__ref-tables {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+}

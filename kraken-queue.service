@@ -1,0 +1,11 @@
+[Unit]
+Description=kraken queue woker
+
+[Service]
+User=www-root
+WorkingDirectory=/var/www/www-root/data/www/krakencassino.com/
+ExecStart=/var/www/www-root/data/www/krakencassino.com/queue_work.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

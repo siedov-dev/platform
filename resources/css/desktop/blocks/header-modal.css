@@ -1,0 +1,286 @@
+.header-modal{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #00000040;
+    /*-webkit-backdrop-filter: blur(5px);*/
+    /*backdrop-filter: blur(5px);*/
+    z-index: 700;
+    display: none;
+    flex-flow: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    animation: opacityAnim;
+    animation-duration: .2s;
+    /*padding-top: 4rem;*/
+}
+.header-modal.shown{
+    display: flex;
+}
+
+.header-modal .content{
+    /*padding: 1rem .5rem;*/
+    width: 500px;
+    opacity: 0;
+    animation: fromBottomAnim;
+    animation-duration: .2s;
+    max-height: calc(100% - 5rem);
+    max-height: calc(100dvh - 5rem);
+    margin-bottom: 1rem;
+    overflow: auto;
+    margin-left: calc((100% - 1230px) / 2 + 60px);
+    margin-top: 60px;
+}
+.header-modal.shown .content{
+    opacity: 1;
+}
+.header-modal .pad{
+    flex-direction: column;
+    padding: 1rem;
+    background-color: #181A32;
+    border-radius: 0.5rem;
+    box-shadow: #0a0a17 0 0 2px;
+}
+
+body.light .header-modal .pad{
+    background-color: #fff;
+}
+
+.header-modal__title{
+    color: #8C90CA;
+    font-size: .875rem;
+    line-height: 1.2rem;
+    display: flex;
+    justify-content: flex-start;
+    font-family: "Gotham Pro", "sans-serif";
+    font-weight: 600;
+}
+
+.header-modal__title-small{
+    color: #8C90CA;
+    font-size: .875rem;
+    line-height: 1rem;
+    display: flex;
+    justify-content: flex-start;
+    font-family: "Gotham Pro", "sans-serif";
+    font-weight: 600;
+}
+
+body.light .header-modal__title{
+    color: #262756;
+}
+
+.popular-providers{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    font-weight: 600;
+}
+.header-modals__games-nav{
+    display: grid;
+    grid-template-columns: repeat(5, calc(20% - 4px));
+    grid-auto-rows: 4.75rem;
+    justify-content: space-between;
+    align-items: center;
+    grid-gap: 1rem 2px;
+}
+.header-modals__games-nav .menu__item{
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+    /*width: 4rem;*/
+    /*height: 5.5rem;*/
+    padding: 0;
+}
+.header-modals__games-nav .menu__item img{
+    background-color: #2C2B64;
+    border-radius: 1rem;
+    padding: .8rem;
+    width: 3.5rem;
+    height: 3.5rem;
+}
+.header-modals__games-nav .menu__item-text{
+    font-family: "Gotham Pro", "sans-serif";
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    margin: 0;
+    color: #8C90CA;
+    font-weight: 500;
+    font-size: .75rem;
+    line-height: 1rem;
+    width: 95%;
+    text-align: center;
+    white-space: nowrap;
+}
+.header-modals__games-nav .menu__item.new-games img{
+    background: linear-gradient(90deg, #0B088E 0%, #26294F 100%);
+}
+.header-modals__games-nav .menu__item.bonus-games img{
+    background: linear-gradient(90deg, rgba(139, 18, 20, 0.66) -34.82%, #1D203E 122.32%);
+}
+.header-modals__games-nav .menu__item.tournament-games img{
+    background: linear-gradient(90deg, #3DE500 -33.93%, #212445 110.71%);
+}
+
+.search-menu{
+    height: 100%;
+}
+
+.search-menu .content{
+    height: 100%;
+}
+
+.search-menu .content .pad{
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+}
+
+.search-menu .games{
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.search-menu .game{
+    display: flex;
+    margin: 0 .5rem 1rem 0;
+    flex-shrink: 0;
+    background: none;
+    height: 3.7rem;
+}
+.search-menu .game:before{
+    padding: 0;
+    width: 0;
+}
+.search-menu .game img{
+    padding: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: .5rem;
+    object-fit: cover;
+}
+.search-menu .game .name{
+    display: flex;
+    flex-flow: column;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: .5rem;
+}
+.search-menu .game .name :first-child{
+    color: #FFF;
+    font-size: .75rem;
+    line-height: 1rem;
+}
+body.light .search-menu .game .name :first-child{
+    color: #000;
+}
+.search-menu .game .provider{
+    color: #8C90CA;
+    font-size: .75rem;
+    line-height: .875rem;
+    display: flex;
+    align-items: flex-end;
+}
+.search-menu .game .provider img{
+    height: 1rem;
+    max-width: 3rem;
+    object-fit: contain;
+}
+
+.search-menu .game .play-button{
+    height: 2.5rem;
+    width: 4rem;
+    color: #000;
+    border-radius: .5rem;
+    background-color: #A7DA94;
+    margin: 0 .5rem;
+    font-size: .875rem;
+    font-weight: 500;
+    line-height: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.search-menu .games-count{
+    display: flex;
+    font-size: .875rem;
+    color: #8C90CA;
+    font-weight: 600;
+    margin: 1rem 0;
+}
+.search-menu .game__image{
+    position: static;
+}
+
+.main-menu.header-modal .content{
+    max-width: 30rem;
+}
+
+@media (max-height: 700px) {
+    .main-menu__support-menu{
+        display: none;
+    }
+}
+
+@keyframes opacityAnim {
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}
+
+@keyframes fromBottomAnim {
+    from{
+        opacity: 0.2;
+        margin-bottom: -50%;
+    }
+    to{
+        opacity: 1;
+        margin-bottom: 0;
+    }
+}
+
+.header-modal .popular-providers .menu__item img{
+    width: 24px;
+    height: 24px;
+}
+.header-modal .popular-providers .menu__item-text{
+    color: #8186BD;
+    font-size: 14px;
+    line-height: 24px;
+}
+.header-modals__games-nav .menu__item .has-new{
+    display: none;
+    position: absolute;
+    right: 8px;
+    top: 0;
+    left: initial;
+    background-color: #f29b49;
+    border-radius: 50%;
+    color: #FFFFFF;
+    width: 1rem;
+    height: 1rem;
+    justify-content: center;
+    align-items: center;
+    font-size: .875rem;
+    line-height: 1rem;
+    font-weight: 700;
+    font-family: "Gotham Pro", "sans-serif";
+}
+.header-modals__games-nav .menu__item.notify .has-new{
+    display: flex;
+}

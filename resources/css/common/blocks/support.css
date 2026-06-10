@@ -1,0 +1,40 @@
+.support__float{
+    right: 60px;
+    bottom: 60px;
+    position: fixed;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 500;
+}
+.support__float .support__item{
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    height: 52px;
+    width: 52px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: 5px;
+    display: none;
+}
+.support__float.shown .support__item{
+    display: flex;
+}
+.support__float .support__item :first-child{
+    color: #8C90CA;
+    font-family: "Gotham Pro", "sans-serif";
+    font-weight: 700;
+    font-size: 0.875rem;
+    position: absolute;
+    right: 65px;
+    word-break: keep-all;
+    white-space: nowrap;
+}
+.support__float .support__item.main-icon {
+    display: flex;
+}
+.support__float.shown .support__item.main-icon {
+    display: none;
+}

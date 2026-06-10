@@ -1,0 +1,78 @@
+.phone-select {
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    border: none;
+    border-bottom: 2px solid #d0d1e7;
+    padding: 0 0.5rem;
+    font-family: 'Gotham Pro', sans-serif;
+    outline: none;
+    font-size: 0.875rem;
+    position: relative;
+    width: 4rem;
+    cursor: pointer;
+}
+.phone-select__dropdown {
+    display: none;
+    flex-direction: column;
+    background-color: #fff;
+    left: 0;
+    top: 2rem;
+    position: absolute;
+    box-shadow: 0 0 1rem #00000026;
+    border-radius: 0.25rem;
+    width: 14rem;
+    z-index: 5;
+    overflow-y: auto;
+    max-height: 15rem;
+}
+.phone-select.shown .phone-select__dropdown{
+    display: flex;
+}
+
+
+@media (max-width: 600px) {
+    .phone-select__dropdown {
+        left: 1rem;
+        top: 1rem;
+        position: fixed;
+        width: calc(100% - 2rem);
+        max-height: calc(100% - 2rem) !important;
+    }
+}
+
+
+.phone-select__option {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+.phone-select__option:hover {
+    background-color: #f9f9f9;
+}
+.phone-select__option:last-child {
+    border-bottom: none;
+}
+.phone-select__option-image {
+    border-radius: 0.25rem;
+    margin-right: 0.5rem;
+}
+
+
+
+.phone-select__dropdown::-webkit-scrollbar {
+    width: 6px;
+    height: 8px;
+    background-color: rgba(255,255,255,.1);
+    padding: 9px;
+    border-radius: 10px;
+}
+
+.phone-select__dropdown::-webkit-scrollbar-thumb {
+    background: #ceced8;
+    width: 0;
+    border-radius: 8px;
+    padding: 4px;
+}

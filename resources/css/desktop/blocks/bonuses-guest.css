@@ -1,0 +1,140 @@
+.bonuses_g_page{
+    margin-top: 30px;
+}
+.bonusg_title{
+    font-size: 36px;
+    color: #fff;
+}
+.bonuses_g_block{
+    display: flex;
+    flex-direction: row;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.bn_g_card{
+    min-height: 230px;
+    background-size: cover;
+    border-radius: 12px;
+    background-position: center;
+}
+.bn_g_card_text{
+    width: 50%;
+    padding: 30px;
+    color: #Fff;
+    padding-top: 50px;
+}
+.bn_g_ct_end{
+    font-size: 12px;
+}
+.bn_g_ct_end span{
+    font-weight: 600;
+}
+.bn_g_ct_name{
+    margin-top: 15px;
+    font-weight: 600;
+    font-size: 14px;
+}
+.bn_g_ct_amount{
+    font-size: 21px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+.bn_g_ct_view{
+    background-color: #A7DA94;
+    padding: 14px 35px;
+    border-radius: 100px;
+    margin-top: 21px;
+    display: inline-block;
+    color: #000;
+    font-weight: 600;
+    font-size: 12px;
+}
+.bn_g_card_link{
+    width: 49%;
+    text-decoration: none;
+    margin-bottom: 20px;
+}
+.bonus_g_banner{
+    background-size: cover;
+    min-height: 300px;
+    border-radius: 17px;
+}
+.bonus_g_b_text{
+    width: 50%;
+    padding: 40px;
+    color: #fff;
+}
+.bonus_g_b_end{
+    color: #000;
+    background: #fff;
+    padding: 7px 20px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 8px;
+}
+.bonus_g_b_end img{
+    margin: 0 5px;
+}
+.bonuses_g_bread{
+    margin-bottom: 30px;
+}
+.bonuses_g_bread ul{
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+.bonuses_g_bread ul li{
+    margin-right: 10px;
+    list-style-type: none;
+}
+.bonuses_g_bread ul li a{
+    border: 1px solid #7a82b442;
+    background: #1C1F3E;
+    padding: 5px 10px;
+    border-radius: 7px;
+    color: #7A82B4;
+    font-size: 14px;
+    text-decoration: none;
+}
+.bonuses_g_bread ul li a.active{
+    color: #fff;
+}
+.bonus_g_b_title{
+    margin-top: 30px;
+}
+.bonus_g_b_title h1{
+    font-size: 40px;
+}
+.bonus_g_b_title p{
+    font-size: 14px;
+    margin-top: 10px;
+}
+.bonus_g_content{
+    margin-top: 30px;
+}
+.bonus_g_content h2{
+    color: #fff;
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+.bonus_g_content h3{
+    color: #A7DA94;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+.bonus_g_content p{
+    color: #7A82B4;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 21px;
+}
+.bonus_g_content p.m-0{
+    margin: 0;
+}
+.other_bonus_title{
+    color: #fff;
+    font-size: 32px;
+    margin-bottom: 15px;
+}

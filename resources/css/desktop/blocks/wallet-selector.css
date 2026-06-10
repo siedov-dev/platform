@@ -1,0 +1,277 @@
+.wallet-selector {
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    width: auto;
+    min-width: 12rem;
+    padding: 0.3rem 0.3rem 0.3rem 0.5rem;
+    border-radius: 1.5rem;
+    position: relative;
+    transition: 500ms;
+    background-color: #272660;
+    cursor: pointer;
+    user-select: none;
+    margin: 1.25rem;
+    z-index: 520;
+    justify-content: space-between;
+}
+.wallet-selector.hidden{
+    display: none;
+}
+body.light .wallet-selector {
+    background-color: #ffffff;
+}
+.wallet-selector:hover {
+    background-color: #302f70;
+}
+
+.wallet-selector__amount {
+    display: flex;
+    flex-wrap: nowrap;
+    font-family: "Gotham Pro", sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    line-height: 1.1rem;
+    color: #fff;
+    margin-right: .4rem;
+    margin-left: 0.4rem;
+}
+.wallet-selector__balance-name{
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+    font-size: 0.6rem;
+    margin-right: auto;
+    margin-left: 0.4rem;
+}
+body.light .wallet-selector__amount {
+    color: #1a1944;
+}
+
+.wallet-selector.click-shown .wallet-selector__dropdown{
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+    top: 3.5rem;
+}
+
+
+.wallet-selector__amount-rest {
+    font-family: "Gotham Pro", sans-serif;
+    font-weight: 800;
+    font-size: 0.875rem;
+    line-height: 1.2rem;
+    color: rgba(255,255,255,0.5);
+}
+
+body.light .wallet-selector__amount-rest {
+    color: #807fa1;
+}
+.wallet-selector__plus-button {
+    width: auto;
+    height: 2.5rem;
+    padding: 0 1.5rem;
+    border-radius: 1.5rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    margin-left: 0.75rem;
+    background-color: #A3DC8E;
+    display: flex;
+    align-items: center;
+    color: #1E1D4E;
+}
+
+.wallet-selector__dropdown {
+    display: flex;
+    flex-direction: column;
+    width: 16rem;
+    background-color: #1C1F3E;
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: 4.5rem;
+    left: calc(50% - 8rem);
+    border-radius: 0.625rem;
+    padding: 1rem 0;
+    transition: 150ms;
+    box-shadow: 0 0 2rem #0000001a;
+    transform: scale(0.9);
+    transform-origin: center -1rem;
+}
+body.light .wallet-selector__dropdown {
+    background-color: #ffffff;
+}
+.wallet-selector:hover .wallet-selector__dropdown {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+    top: 3.5rem;
+}
+.wallet-selector__plus-button:hover + .wallet-selector__dropdown {
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.9);
+    top: 4.5rem;
+}
+.wallet-selector__dropdown::before {
+    content: '';
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.2rem;
+    background-color: #1C1F3E;
+    transform: rotate(45deg);
+    position: absolute;
+    top: -0.45rem;
+    left: calc(50% - 0.5rem);
+}
+body.light .wallet-selector__dropdown::before {
+    background-color: #ffffff;
+}
+.wallet-selector__dropdown::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: -1rem;
+    width: 100%;
+    height: 1rem;
+}
+
+.wallet-selector__item {
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    padding: 0 1rem;
+    background-color: transparent;
+    transition: 500ms;
+    position: relative;
+    overflow: hidden;
+    margin: 0 .5rem;
+}
+.wallet-selector__item:hover {
+    background-color: rgba(255, 255, 255, 0.025);
+}
+.wallet-selector__currency {
+    color: #8283C0;
+    font-weight: 400;
+    font-family: 'Gotham Pro', sans-serif;
+    font-size: 0.875rem;
+    transition: 500ms;
+    margin-right: auto;
+}
+
+/*.wallet-selector__item_uah.wallet-selector__item_active .wallet-selector__currency {*/
+/*    color: #FCC339;*/
+/*}*/
+/*.wallet-selector__item_rub.wallet-selector__item_active .wallet-selector__currency {*/
+/*    color: #e68683;*/
+/*}*/
+/*.wallet-selector__item_usd.wallet-selector__item_active .wallet-selector__currency {*/
+/*    color: #A2DC8D;*/
+/*}*/
+/*.wallet-selector__item_eur.wallet-selector__item_active .wallet-selector__currency {*/
+/*    color: #787BF7;*/
+/*}*/
+/*.wallet-selector__item_inr.wallet-selector__item_active .wallet-selector__currency {*/
+/*    color: #b000db;*/
+/*}*/
+/*.wallet-selector__item_btc.wallet-selector__item_active .wallet-selector__currency {*/
+/*    color: #FD9C0D;*/
+/*}*/
+/*.wallet-selector__item_mbtc.wallet-selector__item_active .wallet-selector__currency {*/
+/*    color: #FD9C0D;*/
+/*}*/
+/*.wallet-selector__item_usdt.wallet-selector__item_active .wallet-selector__currency {*/
+/*    color: #81b070;*/
+/*}*/
+/*.wallet-selector__item_kzt.wallet-selector__item_active .wallet-selector__currency {*/
+/*    color: #00a8c9;*/
+/*}*/
+
+.wallet-selector__item.wallet-selector__item_active{
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+/*.wallet-selector__item::before {*/
+/*    content: '';*/
+/*    display: block;*/
+/*    position: absolute;*/
+/*    left: -0.625rem;*/
+/*    top: 0.25rem;*/
+/*    width: 0.625rem;*/
+/*    height: 2rem;*/
+/*    border-radius: 1rem;*/
+/*    background-color: #FCC339;*/
+/*    opacity: 0;*/
+/*    transition: 500ms;*/
+/*}*/
+
+/*.wallet-selector__item_active::before {*/
+/*    left: -0.3125rem;*/
+/*    opacity: 1;*/
+/*}*/
+
+/*.wallet-selector__item_uah.wallet-selector__item_active::before {*/
+/*    background-color: #FCC339;*/
+/*}*/
+/*.wallet-selector__item_rub.wallet-selector__item_active::before {*/
+/*    background-color: #e68683;*/
+/*}*/
+/*.wallet-selector__item_usd.wallet-selector__item_active::before {*/
+/*    background-color: #A2DC8D;*/
+/*}*/
+/*.wallet-selector__item_eur.wallet-selector__item_active::before {*/
+/*    background-color: #787BF7;*/
+/*}*/
+/*.wallet-selector__item_inr.wallet-selector__item_active::before {*/
+/*    background-color: #b000db;*/
+/*}*/
+/*.wallet-selector__item_btc.wallet-selector__item_active::before {*/
+/*    background-color: #FD9C0D;*/
+/*}*/
+/*.wallet-selector__item_mbtc.wallet-selector__item_active::before {*/
+/*    background-color: #FD9C0D;*/
+/*}*/
+/*.wallet-selector__item_usdt.wallet-selector__item_active::before {*/
+/*    background-color: #81b070;*/
+/*}*/
+/*.wallet-selector__item_kzt.wallet-selector__item_active::before {*/
+/*    background-color: #00a8c9;*/
+/*}*/
+
+/*.user-menu__dropdown .header__wallet-selector.wallet-selector{*/
+/*    display: none;*/
+/*}*/
+
+.checked-icon{
+    color: #A7DA94;
+    font-size: 1.5rem;
+    display: none;
+}
+.wallet-selector__item.wallet-selector__item_active .checked-icon{
+    display: block;
+}
+@media screen and (max-width: 1000px) {
+
+    .header .header__wallet-button .wallet-selector__icon{
+        display: none;
+    }
+    .header .header__wallet-button .wallet-selector__amount{
+        display: none;
+    }
+    .header .header__wallet-button .header__wallet-selector.wallet-selector{
+        min-width: 0;
+        padding: 0;
+        background: none;
+    }
+    .header .header__wallet-button .wallet-selector__arrow.arrow-down{
+        display: none;
+    }
+    .header .header__wallet-button .wallet-selector__plus-button{
+        display: none;
+    }
+    /*.user-menu__dropdown .header__wallet-selector.wallet-selector{*/
+    /*    display: flex;*/
+    /*}*/
+}

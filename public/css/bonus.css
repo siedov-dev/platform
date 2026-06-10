@@ -1,0 +1,18 @@
+.bonuses__article h1 {
+    font-size: 32px;
+}
+
+.bonuses__article>h5{
+    color: #fff;
+    font-size: 32px;
+    margin-bottom: 15px;
+    line-height: 40px;
+}
+.bonuses__title-banner .description{
+    max-width: 100%;
+    width: 50%;
+    flex-flow: initial;
+}
+.bonuses__title-banner {
+    height: 18rem;
+}

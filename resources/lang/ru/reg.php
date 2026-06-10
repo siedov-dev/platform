@@ -1,0 +1,70 @@
+<?php
+
+return [
+    'byClickingIAgreeWith' => 'Нажимая на кнопку, вы принимаете условия',
+    'privacyPolicy' => 'политики конфиденциальности',
+    'registration' => 'Регистрация',
+    'phone' => 'Телефон',
+    'yourPass' => 'Ваш пароль',
+    'yourEmail' => 'Ваш Email',
+    'yourPhone' => 'Ваш телефон',
+    'inputPass' => 'Введите пароль',
+    'chooseCurrency' => 'Выбирите основную валюту',
+    'uah' => 'UAH',
+    'rub' => 'RUB',
+    'usd' => 'USD',
+    'eur' => 'EUR',
+    'inr' => 'INR',
+    'mbtc' => 'mBTC',
+    'usdt' => 'USDT',
+    'kzt' => 'Tenge',
+    'createAccount' => 'Зарегистрироваться',
+    'orUsing' => 'или через',
+    'haveAccount' => 'Есть аккаунт?',
+    'login' => 'Войти',
+
+    'invalid_email' => 'Неправильный email',
+    'invalid_phone' => 'Неправильный номер телефона',
+    'email_already_exists' => 'Пользователь с таким email уже существует. Вы хотите <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">войти</a> или <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">восстановить Ваш пароль</a>?',
+    'phone_already_exists' => 'Пользователь с таким номером телефона уже существует. Вы хотите <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">войти</a> или <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">восстановить Ваш пароль</a>?',
+
+    'currency_required' => 'Выберите валюту',
+    'password_required' => 'Введите пароль',
+    'password_min' => 'Пароль должен содержать минимум 6 символов',
+    'phone_or_email_required' => 'Введите телефон или email',
+
+    'email_required' => 'Введите email',
+    'phone_required' => 'Введите телефон',
+    'address_required' => 'Введите Адрес',
+    'postcode_required' => 'Введите Индекс',
+    'city_required' => 'Введите Город',
+    'state_required' => 'Введите Штат',
+    'postcode_integer' => 'Только числа',
+    'state_min_max' => '2 символа',
+
+    'name_surname' => 'Имя Фамилия',
+    'address' => 'Адрес',
+    'post_code' => 'Индекс',
+    'city' => 'Город',
+    'state' => 'Штат',
+
+    'name_required' => 'Введите Имя',
+    'surname_required' => 'Введите Фамилию',
+    'name' => 'Имя',
+    'surname' => 'Фамилия',
+
+    'iam18' => 'Мне 18 лет или больше',
+    'country' => 'Страна',
+    'ageConfirm' => 'Подтвердите возраст',
+    'birthday' => 'День рождения',
+    'birthday_required' => 'Укажите дату рождения',
+    'must_be_18' => 'Вам должно быть не менее 18 лет',
+    'country_required' => 'Введите Страну',
+
+    'personal-info' => 'Персональные данные',
+    'next' => 'Далее',
+    'captcha_error' => 'Подтвердите recaptcha',
+
+    'user_already_exists' => 'Пользователь уже существует',
+
+];

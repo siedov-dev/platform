@@ -1,0 +1,62 @@
+<?php
+
+return [
+    'byClickingIAgreeWith' => 'Kliknutím na tlačidlo súhlasíte s podmienkami',
+    'privacyPolicy' => 'zásady ochrany osobných údajov',
+    'registration' => 'Registrácia',
+    'phone' => 'Telefón',
+    'yourPass' => 'Vaše heslo',
+    'yourEmail' => 'Váš e-mail',
+    'yourPhone' => 'Vaše telefónne číslo',
+    'inputPass' => 'Zadajte svoje heslo',
+    'chooseCurrency' => 'Vyberte hlavnú menu',
+    'uah' => 'UAH',
+    'rub' => 'RUB',
+    'usd' => 'USD',
+    'eur' => 'EUR',
+    'inr' => 'INR',
+    'mbtc' => 'mBTC',
+    'usdt' => 'USDT',
+    'kzt' => 'Tenge',
+    'createAccount' => 'Registrovať sa',
+    'orUsing' => 'alebo prostredníctvom',
+    'haveAccount' => 'Máte účet?',
+    'login' => 'Prihlásiť sa',
+
+    'invalid_email' => 'Nesprávny e-mail',
+    'invalid_phone' => 'Nesprávne telefónne číslo',
+    'email_already_exists' => 'Používateľ s týmto e-mailom už existuje. Chcete <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">zadajte</a> alebo <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">obnovenie hesla</a>?',
+    'phone_already_exists' => 'Používateľ s týmto telefónnym číslom už existuje. Chcete <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">zadajte</a> или <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">obnovenie hesla</a>?',
+
+    'currency_required' => 'Vyberte menu',
+    'password_required' => 'Zadajte svoje heslo',
+    'password_min' => 'Heslo musí obsahovať minimálne 6 znakov',
+    'phone_or_email_required' => 'Zadajte telefónne číslo alebo e-mail',
+    
+    'iam18' => 'Mám 18 rokov alebo viac',
+    'email_required' => 'Zadajte e-mail',
+    'phone_required' => 'Zadajte telefónne číslo',
+    'address_required' => 'Zadajte adresu',
+    'postcode_required' => 'Zadajte index',
+    'city_required' => 'Zadajte mesto',
+    'state_required' => 'Zadajte štát',
+    'postcode_integer' => 'Len čísla',
+    'state_min_max' => '2 znaky',
+
+    'name_surname' => 'Meno Priezvisko',
+    'address' => 'Adresa',
+    'post_code' => 'Index',
+    'city' => 'Mesto',
+    'state' => 'Zamestnanci',
+
+    'name_required' => 'Zadajte meno',
+    'surname_required' => 'Zadajte priezvisko',
+    'name' => 'Názov',
+    'surname' => 'Priezvisko',
+
+    'personal information' => 'Osobné informácie',
+    'next' => 'Ďalej',
+    
+    'captcha_error' => 'Potvrdiť recaptcha',
+    'user_already_exists' => 'Používateľ už existuje',
+];

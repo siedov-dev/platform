@@ -1,0 +1,318 @@
+.cabinet__acc-wrap {
+    display: flex;
+    justify-content: flex-start;
+    padding: 1.5rem;
+    background-color: #1b1a43;
+    border: 1px solid rgba(130, 131, 192, 0.21);
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+}
+body.light .cabinet__acc-wrap {
+    background-color: #fff;
+    border: none;
+    box-shadow: 0 0 1rem #0000000d;
+}
+.cabinet__acc-user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 1rem;
+}
+
+.cabinet__acc-rank-info {
+    display: flex;
+    align-items: center;
+}
+
+.cabinet__acc-rank-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3.6875rem;
+    height: 3.6875rem;
+    border-radius: 3rem;
+    border: 2px solid #5B4CF1;
+    margin-right: 1rem;
+}
+.cabinet__acc-rank-name {
+    display: flex;
+    align-items: center;
+    font-family: 'Gotham Pro', sans-serif;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+}
+body.light .cabinet__acc-rank-name {
+    color: #2c2b63;
+}
+.cabinet__acc-rank-hint {
+    display: flex;
+    margin-left: 0.5rem;
+}
+
+.cabinet__acc-rank-progress-wrap {
+    display: flex;
+    align-items: center;
+    margin-top: 0.35rem;
+}
+
+.cabinet__acc-rank-progress-track {
+    display: flex;
+    width: 7.5rem;
+    height: 0.5rem;
+    margin-right: 0.5rem;
+    background-color: #1E1D4F;
+    border-radius: 0.5rem;
+    position: relative;
+}
+body.light .cabinet__acc-rank-progress-track {
+    background-color: #f3f3fc;
+}
+.cabinet__acc-rank-progress-bar {
+    content: '';
+    display: block;
+    height: 0.5rem;
+    border-radius: 0.5rem;
+    background-color: var(--color-green);
+}
+
+.cabinet__acc-rank-next {
+    font-family: 'Gotham Pro', sans-serif;
+    color: #8184BC;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.cabinet__acc-rank-next-name {
+    color: var(--color-green);
+}
+
+.cabinet__acc-rank-percents {
+    color: #fff;
+    font-weight: 700;
+}
+
+.cabinet__acc-verification {
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+}
+
+.cabinet__acc-vrf-title {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    font-family: 'Gotham Pro', sans-serif;
+    color: #fff;
+}
+body.light .cabinet__acc-vrf-title {
+    color: #2c2b63;
+}
+.cabinet__acc-vrf-hint {
+    display: flex;
+    margin-left: 0.5rem;
+}
+
+.cabinet__acc-vrf-status {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
+    font-size: 1.35rem;
+    color: #8283C0;
+    font-family: 'Gotham Pro', sans-serif;
+    font-weight: 700;
+}
+body.light .cabinet__acc-vrf-status {
+    color: #2c2b63;
+}
+.cabinet__acc-vrf-icon-wrap {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #8283C0;
+    margin-right: 0.5rem;
+}
+.cabinet__acc-vrf-icon {
+    height: 1.5rem;
+    filter: saturate(1.5) hue-rotate(103deg);
+}
+.cabinet__acc-vrf-link {
+    margin-top: 0.35rem;
+}
+
+.cabinet__acc-cashback {
+    display: flex;
+    align-items: center;
+    z-index: 5;
+}
+
+.cabinet_acc-cashback-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    overflow: visible;
+    position: relative;
+    margin-right: 1rem;
+}
+
+.cabinet__acc-cashback-image {
+    position: absolute;
+    left: -3.25rem;
+    top: -3.2rem;
+    max-width: 300px;
+}
+
+
+.cabinet_acc-cashback-texts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 5;
+}
+
+.cabinet__acc-cashback-percents {
+    font-size: 1.3125rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'Gotham Pro', sans-serif;
+    margin: 0.35rem 0;
+}
+body.light .cabinet__acc-cashback-percents {
+    color: #5e5d97;
+}
+.cabinet__acc-divider {
+    width: 2rem;
+    position: relative;
+}
+.cabinet__acc-divider::before {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 100%;
+    position: absolute;
+    left: 1rem;
+    top: 0;
+    background-color: #3E3D77;
+}
+body.light .cabinet__acc-divider::before {
+    background-color: #e0e0ef;
+}
+.cabinet__money {
+    display: grid;
+    margin-top: 2rem;
+    grid-gap: 2rem;
+}
+
+.cabinet__money-wallets {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    grid-gap: 1rem;
+}
+
+.cabinet__money-wallet {
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-radius: 1rem;
+}
+.cabinet__money-wallet.active{
+    background-color: #0f0253;
+}
+.del-currency{
+    background-color: #c60109;
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    line-height: 1rem;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: -1rem;
+}
+.cabinet__money-wallet.active .del-currency{
+    display: none;
+}
+body.light .cabinet__money-wallet.active{
+    background-color: rgba(22, 21, 58, 0.19);
+}
+.cabinet__money-wallet-icon {
+    margin-right: 0.5rem;
+}
+.cabinet__recent-bets-wrap {
+    /*padding: 1.5rem;*/
+    margin-top: 2rem;
+}
+
+body.light .cabinet__recent-bets-wrap {
+    background-color: #ffffff;
+    box-shadow: 0 0 1rem #0000000d;
+    /*padding: 1.5rem;*/
+    margin-top: 2rem;
+    border-radius: 1rem;
+}
+body.light .cabinet__transactions {
+    background-color: #ffffff;
+    box-shadow: 0 0 1rem #0000000d;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+
+
+.cabinet__hint {
+    position: relative;
+}
+.cabinet__hint-popup {
+    display: none;
+    position: absolute;
+    background-color: #3e3d77;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    left: -5px;
+    top: 1.5rem;
+    z-index: 5;
+    width: 12rem !important;
+}
+.cabinet__hint-popup::before {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 10px;
+    background-color: #3e3d77;
+    transform: rotate(45deg);
+    position: absolute;
+    left: 8px;
+    top: -4px;
+}
+body.light .cabinet__hint-popup {
+    background-color: #fff;
+    box-shadow: 0 0 25px #00000020;
+}
+body.light .cabinet__hint-popup::before {
+    background-color: #fff;
+}
+.cabinet__hint-popup::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 15px;
+    position: absolute;
+    right: 0;
+    top: -10px;
+}
+.cabinet__hint:hover .cabinet__hint-popup {
+    display: block;
+}
+.cabinet__hint div {
+    font-size: 0.75rem;
+    font-weight: 400;
+}
+.cabinet__hint a {
+    margin-top: 0.5rem;
+}

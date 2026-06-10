@@ -1,0 +1,118 @@
+.footer {
+    padding-top: 3rem;
+    padding-bottom: 6rem;
+}
+
+.footer__links-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 2rem 1rem;
+}
+
+.footer__links-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer__links-items {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer__links-title {
+    font-family: 'Gotham Pro', sans-serif;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+body.light .footer__links-title {
+    color: #2c2b63;
+}
+.footer__link {
+    color: #8283C0;
+    font-family: 'Gotham Pro', sans-serif;
+    text-decoration: none;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    margin-top: 1rem;
+    font-weight: 500;
+}
+body.light .footer__link{
+    color: #55549b;;
+}
+
+.footer__line {
+    border-top: 1px solid #8283c033;
+    margin: 2rem 0;
+}
+
+.footer__partners {
+    max-width: 100%;
+}
+body.light .footer__partners {
+    filter: brightness(0.25);
+}
+.footer__bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
+}
+
+.footer__logo {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    font-family: 'Gotham Pro', sans-serif;
+    color: #fff;
+    font-size: 0.75rem;
+}
+/*body.light .footer__logo {*/
+/*    filter: brightness(0.25) hue-rotate(205deg);*/
+/*}*/
+.footer__logo-image {
+    margin: 0 0.5rem;
+    height: 50px;
+}
+.footer__certificate{
+    width: 150px;
+    height: 85px;
+}
+
+.footer__copyright {
+    font-family: 'Gotham Pro', sans-serif;
+    font-size: 0.75rem;
+    color: #8283C0;
+    line-height: 1.5;
+}
+.footer__license-text {
+    font-size: 0.7rem;
+    margin-top: 2rem;
+    color: #8283C0;
+    line-height: 1.5;
+}
+
+.navigation-btn{
+    display: flex;
+    background-color: #1C1F3E;
+    border-radius: 0.5rem;
+    border: #2C2B64 1px solid;
+    justify-content: center;
+    align-items: center;
+    padding: 0 1rem;
+    color: #FFFFFF;
+    font-size: 0.75rem;
+    font-family: "Gotham Pro", sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    text-decoration: none;
+    height: 2.15rem;
+    min-width: 8rem;
+}
+
+body.light .navigation-btn{
+    color: #262756;
+    background-color: #FFF;
+    border: #E9E9E9 1px solid;
+}

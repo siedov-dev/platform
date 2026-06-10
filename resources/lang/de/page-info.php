@@ -1,0 +1,30 @@
+<?php
+return [
+    'slc-1' => 'Slotcoin (SLC)',
+     'slc-2' => " is the in-game currency of KrakenCasino which can be used in the store, buying various bonuses (including no deposit ones), exchange for money, buy chests, unique game suggestions, and other internal interactive items that will be implemented in the future to get even more pleasure from the game.",
+     'slc-3' => "How to get slotcoins?",
+     'slc-4' => "For daily login, for completing daily tasks, for receiving new achievements, in the wheel of fortune.",
+     'slc-5' => "For your activity, KrakenCasino gives you the opportunity to spend time with pleasure and get maximum emotions!",
+     
+     'cashback-plus1' => 'Was ist Cashback+',
+'cashback-plus2' => "und wie funktioniert es?",
+'cashback-plus3' => "-Cashback+ ist ein zusätzlicher Prozentsatz zu Ihrem aktuellen Cashback",
+'cashback-plus4' => "-Um mit der Kanone zu schießen, müssen Sie auf eine der Kugeln klicken",
+'cashback-plus5' => "-Besuchen Sie und schießen Sie jeden Tag mit der Kanone, um Ihr Cashback auf bis zu 100% zu erhöhen",
+'cashback-plus6' => "-100% ist der maximale Cashback+ Prozentsatz",
+'cashback-plus7' => "-Nachdem Sie das Fass zerbrochen haben, erhalten Sie einen Cashback+ Gegenstand von 10% bis 100% und außerdem mit einer Wahrscheinlichkeit von 5% einen Bonus ohne Einzahlung! Die Gegenstände erscheinen im Inventar und müssen dann aktiviert werden!",
+'cashback-plus8' => "-Wahrscheinlichkeit, das Fass zu zerbrechen",
+'cashback-plus9' => "* Goldene Kugel - 5% Wahrscheinlichkeit, das Fass mit einem Schuss zu zerbrechen",
+'cashback-plus10' => "- 100% Wahrscheinlichkeit, einen Riss im Fass zu machen",
+'cashback-plus11' => "* Schwarze Kugel - 20% Wahrscheinlichkeit, einen Riss im Fass zu machen",
+'cashback-plus12' => "* Kugeln können in Truhen gefunden, durch das Erfüllen von Aufgaben erhalten, im Laden gekauft und bei anderen Aktivitäten im Kraken Casino gewonnen werden",
+'cashback-plus13' => "-Solange Sie Kugeln haben, können Sie unbegrenzt schießen. Nachdem Sie das Fass zerbrochen und die Belohnung erhalten haben, bekommen Sie ein neues Fass",
+'cashback-plus14' => "-Nachdem Sie einen Cashback+ Gegenstand erhalten haben, müssen Sie ihn in Ihrem persönlichen Konto aktivieren, um Ihr aktuelles Cashback zu erhöhen!",
+'cashback-plus15' => "Wie funktioniert Cashback?",
+'cashback-plus16' => "-Cashback wird nur den Spielern gutgeschrieben, die mit echtem Geld Einsätze gemacht haben und bisher kein Glück hatten (Bonusgeld wird nicht berücksichtigt).",
+'cashback-plus17' => "-Cashback wird für die Verluste der vergangenen Woche gutgeschrieben (die Woche wird von Montag 00:01 Uhr bis Sonntag 23:59 Uhr gezählt).",
+'cashback-plus18' => "-Um den Bonus abzuholen (falls er Ihnen gutgeschrieben wurde), müssen Sie den Bonusbereich aufrufen und auf der Kachel mit dem Bonus (Cashback) die Schaltfläche 'Abholen' drücken.",
+'cashback-plus19' => "-Eine Benachrichtigung über die Bonusgutschrift wird an Ihre E-Mail-Adresse oder den Telegram-Bot gesendet (um die Benachrichtigung zu erhalten, müssen Sie den Newsletter abonniert haben).",
+'cashback-plus20' => "-Der Cashback-Bonus hat keinen Einsatz, er kann sofort ausgezahlt oder in jedem Spiel eingesetzt werden.",
+
+];

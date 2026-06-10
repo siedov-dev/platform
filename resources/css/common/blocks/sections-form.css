@@ -1,0 +1,82 @@
+.sections-names > *{
+    margin-top: 1.6rem;
+    color: var(--color-gray);
+    font-family: 'Gotham Pro', sans-serif;
+    position: relative;
+    padding-left: 2.5rem;
+    /*text-transform: uppercase;*/
+}
+.sections-names > * img{
+    position: absolute;
+    left: 0;
+    top: -0.5rem;
+}
+.sections-names > *.active,*.done{
+    color: white;
+    font-weight: 600;
+}
+.sections-names > *.active:after {
+    content: "✔";
+    color: red;
+    margin-left: 0.5rem;
+}
+.sections-names > *.done:after {
+    content: "✔";
+    color: green;
+    margin-left: 0.5rem;
+}
+.section-wrapper{
+    display: none;
+}
+.section-wrapper.active{
+    display: initial;
+}
+
+.section-controls{
+    display: flex;
+    flex-flow: row;
+    margin-top: auto;
+    align-items: center;
+}
+
+.section-controls > button{
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 3rem;
+    border-radius: 0.5rem;
+    border: none;
+    background-color: var(--color-green);
+    color: #000000;
+    font-size: 0.875rem;
+    font-family: 'Gotham Pro', sans-serif;
+    cursor: pointer;
+    outline: none;
+    padding: 0 2rem;
+    flex-grow: 1;
+    font-weight: 600;
+}
+.section-controls > button.active{
+    display: initial;
+}
+.sections-form .section-prev-btn{
+    position: absolute;
+    left: 1.5rem;
+    top: 1.5rem;
+    width: .8rem;
+    height: .8rem;
+    border-right: 2px white solid;
+    border-bottom: 2px white solid;
+    transform: rotate(135deg);
+    cursor: pointer;
+    display: none;
+}
+.sections-form .section-prev-btn.active{
+    display: block;
+}
+.sections-form .section-prev-btn::after{
+    content: "";
+}
+.section-controls > .section-next-btn,.section-done-btn{
+    margin-left: auto;
+}

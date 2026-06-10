@@ -1,0 +1,45 @@
+<?php
+return [
+    'LittleChest' => 'Маленька скриня',
+     'MiddleChest' => 'Середня скриня',
+     'BigChest' => 'Велика скриня',
+     'LostContainer' => 'Втрачений контейнер',
+     'BlackBox' => 'Чорна перлина',
+     'BermudaChest' => 'Бермудська скриня',
+
+     'LittleChest_short-info' => 'Заходьте в гру кожен день і отримуйте вашу безкоштовну скриню',
+     'MiddleChest_short-info' => 'Заходьте в гру кожен день і отримуйте вашу безкоштовну скриню',
+     'BigChest_short-info' => 'Заходьте в гру кожен день і отримуйте вашу безкоштовну скриню',
+     'LostContainer_short-info' => 'Заходьте в гру кожен день і отримуйте вашу безкоштовну скриню',
+     'BlackBox_short-info' => 'Заходьте в гру кожен день і отримуйте вашу безкоштовну скриню',
+     'BermudaChest_short-info' => 'Заходьте в гру кожен день і отримуйте вашу безкоштовну скриню',
+
+     'next-key-in' => 'The new key will appear through',
+     'next-quest-in' => 'Next mission on',
+
+     'KeyLittle' => 'Маленький ключ',
+     'KeyMiddle' => 'Середній ключ',
+     'KeyBig' => 'Великий ключ',
+     'KeyLost' => 'Втрачений ключ',
+     'KeyBlack' => 'Чорний ключ',
+     'KeyBermuda' => 'Бермудський ключ',
+
+     'lost_treasures' => 'Lost treasures',
+     'treasure_common' => 'Common',
+     'treasure_legendary' => 'Legendary',
+     'key_price' => 'Ціна ключа',
+     'open' => 'Відкрити',
+     'you_have' => 'У вас є',
+     'keys' => 'ключів',
+     'congratz' => 'Вітаємо!',
+     'open-next' => 'Відкрити ще',
+     'contains' => 'Скриня містить',
+     'SmallKeyPiece' => 'Уламок ключа малої скрині',
+     'MiddleKeyPiece' => 'Уламок ключа середньої скрині',
+     'BigKeyPiece' => 'Уламок ключа великої скрині',
+     'LostKeyPiece' => 'Уламок втраченого ключа',
+     'BlackKeyPiece' => 'Уламок ключа чорної скрині',
+     'BermudaKeyPiece' => 'Уламок ключа бермудської скрині',
+
+     'not_enough_keys' => 'Відсутній ключ',
+];

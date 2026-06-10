@@ -1,0 +1,45 @@
+<?php
+return [
+    'LittleChest' => 'Little chest',
+     'MiddleChest' => 'Middle Chest',
+     'BigChest' => 'Big Chest',
+     'LostContainer' => 'Lost container',
+     'BlackBox' => 'Black Pearl',
+     'BermudaChest' => 'Bermuda Chest',
+
+     'LittleChest_short-info' => 'Login the game every day and get your free chest',
+     'MiddleChest_short-info' => 'Login the game every day and get your free chest',
+     'BigChest_short-info' => 'Login the game every day and get your free chest',
+     'LostContainer_short-info' => 'Login the game every day and get your free chest',
+     'BlackBox_short-info' => 'Login the game every day and get your free chest',
+     'BermudaChest_short-info' => 'Login the game every day and get your free chest',
+
+     'next-key-in' => 'The new key will appear through',
+     'next-quest-in' => 'Next mission on',
+
+     'KeyLittle' => 'Little key',
+     'KeyMiddle' => 'Middle Key',
+     'KeyBig' => 'Big key',
+     'KeyLost' => 'Lost key',
+     'KeyBlack' => 'Black Key',
+     'KeyBermuda' => 'Bermuda Key',
+
+     'lost_treasures' => 'Lost treasures',
+     'treasure_common' => 'Common',
+     'treasure_legendary' => 'Legendary',
+     'key_price' => 'Key price',
+     'open' => 'Open',
+     'you_have' => 'You have',
+     'keys' => 'keys',
+     'congratz' => 'Congratulations!',
+     'open-next' => 'Open more',
+     'contains' => 'The chest contains',
+     'SmallKeyPiece' => 'Small Chest Key Piece',
+     'MiddleKeyPiece' => 'Middle Key Piece',
+     'BigKeyPiece' => 'Big Chest Key Piece',
+     'LostKeyPiece' => 'Lost Key Piece',
+     'BlackKeyPiece' => 'Black Chest Key Piece',
+     'BermudaKeyPiece' => 'Bermuda Chest Key Piece',
+
+     'not_enough_keys' => 'No key',
+];

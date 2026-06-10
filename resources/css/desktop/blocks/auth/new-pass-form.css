@@ -1,0 +1,13 @@
+.new-pass-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--color-overlay-background);
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 27rem;
+}
+.new-pass-form .spinner {
+    background-color: #ffffffbf;
+    border-radius: 1rem;
+}

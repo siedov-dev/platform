@@ -1,0 +1,30 @@
+<?php
+return [
+    'slc-1' => 'Slotcoin (SLC)',
+     'slc-2' => " is the in-game currency of KrakenCasino which can be used in the store, buying various bonuses (including no deposit ones), exchange for money, buy chests, unique game suggestions, and other internal interactive items that will be implemented in the future to get even more pleasure from the game.",
+     'slc-3' => "How to get slotcoins?",
+     'slc-4' => "For daily login, for completing daily tasks, for receiving new achievements, in the wheel of fortune.",
+     'slc-5' => "For your activity, KrakenCasino gives you the opportunity to spend time with pleasure and get maximum emotions!",
+     
+     'cashback-plus1' => 'क्या है कैशबैक+',
+'cashback-plus2' => 'और यह कैसे काम करता है?',
+'cashback-plus3' => '-कैशबैक+ आपके मौजूदा कैशबैक में एक अतिरिक्त प्रतिशत है',
+'cashback-plus4' => '-एक बरूद से गोली चलाने के लिए, आपको किसी एक कोर पर क्लिक करना होगा',
+'cashback-plus5' => '-हर दिन बरूद से गोली चलाएं और अपना कैशबैक 100% तक बढ़ाएं',
+'cashback-plus6' => '-100% यह कैशबैक+ का अधिकतम प्रतिशत है',
+'cashback-plus7' => '-बैरल फटने के बाद, आपको 10% से 100% तक कैशबैक+ आइटम प्राप्त होगा और 5% की संभावना के साथ नो डिपॉजिट बोनस भी! आइटम इन्वेंटरी में दिखाई देंगे, जिन्हें आपको सक्रिय करना होगा!',
+'cashback-plus8' => '-बैरल फटने की संभावना',
+'cashback-plus9' => '* स्वर्ण कोर - एक बार में बैरल फटाने की 5% संभावना',
+'cashback-plus10' => ' - बैरल में दरार करने का 100% मौका',
+'cashback-plus11' => '* काला कोर - बैरल में दरार करने की 20% संभावना',
+'cashback-plus12' => '* कोर संदूकों से, टास्क पूरा करने से, दुकान से खरीदने और अन्य क्रैकन कैसीनो गतिविधियों से प्राप्त किया जा सकता है',
+'cashback-plus13' => '-जब तक आपके पास कोर हैं, आप सीमित संख्या में गोलियां चला सकते हैं। बैरल फटने के बाद और इनाम प्राप्त करने के बाद, आपको एक नया बैरल मिलेगा',
+'cashback-plus14' => '-कैशबैक+ आइटम प्राप्त करने के बाद, इसे अपने खाते में सक्रिय करना होगा ताकि आपका मौजूदा कैशबैक बढ़ सके!',
+'cashback-plus15' => 'कैशबैक कैसे काम करता है?',
+'cashback-plus16' => '-कैशबैक केवल उन खिलाड़ियों को प्रदान किया जाता है जिन्होंने वास्तविक धन पर सट्टे लगाए हैं और उन्हें अभी तक भाग्य नहीं था (बोनस नहीं शामिल किया गया है)।',
+'cashback-plus17' => '-कैशबैक पिछले सप्ताह के हार के लिए दिया जाता है (सप्ताह मंगलवार 00:01 से रविवार 23:59 तक माना जाता है)।',
+'cashback-plus18' => '-बोनस को वापस पाने के लिए (अगर आपको दिया गया है), आपको बोनस सेक्शन में जाना होगा, और बोनस टाइल पर (कैशबैक) वाली बटन पर क्लिक करना होगा।',
+'cashback-plus19' => '-बोनस के मिलने की सूचना ईमेल पते या टेलीग्राम बॉट पर आती है (सूचना प्राप्त करने के लिए आपको सदस्यता लेनी होगी)।',
+'cashback-plus20' => '-कैशबैक बोनस में कोई वेजर नहीं होता है, आप इसे सीधे निकाल सकते हैं या किसी भी खेल में खेल सकते हैं।',
+
+];

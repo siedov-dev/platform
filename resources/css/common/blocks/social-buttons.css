@@ -1,0 +1,52 @@
+.ulogin-buttons-container {
+    display: flex !important;
+    width: auto !important;
+    justify-content: center;
+}
+.ulogin-button-facebook {
+    width: 2rem !important;
+    height: 2rem !important;
+    background-image: url(/img/auth/facebook.svg) !important;
+    background-position: 0 0 !important;
+    background-size: contain !important;
+}
+.ulogin-button-google {
+    width: 2rem !important;
+    height: 2rem !important;
+    background-image: url(/img/auth/google.svg) !important;
+    background-position: 0 0 !important;
+    background-size: contain !important;
+}
+
+.ulogin-button-vkontakte {
+    width: 2rem !important;
+    height: 2rem !important;
+    background-image: url(/img/auth/vk.svg) !important;
+    background-position: 0 0 !important;
+    background-size: contain !important;
+}
+
+.ulogin-button-odnoklassniki {
+    width: 2rem !important;
+    height: 2rem !important;
+    background-image: url(/img/auth/odnoklassniki.svg) !important;
+    background-position: 0 0 !important;
+    background-size: contain !important;
+}
+.ulogin-button-mailru {
+    width: 2rem !important;
+    height: 2rem !important;
+    background-image: url(/img/auth/mailru.svg) !important;
+    background-position: 0 0 !important;
+    background-size: contain !important;
+}
+.ulogin-dropdown-button {
+    background: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    border-left: 0.5rem solid transparent !important;
+    border-right: 0.5rem solid transparent !important;
+    border-top: 0.5rem solid #c0c1df !important;
+    display: none !important;
+    margin: 12px 5px 5px 5px !important;
+}

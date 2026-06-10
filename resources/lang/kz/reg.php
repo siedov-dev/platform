@@ -1,0 +1,63 @@
+<?php
+
+return [
+    'byClickingIAgreeWith' => 'Түймені басу арқылы сіз шарттарды қабылдайсыз',
+    'privacyPolicy' => 'құпиялылық саясаты',
+    'registration' => 'Тіркелу',
+    'phone' => 'Телефон',
+    'yourPass' => 'Сіздің құпиясөз',
+    'yourEmail' => 'Сіздің Email',
+    'yourPhone' => 'Сіздің телефон',
+    'inputPass' => 'Құпиясөзді еңгізіңіз',
+    'chooseCurrency' => 'Негізгі валютаны таңдаңыз',
+    'uah' => 'UAH',
+    'rub' => 'RUB',
+    'usd' => 'USD',
+    'eur' => 'EUR',
+    'inr' => 'INR',
+    'mbtc' => 'mBTC',
+    'usdt' => 'USDT',
+    'kzt' => 'Теньге',
+    'createAccount' => 'Аккаунт ашу',
+    'orUsing' => 'немесе арқылы',
+    'haveAccount' => 'Аккаунтыңыз бар ма?',
+    'login' => 'Кіру',
+
+    'invalid_email' => 'Қате email',
+    'invalid_phone' => 'Қате телефон нөмірі',
+    'email_already_exists' => 'Мұндай email-і бар пайдаланушы бар. Сіз <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">кіргіңіз</a> немесе <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">құпиясөзді қалпына келтіргіңіз</a> келеді ме? ',
+    'phone_already_exists' => 'Мұндай телефон нөмірі бар пайдаланушы бар. Сіз <a href=":loginUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'login-form\'));">кіргіңіз</a> немесе <a href=":recoverUrl" onclick="event.preventDefault(); Modal.show(document.getElementById(\'forgot-pass-form\'));">құпиясөзді қалпына келтіргіңіз</a> келеді ме?',
+
+    'currency_required' => 'Валютаны таңдаңыз',
+    'password_required' => 'Құпиясөзді еңгізіңіз',
+    'password_min' => 'Құпиясөз кем дегенде 6 таңбадан тұруы керек',
+    'phone_or_email_required' => 'Телефон немес email еңгізіңіз',
+    
+    'iam18' => 'Мен 18 жастамын немесе одан үлкенмін',
+    'email_required' => 'email еңгізіңіз',
+    'phone_required' => 'Телефоныңызды еңгізіңіз',
+    'address_required' => 'Мекен-жайыңызды еңгізіңіз',
+    'postcode_required' => 'Индекс еңгізіңіз',
+    'city_required' => 'Қаланы еңгізіңіз',
+    'state_required' => 'Штатты еңгізіңіз',
+    'postcode_integer' => 'Тек қана сандар',
+    'state_min_max' => '2 таңба',
+
+    'name_surname' => 'Аты Тегі',
+    'address' => 'Мекен-жайы',
+    'post_code' => 'Индекс',
+    'city' => 'Қала',
+    'state' => 'Штат',
+
+    'name_required' => 'Атыңызды еңгізіңіз',
+    'surname_required' => 'Тегіңізді еңгізіңіз',
+    'name' => 'Аты',
+    'surname' => 'Тегі',
+    'kzt' => 'Теньге',
+
+    'personal-info' => 'Жеке ақпарат',
+    'next' => 'Келесі',
+    
+    'captcha_error' => 'Recaptcha-ны растау',
+    'user_already_exists' => 'Пайдаланушы бұрыннан бар',
+];

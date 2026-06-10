@@ -1,0 +1,74 @@
+.preloader,
+.preloader__overlay {
+    background-color: #181A32;
+}
+body.light .preloader,
+body.light .preloader__overlay {
+    background-color: #f9f9f9;
+}
+
+.preloader,
+.preloader__overlay {
+    background-color: #181A32;
+}
+.preloader.remove {
+    /*pointer-events: none;*/
+    /*opacity: 0;*/
+    display: none;
+}
+
+.preloader {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    display: flex;
+    padding: 35px 50px;
+    transition: opacity 0.2s ease 0s;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+}
+.preloader__wrap-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100px;
+    max-height: 100%;
+    margin: auto;
+    position: relative;
+    width: 320px;
+    max-width: 100%;
+}
+.preloader__wrap-logo svg {
+    height: auto;
+    max-height: 100%;
+    width: 100%;
+    max-width: 100%;
+}
+.preloader__wrap-logo .letter {
+    fill: #EAEAEA;
+}
+/*
+html.dark .preloader__wrap-logo .element {
+    fill: #FF7900;
+}
+*/
+body.light .preloader__wrap-logo .letter {
+    fill: #262756;
+}
+/*
+html.light .preloader__wrap-logo .element {
+    fill: #FF7900;
+}
+*/
+.preloader__overlay {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 120;
+}

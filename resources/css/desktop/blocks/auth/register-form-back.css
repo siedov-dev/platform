@@ -1,0 +1,87 @@
+.register-form__wrap {
+    display: flex;
+}
+.register-form__wrap-ext {
+    display: flex;
+    background-color: #1A1944;
+    border-radius: 1rem;
+}
+.register-form__banner-wrap {
+    display: flex;
+    width: 29rem;
+    height: 100%;
+    position: relative;
+    /*margin-right: -4rem;*/
+}
+.register-form__banner-wrap-ext {
+    display: flex;
+    flex-flow: column;
+    width: 20rem;
+    height: 100%;
+    position: relative;
+    padding: 1rem;
+    min-height: 32rem;
+    /*margin-right: -4rem;*/
+}
+.register-form__banner {
+    height: 44.5rem;
+    position: relative;
+    object-fit: contain;
+    border-radius: 1rem;
+}
+.register-form__banner-t1 {
+    position: absolute;
+    left: -2rem;
+    top: 0;
+}
+.register-form__banner-t2 {
+    position: absolute;
+    bottom: -2rem;
+    right: 4rem;
+}
+
+.promo-switcher{
+    display: flex;
+    min-height: 3.2rem;
+}
+.promo-switcher.shown{
+    align-items: center;
+    display: block;
+}
+.promo-switcher::after{
+    content: "+";
+    margin-left: 0.3rem;
+    margin-top: -3px;
+    display: flex;
+    justify-content: center;
+    justify-items: flex-start;
+    border-radius: 50%;
+    height: 1rem;
+    width: 1rem;
+    line-height: 1.2rem;
+    font-size: 1rem;
+    background-color: #0B0D31;
+    color: #FFFFFF;
+    font-weight: 600;
+    cursor: pointer;
+}
+.promo-switcher.shown::after{
+    display: none;
+}
+.promo-switcher .input__wrap_modal{
+    display: none;
+}
+.promo-switcher.shown .input__wrap_modal{
+    display: flex;
+}
+
+.hide-promo{
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.5rem;
+    line-height: 1.1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #d0d1e7;
+}

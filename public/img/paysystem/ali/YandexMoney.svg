@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="27px" height="35px" viewBox="0 0 27 35" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61 (89581) - https://sketch.com -->
+    <title>yandex_money</title>
+    <desc>Created with Sketch.</desc>
+    <g id="desktop" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="18-qpay-payment-choose-payment-method-step-1-v4-screen" transform="translate(-707.000000, -925.000000)">
+            <g id="yandex-wallet" transform="translate(625.000000, 900.000000)">
+                <g id="yandex_money" transform="translate(82.000000, 25.000000)">
+                    <g id="Group-3" transform="translate(0.000000, 0.000000)">
+                        <path d="M0.000375731945,17.3888744 C0.000375731945,15.4329392 0.164320104,14.1917713 4.21496096,11.1680059 C7.56849382,8.66475439 18.3174333,0.110339948 18.3174333,0.110339948 L18.3174333,14.3904083 L26.4917323,14.3904083 L26.4917323,34.9430709 L2.55359954,34.9430709 C1.14936402,34.9430709 0,33.7937069 0,32.3893461 L0.000375731945,17.3888744" id="Fill-1" fill="#FACA22"></path>
+                        <polyline id="Fill-4" fill="#C9A521" points="18.3174333 14.3904083 18.3174333 22.6646519 3.29654684 32.8977115 22.2877928 26.7185491 22.2877928 14.3904083 18.3174333 14.3904083"></polyline>
+                        <path d="M11.4533116,13.9624496 C12.3316477,12.9157856 13.6145218,12.5461906 14.3188939,13.1373422 C15.0232661,13.7284938 14.8824919,15.0563305 14.0040306,16.1029945 C13.1261955,17.1495332 11.8429457,17.5186272 11.1385735,16.9274756 C10.4340761,16.3364493 10.5752261,15.0089883 11.4533116,13.9624496" id="Fill-5" fill="#1D2326"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

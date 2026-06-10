@@ -1,0 +1,250 @@
+.games-slider {
+
+}
+.games-slider .spinner {
+    background-color: #1e1d4e73;
+}
+.games-slider + .games-slider {
+    margin-top: 2rem;
+}
+
+.games-slider__header {
+    display: flex;
+    align-items: center;
+}
+
+.games-slider__info {
+    display: flex;
+    align-items: center;
+}
+
+.games-slider__icon {
+    margin-right: 1rem;
+}
+
+.games-slider__title {
+    font-family: Montserrat, sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.4rem;
+}
+body.light .games-slider__title {
+    color: #2c2c5d;
+}
+.games-slider__total-number {
+    color: #FFC660;
+    font-weight: 600;
+    font-family: "Gotham Pro", sans-serif;
+    font-size: 0.875rem;
+}
+
+.games-slider__total-text {
+    color: #8283C0;
+    font-weight: 400;
+    font-family: "Gotham Pro", sans-serif;
+    font-size: 0.875rem;
+}
+
+.games-slider__controls {
+    display: none;
+    margin-left: auto;
+}
+.providers-list .games-slider__controls {
+    display: flex;
+}
+
+
+.games-slider__arrow-left,
+.games-slider__arrow-right {
+    width: 2.15rem;
+    height: 2.15rem;
+    border-radius: 0.5rem;
+    background-color: #2c2c5d;
+    border: 1px solid transparent;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    transition: 250ms;
+}
+body.light .games-slider__arrow-left,
+body.light .games-slider__arrow-right {
+    background-color: #e5e1ef;
+}
+.games-slider__arrow-left:hover,
+.games-slider__arrow-right:hover {
+    border: 1px solid #9c9fff;
+}
+.games-slider__arrow-left {
+    margin-right: 0.5rem;
+}
+
+.games-slider__arrow-left::before {
+    content: '';
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-left: 2px solid #8283C0;
+    border-bottom: 2px solid #8283C0;
+    transform: rotate(45deg);
+    position: absolute;
+    left: 0.85rem;
+    top: 0.75rem;
+}
+
+.games-slider__arrow-right::before {
+    content: '';
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-top: 2px solid #8283C0;
+    border-right: 2px solid #8283C0;
+    transform: rotate(45deg);
+    position: absolute;
+    left: 0.6rem;
+    top: 0.75rem;
+}
+
+.games-slider__arrow-left.slider__disabled,
+.games-slider__arrow-right.slider__disabled {
+    background-color: #2C2B63;
+    border-color: transparent;
+    pointer-events: none;
+    opacity: 0.25;
+}
+
+
+.games-slider__all-button {
+    display: flex;
+    background-color: #2c2c5d;
+    border-radius: 0.5rem;
+    margin-right: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0 1rem;
+    color: #8283C0;
+    font-size: 0.75rem;
+    font-family: "Gotham Pro", sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: 250ms;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.games-slider__all-button:hover {
+    border-color: #5e60b7;
+}
+
+
+.games-slider__games {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+    grid-gap: 1rem;
+    margin-top: 1rem;
+}
+
+.games-slider__games_scrollable {
+    display: grid;
+    grid-auto-flow: column dense;
+    grid-template-columns: 9rem 9rem;
+    grid-template-rows: 9rem 9rem 9rem;
+    grid-auto-columns: 9rem;
+    /*margin-top: 1rem;*/
+    /*width: 100%;*/
+    overflow-x: auto;
+    /*overflow-y: hidden;*/
+}
+
+.games-slider__games_scrollable.games-slider__bonuses_scrollable {
+    display: grid;
+    grid-auto-flow: column dense;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+    grid-auto-columns: initial;
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.games-slider__games_scrollable .game + .game {
+    /*margin-left: 1rem;*/
+}
+
+.games-slider__games_scrollable .game {
+    display: flex;
+    overflow: hidden;
+    border-radius: 1rem;
+    background-color: #323274;
+    position: relative;
+    /*width: calc(33.33% - 0.6666rem);*/
+    margin: 0.5rem;
+    /*flex-shrink: 0;*/
+}
+
+.slider-all-games{
+    min-height: 112px;
+    overflow: hidden;
+    border-radius: 1rem;
+    position: relative;
+    background-color: #32327450;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    width: 8rem;
+    margin-left: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.slider-all-games .arrow-right{
+    display: block;
+    border-bottom: #FFFFFF 4px solid;
+    border-right: #FFFFFF 4px solid;
+    height: 18px;
+    width: 18px;
+    margin-left: -9px;
+    transform: rotate(-45deg);
+}
+.games-slider__triple_games_list{
+    display: flex;
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+}
+
+.triple-games-wrapper{
+    display: grid;
+    grid-template-columns: repeat(2, 50%);
+    grid-template-rows: repeat(3, 32%);
+    grid-gap: 1rem;
+    margin-right: 8px;
+    min-width: 90%;
+    width: 90%;
+    aspect-ratio: 2/3;
+    padding: 1rem;
+    scroll-snap-align: start;
+}
+.triple-games-wrapper .slider__item{
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+}
+.triple-games-wrapper > div {
+    width: 100%;
+}
+.triple-games-wrapper:nth-child(odd) > div:nth-child(1) {
+    width: 100%;
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.triple-games-wrapper:nth-child(2n) > div:nth-child(3) {
+    width: 100%;
+    grid-column: span 2;
+    grid-row: span 2;
+}

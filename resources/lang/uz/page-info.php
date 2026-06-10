@@ -1,0 +1,30 @@
+<?php
+return [
+    'slc-1' => 'Slotcoin (SLC)',
+     'slc-2' => " is the in-game currency of KrakenCasino which can be used in the store, buying various bonuses (including no deposit ones), exchange for money, buy chests, unique game suggestions, and other internal interactive items that will be implemented in the future to get even more pleasure from the game.",
+     'slc-3' => "How to get slotcoins?",
+     'slc-4' => "For daily login, for completing daily tasks, for receiving new achievements, in the wheel of fortune.",
+     'slc-5' => "For your activity, KrakenCasino gives you the opportunity to spend time with pleasure and get maximum emotions!",
+     
+     'cashback-plus1' => 'What is Cashback+',
+'cashback-plus2' => "and how does it work?",
+'cashback-plus3' => "-Cashback+ is an additional percentage to your current cashback",
+'cashback-plus4' => "-To fire the cannon, you need to click on one of the cannonballs",
+'cashback-plus5' => "-Come and fire the cannon every day to increase your cashback up to 100%",
+'cashback-plus6' => "-100% is the maximum percentage for Cashback+",
+'cashback-plus7' => "-After you break the barrel, you will receive a Cashback+ item from 10% to 100% and also with a 5% chance of a no-deposit bonus! Items will appear in the inventory, after which they need to be activated!",
+'cashback-plus8' => "-Probability of breaking the barrel",
+'cashback-plus9' => "* golden cannonball - 5% chance to break the barrel with one shot",
+'cashback-plus10' => " - 100% chance to crack the barrel",
+'cashback-plus11' => " * black cannonball - 20% chance to crack the barrel",
+'cashback-plus12' => "* the cannonball can be obtained in chests, for completing tasks, purchased in the shop, and in other Kraken Casino activities",
+'cashback-plus13' => "-As long as you have cannonballs, you can shoot without restrictions. After you break the barrel and take the reward, you will get a new barrel",
+'cashback-plus14' => "-After receiving the Cashback+ item, it needs to be activated in the personal account to increase your current cashback!",
+'cashback-plus15' => "How does cashback work?",
+'cashback-plus16' => "-Cashback is awarded only to those players who placed bets with real money and have not been lucky so far (bonuses are not taken into account).",
+'cashback-plus17' => "-Cashback is credited for the previous week's loss (the week is counted from Monday 00:01 to Sunday 23:59).",
+'cashback-plus18' => "-To claim the bonus (if it has been credited to you) you need to go to the bonuses section, and click the claim button on the bonus tile (CashBack).",
+'cashback-plus19' => "-Notification of the bonus crediting is sent to your email address or Telegram bot (to receive the notification you need to be subscribed to the mailing list).",
+'cashback-plus20' => "-The Cashback bonus has no wagering requirement, it can be withdrawn immediately or played in any game.",
+
+];

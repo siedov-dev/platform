@@ -1,0 +1,16 @@
+.rank-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    background-position: center;
+}
+
+
+.rank-icon_1 {
+    background-image: url("/img/ui/ranks/rank_1.png");
+}
+
+.rank-icon_2 {
+    background-color: #0f0;
+}

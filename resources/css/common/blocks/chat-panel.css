@@ -1,0 +1,59 @@
+body.light .chat-panel{
+    background: linear-gradient(to right, #f1f1f1 0,#FFFFFFDD 100%);
+}
+.footer__links-section .chat-panel{
+    width: 22rem;
+}
+.chat-panel{
+    width: 100%;
+    /*height: 8rem;*/
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1rem;
+    border-radius: 1rem;
+    background: #1C1F3E;
+    margin: 1rem 0;
+    border: #2C2B64 1px solid;
+}
+.chat-panel .title{
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    flex-grow: 1;
+    font-size: .875rem;
+    color: #FFFFFF;
+    font-weight: 500;
+}
+body.light .chat-panel .title {
+    color: #55549b;
+}
+.chat-panel .items{
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+}
+.chat-panel .chat-item{
+    text-decoration: none;
+    display: flex;
+    flex-flow: column;
+    font-size: .75rem;
+    color: #8C90CA;
+    font-weight: 600;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem;
+    cursor: pointer;
+    height: 3.6rem;
+}
+
+.chat-menu-btn{
+    filter: grayscale(1);
+    pointer-events: none;
+}
+
+.TalkMe-initialized .chat-menu-btn{
+    filter: none;
+    pointer-events: initial;
+}

@@ -1,0 +1,145 @@
+<?php
+
+return [
+    'wallet' => 'billetera',
+     'deposit' => 'Depósito',
+     'payout' => 'Retiro',
+     'choosePaymentMethod' => 'Elegir método de pago',
+     'chooseDepositSum' => 'Ingrese el monto del depósito',
+     'fee' => 'Comisión',
+     'processPayment' => 'Proceder al pago',
+
+     'payoutNotAvailable' => '¡Retiro no disponible!',
+     'payoutRequirements' => 'Para poder retirar dinero de esta billetera, debes hacer :n apuestas en juegos',
+     'choosePayoutSum' => 'Ingrese el monto del retiro',
+     'requisites' => 'Requisitos',
+     'makePayout' => 'Retirar fondos',
+
+     'cardNumber' => 'Número de tarjeta',
+     'walletNumberPiastrix' => 'Número de cartera',
+     'walletNumberFK' => 'Número de billetera FkWalet (F111111112)',
+     'walletNumberQiwi' => 'Número de billetera Qiwi (número de teléfono sin +)',
+     'walletNumberYandex' => 'Número de billetera Yandex',
+     'bankAccount' => 'Número de cuenta bancaria',
+
+    'invalid_req_params' => 'Parámetros de solicitud no válidos.',
+     'phone_not_verified' => 'El número de teléfono no está verificado',
+     'email_not_verified' => 'el correo electrónico no está verificado',
+     'empty_address' => 'dirección no especificada',
+     'empty_name' => 'nombre no especificado',
+     'wrong_inr_phone' => 'no es un número de teléfono válido. (+91(6,7,8 o 9)123456789) o (6,7,8 o 9)123456789)',
+     'wrong_10_phone' => 'número de teléfono incorrecto, ingrese 10 dígitos después de +91',
+     'not_enough_data' => 'No todos los datos están completos',
+     'ifsc_required' => 'ifsc no especificado',
+     'email_required' => 'ingrese un correo electrónico válido',
+
+    'invalid_account_no' => 'Número de cuenta no válido.',
+     'required_other_payins' => 'Para utilizar este sistema de pago, realice :pay_count reposiciones en otros sistemas',
+     'required_other_payins_with_sum' => 'Para utilizar este sistema de pago, realice :count recargas de :amount :curr en otros sistemas disponibles',
+     'refill_account' => 'Recargar cuenta',
+     'amount_should_be_more' => 'La cantidad debe ser mayor que :amount',
+     'minimum_refill_amount' => 'Cantidad mínima de recarga :amount :curr',
+     'minimum_payout_amount' => 'Monto mínimo de retiro :amount :curr',
+     'max_refill_amount' => 'Cantidad máxima de recarga :amount :curr',
+     'max_payout_amount' => 'Monto máximo de retiro :amount :curr',
+     'currency_convert_err' => 'Error de conversión de moneda, comuníquese con su administrador',
+
+    'paysystem_balance_error' => 'Error de saldo del sistema, contacte a su administrador',
+     'payout_not_available' => 'El pago no está disponible temporalmente',
+     'account_not_found' => 'No se encontró la cuenta especificada',
+     'not_enough_money' => 'No hay suficiente dinero en la cuenta.',
+
+     'paysystem_error' => 'Error del sistema de pago',
+     'payout_application_created' => 'Su solicitud de retiro ha sido creada.',
+     'request_error_retry' => 'Error al procesar la solicitud. Por favor, inténtelo de nuevo más tarde.',
+
+     'pay_success' => 'Su pago fue exitoso.',
+     'pay_error' => 'Ocurrió un error durante el pago.',
+     'payout_canceled' => 'Pago cancelado, dinero devuelto a la cuenta',
+     'payout_not_found' => 'Solicitud de pago no encontrada',
+
+    'transferred_to_wallet' => 'Transferido exitosamente a la billetera :amount :curr',
+     'reff_not_enough_money' => "No hay suficiente dinero en las cuentas. Para retirar, necesitas:\n",
+     'reff_not_enough_bonus_money' => "No hay suficiente dinero en las cuentas de bonificación. Para retirar, necesitas:\n",
+     'reff_request_error' => 'Ocurrió un error al procesar la solicitud.',
+     'reff_bonus_created' => 'Se ha creado el bono \"Activo sin depósito\" por la cantidad de :amount :curr. ',
+     'back' => 'Atrás',
+
+    'payoutVerification' => 'El pago estará disponible después de la verificación',
+     'payoutVerificationLink' => 'Para pasar la verificación debes ir al menú de configuración',
+     'payoutVerificationDescr1' => 'Especificar y verificar correo electrónico o teléfono',
+     'payoutVerificationDescr2' => 'Rellene el nombre completo',
+     'payoutVerificationDescr3' => 'Adjunte documentos que confirmen su identidad',
+     'payoutVerificationDescr4' => 'Guardar',
+     'payoutVerificationDescr5' => 'Esperar confirmación',
+     'successfullyFilledUp' => 'inscrito exitosamente',
+
+    'add_currency' => 'Agregar moneda',
+     'choose_currency' => 'Elegir moneda',
+     'add' => 'Agregar',
+
+     'sum_available' => 'Monto disponible',
+     'maximum' => 'Máximo',
+     'continue' => 'Continuar',
+
+     'without_bonus' => 'Sin bonificación',
+     'choose_bonus' => 'Elegir bono',
+     'change_method' => 'Cambiar método de pago',
+     'balance' => 'Saldo',
+     'amount_lower_bonus' => 'El monto de recarga es menor que el requerido para activar el bono seleccionado.',
+     'resend' => 'Reenviar',
+     'enter_verification_code' => 'Ingresa el código de verificación enviado a tu teléfono',
+     'enter_otp_code' => 'Ingresar código otp',
+     'success' => 'Exitoso',
+
+    'del_currency' => 'Desactivar moneda',
+     'sure_del_currency' => '¿Quieres desactivar la moneda especificada? Todos los datos se guardarán y estarán disponibles después de la reactivación',
+
+     'wait_pay_not_close' => 'Esperando pago, no cierres la página.',
+     'wait-message_1' => 'Esperando',
+     'wait-message_2' => 'Error de pago',
+     'wait-message_3' => 'Pago exitoso',
+     'wait-message_4' => 'reenvío 3ds',
+     'wait-message_5' => 'reenvío 3ds',
+
+     'card_holder' => 'Titular de la tarjeta',
+     'month' => 'Mes',
+     'year' => 'Año',
+     'cvc' => 'CVC',
+
+    'address1' => 'Línea de dirección 1',
+     'address2' => 'Línea de dirección 2',
+
+     'deposit_title' => 'Depósito :moneda',
+     'deposit_crypto_info' => 'Para realizar un pago, envíe :currency a la dirección de billetera especificada',
+     'address_copied' => 'Dirección de billetera copiada',
+
+     'header' => 'Monedero',
+     'total-balance' => 'saldo total',
+     'withdraw' => 'Pago',
+     'buy' => 'Reembolso',
+     'your_assets' => 'Tus activos',
+     'history' => 'Historial de transacciones',
+     'depositAmount' => 'Monto del depósito:',
+     'payoutAmount' => 'Monto del pago:',
+
+     'currency_rub' => 'Rublo ruso',
+     'currency_uah' => 'hryvnia ucraniana',
+     'moneda_eur' => 'Euro',
+     'currency_usd' => 'dólar estadounidense',
+     'currency_inr' => 'Rupia india',
+     'currency_mbtc' => 'mBTC',
+     'currency_usdt' => 'Tether',
+     'currency_kzt' => 'Tenge kazajo',
+     
+     'group-VisaMaster' => 'Visa/Mastercard',
+    'group-P2p' => 'p2p',
+    'group-Bank' => 'Banco',
+    'group-Crypto' => 'Cripta',
+    'group-MobileCommerce' => 'Mob Commerce',
+    
+    'from' => 'desde',
+    
+    'deposit_blocked_to' => 'Demasiadas solicitudes, método bloqueado por :time'
+    
+];

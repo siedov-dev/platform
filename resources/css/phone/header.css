@@ -1,0 +1,241 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 5rem;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 300;
+    background-color: #1A1944;
+    transition: background-color 150ms, box-shadow 150ms;
+}
+body.no-panels #header {
+    display: none;
+}
+body.no-panels #layout-content {
+    padding-top: 0 !important;
+}
+body.light .header {
+    background-color: #f8f8fa;
+}
+body.light .header_scrolled {
+    background-color: #ffffff;
+}
+/*.menu-button {*/
+/*    width: 2.4rem;*/
+/*    height: 2.4rem;*/
+/*    background-color: #2C2B56;*/
+/*    margin: 0 0.5rem;*/
+/*    border-radius: 0.75rem;*/
+/*    flex-shrink: 0;*/
+/*    position: relative;*/
+/*}*/
+/*body.light .menu-button {*/
+/*    background-color: #e6e6ef;*/
+/*}*/
+.menu-button__line:nth-child(1) {
+    width: 1rem;
+    height: 2px;
+    background-color: #fff;
+    left: 0.7rem;
+    top: 0.7rem;
+    position: absolute;
+}
+
+.menu-button__line:nth-child(2) {
+    width: 1.4rem;
+    height: 2px;
+    background-color: #fff;
+    left: 0.5rem;
+    top: 1.2rem;
+    position: absolute;
+}
+
+.menu-button__line:nth-child(3) {
+    width: 1rem;
+    height: 2px;
+    background-color: #fff;
+    left: 0.7rem;
+    top: 1.7rem;
+    position: absolute;
+}
+body.light .menu-button__line:nth-child(1),
+body.light .menu-button__line:nth-child(2),
+body.light .menu-button__line:nth-child(3) {
+    background-color: #2c2b63;
+}
+.user-menu-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2rem;
+    height: 2rem;
+    /*background-color: #5B4CF1;*/
+    margin: 0 0.5rem;
+    border-radius: 0.75rem;
+    flex-shrink: 0;
+    position: relative;
+}
+.user-menu-button__image {
+    width: 24px;
+}
+
+.header_scrolled {
+    background-color: #1A1944;
+    box-shadow: 0 0 1rem #00000040;
+}
+#layout-wrap.collapsed .header {
+    width: calc(100% - 80px);
+    left: 80px;
+}
+.header__all-games-btn {
+}
+
+.header__button {
+    margin-right: 1rem;
+}
+
+
+.header__wallet-button {
+    margin-left: auto;
+}
+
+
+.header .user-menu {
+    margin-left: 1rem;
+}
+
+
+.header .notifications {
+    margin-left: 1rem;
+}
+
+.header .width-limiter {
+    display: flex;
+    align-items: center;
+}
+
+.header__login-button {
+    margin-left: auto;
+}
+
+.header__reg-button {
+    margin-left: 1rem;
+}
+
+.header__button:hover .button__icon {
+    filter: hue-rotate(155deg) saturate(1.5) brightness(1.25);
+}
+
+.header__deposit-btn{
+    height: 2.5rem;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0.5rem;
+    background-color: var(--color-green);
+    color: #000;
+    line-height: 2.2rem;
+    font-size: 2rem;
+    font-weight: 400;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    text-decoration: none;
+    display: none;
+    padding: 0 .5rem;
+    flex-shrink: 0;
+    width: 40px;
+    margin-left: auto;
+}
+.header__deposit-btn :last-child{
+    display: none;
+}
+
+.header__deposit-btn.shown :first-child{
+    display: none;
+}
+.header__deposit-btn.shown :last-child{
+    display: flex;
+}
+
+.header.authorized .header__deposit-btn{
+    display: flex;
+}
+
+.header__balance{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+.switch-panel{
+    /*position: absolute;*/
+    /*top: 5rem;*/
+    height: 3.4rem;
+    width: 100%;
+    z-index: 40;
+    background-color: #181A32;
+    padding: .4rem 1rem;
+}
+body.light .switch-panel{
+    background-color: #FFF;
+}
+.header .sport-header-items{
+    display: none;
+}
+.sport-header-items{
+    display: none;
+}
+.header .tv-bet-items{
+    display: none;
+}
+
+body.sport .sport-header-items{
+    display: flex;
+}
+
+body.tv-bet .tv-bet-items{
+    display: flex;
+}
+
+body.sport .sport-hide{
+    display: none;
+}
+
+body.tv-bet .tv-bet-hide{
+    display: none;
+}
+.my-profile-btn{
+    display: flex;
+    background-color: #272660;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    align-items: center;
+    cursor: pointer;
+    height: 2.5rem;
+}
+.my-profile-btn .user-avatar{
+    width: 30px;
+    height: 30px;
+}
+.my-profile-btn .user-avatar__image-wrap{
+    width: 30px;
+    height: 30px;
+}
+.my-profile-btn .title{
+    font-family: Gotham Pro;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    color: #FFFFFF;
+    white-space: nowrap;
+}
+.my-profile-btn .amount{
+    font-family: Gotham Pro;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+    color: #8C90CA;
+    white-space: nowrap;
+}

@@ -1,0 +1,118 @@
+/*.tabs {*/
+/*    display: flex;*/
+/*    border-bottom: 1px solid #3E3D77;*/
+/*    margin-bottom: 1rem;*/
+/*}*/
+
+.tabs__tab {
+    display: flex;
+    align-items: center;
+    height: 3.5rem;
+    padding: 0 1rem;
+    font-size: 0.95rem;
+    color: #8283C0;
+    margin-bottom: -1px;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    user-select: none;
+    transition: 150ms;
+    background-image: linear-gradient(to top, transparent, transparent);
+    background-position: 0 2px;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.tabs__tab_active {
+    border-color: #4E7CFF;
+    color: #fff;
+}
+body.light .tabs__tab_active {
+    border-color: #3e3d77;
+    color: #1a1944;
+}
+.tabs__tab:hover {
+    background-image: linear-gradient(to top, rgba(255,255,255,0.025), transparent);
+}
+
+.tabs__tab_active:hover {
+    background-image: linear-gradient(to top, transparent, transparent);
+}
+.tabs_small .tabs__tab {
+    font-size: 0.75rem;
+}
+
+
+.tabs__right-link {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    color: #6769ae;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+.tabs__right-link:hover {
+    color: #8386d7;
+}
+.tabs__tab_badged::after {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: #ff3f3f;
+    position: absolute;
+    top: 16px;
+    right: 6px;
+}
+
+.tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-columns: 1fr;
+    margin-bottom: 2rem;
+    background-color: #1C1F3E;
+    border-radius: 0.5rem;
+    padding: 4px;
+    border: none;
+    grid-auto-flow: column;
+}
+body.light .tabs {
+    background-color: #EEEEEE;
+}
+
+.tabs__tab {
+    color: #8C90CA;
+    font-weight: 500;
+    justify-content: center;
+    height: 2.5rem;
+    font-size: 0.875rem;
+    margin-bottom: -2px;
+    border-radius: 0.5rem;
+    border: none;
+}
+.tabs__tab_active {
+    background-color: #2B2F5B;
+    color: #ffffff;
+}
+body.light .tabs__tab_active {
+    background-color: #CCCCCC;
+    color: #000;
+}
+
+.tabs__tab .amount{
+    position: absolute;
+    right: .5rem;
+    border-radius: 50%;
+    background: #2B2F5B;
+    padding: 0 .5rem;
+    line-height: 1.4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    color: #FFF;
+}
+.tabs__tab_active .amount{
+    background: #1C1F3E;
+}

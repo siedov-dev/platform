@@ -1,0 +1,30 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password Reset Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | The following language lines are the default lines which match reasons
+    | that are given by the password broker for a password update attempt
+    | has failed, such as for an invalid token or invalid new password.
+    |
+    */
+
+    'password' => 'Пароли должны состоять минимум из шести символов и соответствовать подтверждению.',
+    'reset' => 'Ваш пароль был сброшен!',
+    'sent' => 'Мы отправили вам ссылку для сброса пароля по электронной почте!',
+    'token' => 'Этот токен сброса пароля недействителен.',
+    'user' => "Мы не можем найти пользователя с таким адресом электронной почты.",
+    'change' => "Изменить пароль",
+    'enterpassword' => "Введите пароль",
+    'repeatpassword' => "Повторите пароль",
+    'complexity' => "Сложность пароля:",
+    'change' => "СМЕНИТЬ ПАРОЛЬ",
+    '6characters' => "Пароль должен содержать минимум 6 символов",
+    'notmatch' => "Пароли не совпадают",
+    
+
+];

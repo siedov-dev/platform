@@ -1,0 +1,78 @@
+:root {
+    --color-blue: #787bf7;
+    --color-red: #EF8E8B;
+    --color-orange: #F29B49;
+    --color-green: #a3dc8e;
+    --color-gray: #8283C0;
+    --color-gray-dark: #2B2F5B;
+    --color-background: #14142FFA;
+    --color-overlay-background: #14142F;
+    --color-green-light: #34C759;
+    --color-disabled-background: #CCCCCC;
+}
+
+.money {
+    display: flex;
+}
+
+.money__int {
+    color: #fff;
+    word-break: keep-all;
+    white-space: pre;
+    font-family: Roboto, sans-serif;
+}
+body.light .money__int {
+    color: #1A1944;
+}
+.money__rest {
+    color: #8283C0;
+    word-break: keep-all;
+    white-space: pre;
+    font-family: Roboto, sans-serif;
+}
+
+
+.text-green .money__int,
+.text-green .money__rest,
+.text-green {
+    color: var(--color-green);
+}
+.text-red .money__int,
+.text-red .money__rest,
+.text-red {
+    color: var(--color-red);
+}
+.text-orange .money__int,
+.text-orange .money__rest,
+.text-orange {
+    color: var(--color-orange);
+}
+
+.text-white {
+    color: #FFF;
+}
+.text-gray {
+    color: #999;
+}
+
+.text-title{
+    color: #FFF;
+}
+body.light .text-title{
+    color: #000;
+}
+.text-subtitle{
+    color: #8C90CA;
+}
+body.light .text-subtitle{
+    color: #8C90CA;
+}
+
+
+body.light img.invert-white{
+    filter: invert(1);
+}
+
+.grayscale{
+    filter: grayscale(1);
+}

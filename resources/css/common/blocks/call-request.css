@@ -1,0 +1,136 @@
+.user-call-request-block{
+    display: flex;
+    flex-flow: column;
+    background-color: #2B2F5B;
+    border-radius: 1rem;
+    padding: 1rem;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.user-call-request-block .title{
+    font-family: Gotham Pro;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.2rem;
+    text-align: center;
+    color: #FFFFFF;
+    margin-top: 1.5rem;
+}
+
+.user-call-request-block .subtitle{
+    font-family: Gotham Pro;
+    font-weight: 400;
+    font-size: .875rem;
+    line-height: 1rem;
+    text-align: center;
+    color: #8C90CA;
+    margin-top: .75rem;
+}
+
+.user-call-request-block .button{
+    margin-top: 1rem;
+    font-size: 1rem;
+}
+
+.user-call-request-block.disabled{
+    background-color: transparent;
+}
+.user-call-request-block.disabled .title{
+    color: #4A4E7F;
+}
+.user-call-request-block.disabled .subtitle{
+    color: #4A4E7F;
+}
+.user-call-request-block.disabled .button_green{
+    background-color: #2B2F5B;
+    color: #4A4E7F;
+    cursor: default;
+}
+.user-call-request-block.disabled img{
+    filter: grayscale(1);
+}
+
+.user-call-request-block .confirm-info{
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: #2B2F5B;
+    color: #FFFFFF;
+    font-size: .875rem;
+    line-height: 1rem;
+    margin-top: 1rem;
+    font-weight: 600;
+}
+.user-call-request-block .confirm-info img{
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 1rem;
+}
+.user-call-request-block .button.button_red{
+    color: #FFFFFF;
+    width: 100%;
+    background-color: #E44E50;
+}
+
+
+.user-call-request-block.had-call-request{
+    flex-flow: row;
+}
+.user-call-request-block.had-call-request .subtitle{
+    display: none;
+}
+.user-call-request-block.had-call-request .title{
+    margin-top: 0;
+    font-size: 1rem;
+    text-wrap: balance;
+}
+.user-call-request-block.had-call-request .button_green{
+    margin-top: 0;
+}
+.user-call-request-block.had-call-request img{
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: .5rem;
+}
+
+.user-call-request-block.pending{
+    flex-flow: row;
+}
+.user-call-request-block .check-icon{
+    width: 64px;
+    height: 64px;
+    background-color: #A3DC8E30;
+    border-radius: 1.1rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.user-call-request-block .check-icon img{
+    width: 36px;
+    height: 36px;
+}
+.user-call-request-block .pending-text{
+    font-family: Gotham Pro;
+    font-weight: 400;
+    font-size: .875rem;
+    line-height: 1rem;
+}
+
+@media screen and (max-width: 400px){
+    .user-call-request-block.had-call-request .title{
+        margin-top: 0;
+        text-wrap: balance;
+        font-size: .875rem;
+    }
+    .user-call-request-block.had-call-request .button_green{
+        margin-top: 0;
+        font-size: .875rem;
+    }
+}

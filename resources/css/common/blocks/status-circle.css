@@ -1,0 +1,67 @@
+.status-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 0.6rem;
+    position: relative;
+    flex-shrink: 0;
+}
+.status-circle::before {
+    content: '';
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    left: -3px;
+    top: -3px;
+    opacity: 0.25;
+    border-radius: 1rem;
+}
+.status-circle::after {
+    content: '';
+    display: block;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 0.6rem;
+    filter: blur(5px);
+}
+
+
+.status-circle_green {
+    background-color: var(--color-green);
+}
+
+.status-circle_green::before {
+    background-color: var(--color-green);
+}
+
+.status-circle_green::after {
+    background-color: var(--color-green);
+}
+
+
+
+.status-circle_orange {
+    background-color: var(--color-orange);
+}
+
+.status-circle_orange::before {
+    background-color: var(--color-orange);
+}
+
+.status-circle_orange::after {
+    background-color: var(--color-orange);
+}
+
+
+.status-circle_gray {
+    background-color: #999;
+}
+
+.status-circle_gray::before {
+    background-color: #999;
+}
+
+.status-circle_gray::after {
+    background-color: #999;
+}
+

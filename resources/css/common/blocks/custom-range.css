@@ -1,0 +1,90 @@
+.custom-range{
+    position: relative;
+    --rangeBackgroud: #1C1F3E;
+    --rangeAccent: #A3DC8F;
+}
+
+body.light .custom-range {
+    --rangeBackgroud: #E3E5F3;
+    --rangeAccent: #A3DC8F;
+}
+
+
+.custom-range input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(90deg, var(--rangeAccent) var(--value), var(--rangeBackgroud) var(--value));
+    outline: none;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    border-radius: 1rem;
+    accent-color: var(--rangeAccent);
+}
+
+@media (hover: hover) {
+    .custom-range input[type="range"] {
+        opacity: 0.7;
+    }
+    .custom-range input[type="range"]:hover {
+        opacity: 1;
+    }
+}
+
+.custom-range input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: var(--rangeAccent);
+    border: 2px solid var(--rangeBackgroud);
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.custom-range input[type="range"]::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: var(--rangeAccent);
+    border: 2px solid var(--rangeBackgroud);
+    cursor: pointer;
+    border-radius: 50%;
+}
+.custom-range .range-sums{
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    font-weight: 400;
+    line-height: 0.85rem;
+    text-align: center;
+    color: #8186BD;
+}
+.custom-range .range-threshold:before{
+    content: "";
+    margin-top: -15px;
+    width: 0;
+    height: 0;
+    position: absolute;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #8186BD;
+    left: var(--left, 0);
+}
+.custom-range .range-threshold{
+    display: flex;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 400;
+    line-height: 0.85rem;
+    text-align: center;
+    color: #8186BD;
+}
+.custom-range .range-threshold .threshold-img{
+    margin-top: -42px;
+    position: absolute;
+    left: var(--left, 0);
+    pointer-events: none;
+    height: 25px;
+    width: 25px;
+}

@@ -1,0 +1,78 @@
+body.halloween-event::before{
+    content: "";
+    background-image: url("/img/special_events/halloween/halloween-lt.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 1;
+    top: 0;
+    left: calc(((100% - 1230px) / 2) - max(calc((100% - 1230px) / 2), 306px));
+    position: absolute;
+    z-index: 2;
+    width:  max(calc((100% - 1230px) / 2), 306px);
+    height: 1000px;
+    pointer-events: none;
+}
+body.light.halloween-event::before {
+    background-image: url("/img/special_events/halloween/halloween-lt-light.svg");
+}
+body.halloween-event::after{
+    content: "";
+    background-image: url("/img/special_events/halloween/halloween-rt.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 1;
+    top: 0;
+    right: calc(((100% - 1030px) / 2) - max(calc((100% - 1030px) / 2), 406px));
+    position: absolute;
+    z-index: 10;
+    width:  max(calc((100% - 1030px) / 2), 406px);
+    height: 1000px;
+    pointer-events: none;
+}
+body.light.halloween-event::after {
+    background-image: url("/img/special_events/halloween/halloween-rt-light.svg");
+}
+body.halloween-event #layout-wrap::before{
+    content: "";
+    background-image: url("/img/special_events/halloween/halloween-lb.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 1;
+    bottom: 0;
+    left: calc(((100% - 1230px) / 2) - max(calc((100% - 1230px) / 2), 306px));
+    position: absolute;
+    z-index: 0;
+    width:  max(calc((100% - 1230px) / 2), 306px);
+    height: 200px;
+    pointer-events: none;
+}
+body.halloween-event #layout-wrap::after{
+    content: "";
+    background-image: url("/img/special_events/halloween/halloween-rb.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 1;
+    bottom: 0;
+    right: calc(((100% - 1300px) / 2) - max(calc((100% - 1300px) / 2), 306px));
+    position: absolute;
+    z-index: 0;
+    width:  max(calc((100% - 1300px) / 2), 306px);
+    height: 200px;
+    pointer-events: none;
+}
+body.halloween-event .logo__image{
+    background-image: url("/img/special_events/halloween/logo.svg");
+}
+body.light.halloween-event .logo__image{
+    background-image: url("/img/special_events/halloween/logo-dark.svg");
+}
+body.halloween-event .menu-button{
+    background-image: url("/img/special_events/halloween/eye.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-color: transparent;
+}
+body.halloween-event .menu-button .menu-button__line{
+    display: none;
+}

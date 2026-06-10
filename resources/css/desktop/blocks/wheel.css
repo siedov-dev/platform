@@ -1,0 +1,159 @@
+#wheel-of-fortune{
+    position: relative;
+    width: clamp(600px, 100vw, 850px);
+    min-height: 580px;
+    overflow: hidden;
+    border-radius: 1rem;
+}
+#wheel-of-fortune .wheel-bg{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    object-fit: cover;
+}
+.wheel-bg img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.drum-block{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    width: 100%;
+}
+.drum-block img{
+    position: absolute;
+    margin: 0 auto;
+}
+.drum-block img.base{
+    top: 40px;
+    width: 360px;
+    min-width: 36px;
+    z-index: 2;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.drum-block img.drum-bg{
+    top: 97px;
+    width: 245px;
+    z-index: 3;
+    left: 0;
+    right: 0;
+}
+
+.drum-block img.top{
+    top: 85px;
+    width: 270px;
+    z-index: 5;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#wheel-of-fortune .bottom-block{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+#wheelCanvasTexts{
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 98px;
+    width: 245px;
+    z-index: 4;
+}
+
+#wheelCanvas{
+    width: 100%;
+    transition: transform ease-out 4s;
+}
+.wheel-drum > *{
+    transition: transform ease-out 4s;
+}
+#wheelArrowCanvas{
+    position: absolute;
+    max-height: 160%;
+    top: -20%;
+}
+#wheel-of-fortune .popup__content{
+    padding: 0;
+}
+#wheel-of-fortune .wheel-bonus-got{
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 700;
+    font-family: "Gotham Pro", "sans-serif";
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    /*position: absolute;*/
+    /*bottom: 1rem;*/
+    /*left: 0;*/
+    /*right: 0;*/
+    text-shadow: #C29200 0 1px 2px;
+    margin: 0 auto;
+    width: clamp(20rem, 95%, 45rem);
+}
+#wheel-of-fortune .get-bonus-form{
+    width: 50%;
+}
+#wheel-of-fortune .get-bonus-btn{
+    padding: 0;
+    margin: 1rem 0 0 0;
+}
+#wheel-of-fortune .spin_again-bonus-btn{
+    padding: 0;
+    margin: 1rem 0 0 .5rem;
+    width: 50%;
+}
+#wheel-of-fortune .bonus-win-block{
+    position: relative;
+    width: 100%;
+}
+#wheel-of-fortune .btn-wheel-spin{
+    margin-bottom: .5rem;
+}
+#wheel-of-fortune .spin-controls{
+}
+.get-bonus-btn.button_green.disabled{
+    background-color: #cccccc;
+}
+.spin_again-bonus-btn.disabled{
+    background-color: #cccccc;
+}
+.respin-controls{
+    padding: 0 1rem;
+}
+.now-won{
+    max-width: 100vw;
+}
+
+p.wheel-of-fortune-popup__text-under-button{
+    color: #FFFFFF;
+}
+
+#wheel-of-fortune .btn-wheel-spin.disabled{
+    background-color: #cccccc;
+}
+
+
+@media screen and (max-width: 340px) {
+    .now-won{
+        font-size: .875rem;
+    }
+    .now-won button{
+        font-size: .75rem;
+    }
+}

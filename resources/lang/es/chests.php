@@ -1,0 +1,45 @@
+<?php
+return [
+    'LittleChest' => 'Pequeño cofre',
+     'MiddleChest' => 'MiddleChest',
+     'BigChest' => 'Gran Cofre',
+     'LostContainer' => 'Contenedor perdido',
+     'BlackBox' => 'Perla Negra',
+     'BermudaChest' => 'BermudaChest',
+
+     'LittleChest_short-info' => 'Inicia sesión en el juego todos los días y obtén tu cofre gratis',
+     'MiddleChest_short-info' => 'Inicia sesión en el juego todos los días y obtén tu cofre gratis',
+     'BigChest_short-info' => 'Inicia sesión en el juego todos los días y obtén tu cofre gratis',
+     'LostContainer_short-info' => 'Inicia sesión en el juego todos los días y obtén tu cofre gratis',
+     'BlackBox_short-info' => 'Inicia sesión en el juego todos los días y obtén tu cofre gratis',
+     'BermudaChest_short-info' => 'Inicia sesión en el juego todos los días y obtén tu cofre gratis',
+
+     'next-key-in' => 'La nueva clave aparecerá',
+     'next-quest-in' => 'Próxima misión en',
+
+     'KeyLittle' => 'Llavecita',
+     'KeyMiddle' => 'Tecla del medio',
+    'KeyBig' => 'Clave grande',
+     'KeyLost' => 'Clave perdida',
+     'KeyBlack' => 'Tecla Negra',
+     'KeyBermuda' => 'Clave de las Bermudas',
+
+     'lost_treasures' => 'Tesoros perdidos',
+     'treasure_common' => 'Común',
+     'treasure_legendary' => 'Legendario',
+     'key_price' => 'Precio clave',
+     'open' => 'Abrir',
+     'you_have' => 'Tienes',
+     'keys' => 'claves',
+     'congratz' => '¡Felicidades!',
+     'open-next' => 'Abrir más',
+     'contains' => 'El cofre contiene',
+     'SmallKeyPieza' => 'Pieza clave del cofre pequeño',
+     'MiddleKeyPieza' => 'Pieza clave intermedia',
+     'BigKeyPieza' => 'Pieza clave del cofre grande',
+     'LostKeyPiece' => 'Pieza clave perdida',
+     'BlackKeyPieza' => 'Pieza clave del cofre negro',
+     'BermudaKeyPieza' => 'Pieza clave del cofre de las Bermudas',
+
+     'not_enough_keys' => 'Sin clave',
+];

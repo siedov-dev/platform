@@ -1,0 +1,150 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?2g4lmc');
+  src:  url('fonts/icomoon.eot?2g4lmc#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?2g4lmc') format('truetype'),
+    url('fonts/icomoon.woff?2g4lmc') format('woff'),
+    url('fonts/icomoon.svg?2g4lmc#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="fashion-"], [class*=" fashion-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fashion-trophy:before {
+  content: "\e914";
+}
+.fashion-search:before {
+  content: "\e90f";
+}
+.fashion-personal-menu-1:before {
+  content: "\e909";
+}
+.fashion-personal-menu-2:before {
+  content: "\e90a";
+}
+.fashion-personal-menu-3:before {
+  content: "\e90b";
+}
+.fashion-personal-menu-4:before {
+  content: "\e90c";
+}
+.fashion-personal-menu-5:before {
+  content: "\e90d";
+}
+.fashion-personal-menu-6:before {
+  content: "\e90e";
+}
+.fashion-personal-menu-7:before {
+    content: "\f005";
+}
+.fashion-personal-menu-8:before {
+    content: "\e913";
+}
+.fashion-personal-menu-9:before {
+    content: "\e916";
+}
+.fashion-menu-icon-1:before {
+  content: "\e904";
+}
+.fashion-menu-icon-2:before {
+  content: "\e905";
+}
+.fashion-menu-icon-3:before {
+  content: "\e906";
+}
+.fashion-menu-icon-4:before {
+  content: "\e907";
+}
+.fashion-menu-icon-5:before {
+  content: "\e908";
+}
+.fashion-advantages-1:before {
+  content: "\e900";
+}
+.fashion-advantages-2:before {
+  content: "\e901";
+}
+.fashion-advantages-3:before {
+  content: "\e902";
+}
+.fashion-advantages-4:before {
+  content: "\e903";
+}
+.fashion-list_alt:before {
+  content: "\e910";
+}
+.fashion-access_timequery_builderschedule:before {
+  content: "\e911";
+}
+.fashion-clock:before {
+  content: "\e912";
+}
+.fashion-credit-card:before {
+  content: "\e913";
+}
+.fashion-trophy1:before {
+  content: "\e915";
+}
+.fashion-wallet:before {
+  content: "\e916";
+}
+.fashion-star:before {
+  content: "\f005";
+}
+.fashion-star-o:before {
+  content: "\f006";
+}
+.fashion-image:before {
+  content: "\f03e";
+}
+.fashion-photo:before {
+  content: "\f03e";
+}
+.fashion-picture-o:before {
+  content: "\f03e";
+}
+.fashion-edit:before {
+  content: "\f044";
+}
+.fashion-pencil-square-o:before {
+  content: "\f044";
+}
+.fashion-minus-circle:before {
+  content: "\f056";
+}
+.fashion-check-circle:before {
+  content: "\f058";
+}
+.fashion-telegram:before {
+  content: "\f2c6";
+}
+.fashion-calendar:before {
+  content: "\e953";
+}
+.fashion-undo2:before {
+  content: "\e967";
+}
+.fashion-users:before {
+  content: "\e972";
+}
+.fashion-user-check:before {
+  content: "\e975";
+}
+.fashion-trophy11:before {
+  content: "\e99e";
+}

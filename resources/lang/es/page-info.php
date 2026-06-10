@@ -1,0 +1,30 @@
+<?php
+return [
+    'slc-1' => 'Slotcoin (SLC)',
+     'slc-2' => " es la moneda del juego de KrakenCasino que se puede usar en la tienda, comprando varios bonos (incluidos los sin depósito), canjearlos por dinero, comprar cofres, sugerencias de juegos únicas y otros elementos interactivos internos. que se implementará en el futuro para disfrutar aún más del juego.",
+     'slc-3' => "¿Cómo conseguir slotcoins?",
+     'slc-4' => "Para iniciar sesión diariamente, completar tareas diarias, recibir nuevos logros, en la rueda de la fortuna.",
+     'slc-5' => "¡Para tu actividad, KrakenCasino te brinda la oportunidad de pasar tiempo con placer y obtener las máximas emociones!",
+     
+     'cashback-plus1' => '¿Qué es Cashback+?',
+     'cashback-plus2' => '¿y cómo funciona?',
+     'cashback-plus3' => '-Cashback+ es un porcentaje adicional a tu cashback actual',
+     'cashback-plus4' => '-Para disparar el cañón, debes hacer clic en una de las balas de cañón',
+     'cashback-plus5' => '-¡Entra y dispara el cañón todos los días para aumentar tu cashback hasta el 100%!',
+     'cashback-plus6' => '-El 100% es el porcentaje máximo de Cashback+',
+     'cashback-plus7' => '-Después de romper un barril, recibirás un artículo de Cashback+ del 10% al 100% y también un bono sin depósito con un 5% de probabilidad. ¡Los artículos aparecerán en tu inventario y deberán activarse!',
+     'cashback-plus8' => '-Probabilidad de romper el barril',
+     'cashback-plus9' => '* Bala de cañón dorada - 5% de probabilidad de romper el barril con un solo disparo',
+     'cashback-plus10' => '- 100% de probabilidad de hacer una grieta en el barril',
+     'cashback-plus11' => '* Bala de cañón negra - 20% de probabilidad de hacer una grieta en el barril',
+     'cashback-plus12' => '* Las balas de cañón se pueden obtener en cofres, completando tareas, comprándolas en la tienda y en otras actividades del Kraken Casino',
+     'cashback-plus13' => '-Mientras tengas balas de cañón, puedes disparar sin restricciones. Después de romper un barril y recoger la recompensa, recibirás un nuevo barril',
+     'cashback-plus14' => '-Después de recibir el artículo de Cashback+, debes activarlo en tu cuenta personal para aumentar tu cashback actual',
+     'cashback-plus15' => '¿Cómo funciona el cashback?',
+     'cashback-plus16' => '-El cashback solo se otorga a los jugadores que han apostado dinero real y aún no han tenido suerte (los bonos no cuentan).',
+     'cashback-plus17' => '-El cashback se acredita por las pérdidas de la semana pasada (la semana se cuenta desde el lunes a las 00:01 hasta el domingo a las 23:59).',
+     'cashback-plus18' => '-Para reclamar el bono (si se te ha acreditado), debes ir a la sección de bonos y hacer clic en el botón reclamar en el mosaico del bono (CashBack).',
+     'cashback-plus19' => '-La notificación del bono acreditado llega a tu correo electrónico o al bot de Telegram (para recibir la notificación, debes estar suscrito a las notificaciones).',
+     'cashback-plus20' => '-El bono de cashback no tiene requisito de apuesta, se puede retirar inmediatamente o jugar en cualquier juego.',
+
+];

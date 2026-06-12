@@ -43,11 +43,31 @@ class Controller extends BaseController
         $this->_jsonData = array_merge($this->_jsonData, $params);
     }
 
+    /**
+     * Очищает данные перед отдачей в JSON, 
+     * чтобы случайно не слить пароли и системные токены.
+     */
+    protected function sanitizeJsonData(array $data): array
+    {
+        if (isset($data['user']) && is_object($data['user']) && method_exists($data['user'], 'makeHidden')) {
+            $data['user']->makeHidden([
+                'password', 
+                'remember_token', 
+                'two_factor_secret', 
+                'email_verified_at', 
+                'auth_token'
+            ]);
+        }
+        
+        return $data;
+    }
+
 
     protected function viewOrJson($view, array $params = [])
     {
         if ($this->wantsJsonResponse()) {
-            return response()->json($params);
+            // Прогоняем данные через санитайзер
+            return response()->json($this->sanitizeJsonData($params));
         }
         return view($view, $params);
     }
@@ -85,21 +105,25 @@ class Controller extends BaseController
     protected function sendPreparedResponse(bool $allowCaching = false, array $headers = [], array $cookies = [])
     {
         if ($this->wantsJsonResponse()) {
-            $res = response()->json($this->_jsonData);
+            // Прогоняем собранные данные через санитайзер
+            $res = response()->json($this->sanitizeJsonData($this->_jsonData));
         } else {
             $res = response(($this->metaTags === null ? '' : $this->metaTags->render()) . $this->_preparedContent);
         }
+        
         if ($allowCaching) {
             $res->header('Cache-Control', 'no-cache, no-store, must-revalidate')
                 ->header('Pragma', 'no-cache')
                 ->header('Expires', '0');
         }
+        
         foreach ($headers as $k => $v) {
             $res->header($k, $v);
         }
         foreach ($cookies as $k => $v) {
             $res->cookie($k, $v);
         }
+        
         return $res;
     }
 

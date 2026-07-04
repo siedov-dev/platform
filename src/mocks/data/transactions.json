@@ -1,0 +1,7 @@
+[
+  { "id": "t1", "type": "deposit", "amount": 1000.0, "currency": "USD", "status": "done", "statusName": "Done", "method": "Crypto", "date": "2026-06-08T12:30:00Z" },
+  { "id": "t2", "type": "withdraw", "amount": 500.0, "currency": "USD", "status": "pending", "statusName": "Pending", "method": "Visa P2P", "date": "2026-06-09T09:15:00Z" },
+  { "id": "t3", "type": "deposit", "amount": 250.0, "currency": "USD", "status": "done", "statusName": "Done", "method": "Kaspi.kz", "date": "2026-06-09T18:45:00Z" },
+  { "id": "t4", "type": "withdraw", "amount": 1200.0, "currency": "USD", "status": "done", "statusName": "Done", "method": "Crypto", "date": "2026-06-07T20:10:00Z" },
+  { "id": "t5", "type": "deposit", "amount": 75.0, "currency": "USD", "status": "canceled", "statusName": "Canceled", "method": "Visa P2P", "date": "2026-06-06T14:00:00Z" }
+]

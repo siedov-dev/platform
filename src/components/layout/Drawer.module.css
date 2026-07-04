@@ -1,0 +1,18 @@
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 60; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.drawer { position: absolute; top: 0; bottom: 0; left: 0; width: 78%; background: linear-gradient(180deg,#1a0608,#0c0304); border-right: 1px solid var(--surface-border); transform: translateX(-100%); transition: transform .3s cubic-bezier(.2,.7,.2,1); z-index: 65; display: flex; flex-direction: column; padding: 54px 0 14px; }
+.drawer.on { transform: translateX(0); }
+.header { padding: 8px 16px 12px; display: flex; align-items: center; justify-content: space-between; }
+.title { font: 700 14px var(--font-display); color: var(--gold); letter-spacing: .1em; }
+.avatars { display: flex; gap: 6px; padding: 4px 16px 14px; }
+.avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg,#3a1014,#150607); border: 1px solid var(--gold-dark); display: grid; place-items: center; font: 700 16px var(--font-display); color: var(--gold); cursor: pointer; }
+.add { background: var(--surface); color: var(--text-muted); border-style: dashed; }
+.menu { flex: 1; overflow-y: auto; padding: 6px 0; scrollbar-width: none; }
+.menuItem { display: flex; align-items: center; gap: 12px; padding: 11px 18px; color: #e8d6a8; font: 600 13px var(--font-body); cursor: pointer; }
+.menuItem:active { background: rgba(217,177,90,.06); }
+.menuIcon { width: 22px; text-align: center; color: var(--gold); font-size: 14px; }
+.footer { padding: 10px 16px; border-top: 1px solid #2a1012; }
+.footerTitle { font: 600 11px var(--font-body); color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+.socials { display: flex; gap: 8px; }
+.social { width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--surface-border); display: grid; place-items: center; color: var(--gold); font: 700 12px var(--font-body); cursor: pointer; }
+.lang { margin-top: 12px; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font: 600 12px var(--font-body); cursor: pointer; }

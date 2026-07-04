@@ -1,0 +1,24 @@
+:root {
+  --gold: #d9b15a;
+  --gold-light: #f4d27a;
+  --gold-dark: #6b4a1c;
+  --gold-deep: #a0701f;
+  --maroon: #3a0e10;
+  --maroon-dark: #2a0a0c;
+  --ink: #120608;
+  --paper: #f3e9d2;
+  --accent-red: #c83232;
+  --surface: #1a0d0f;
+  --surface-border: #3a1c1e;
+  --text-primary: #fff;
+  --text-secondary: #cbb38a;
+  --text-muted: #a39073;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-pill: 30px;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --font-display: "Cinzel", serif;
+  --shadow-card: 0 6px 14px rgba(0, 0, 0, 0.55);
+  --shadow-heavy: 0 10px 22px rgba(0, 0, 0, 0.7);
+}

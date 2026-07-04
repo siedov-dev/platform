@@ -1,0 +1,12 @@
+[
+  { "id": "pg-1", "name": "Fortune Tiger", "colors": ["#7a1f1f", "#1a0608"] },
+  { "id": "pg-2", "name": "Fortune Dragon", "colors": ["#7a4a10", "#1a0a04"] },
+  { "id": "pg-3", "name": "Treasure", "colors": ["#3a1a6e", "#0a041a"] },
+  { "id": "pg-4", "name": "Pinata Wins", "colors": ["#7a1a4a", "#1a0410"] },
+  { "id": "pg-5", "name": "Sweet Bonanza", "colors": ["#6a1530", "#1a0608"] },
+  { "id": "pg-6", "name": "Olympus", "colors": ["#1a3a6e", "#06121e"] },
+  { "id": "pg-7", "name": "Mahjong", "colors": ["#2a5e2a", "#061a0a"] },
+  { "id": "pg-8", "name": "Aviator", "colors": ["#5a1a3a", "#14040a"] },
+  { "id": "pg-9", "name": "Dog Tycoon", "colors": ["#5a4a1a", "#1a1404"] },
+  { "id": "pg-10", "name": "Wild West", "colors": ["#7a3a1a", "#1a0a04"] }
+]

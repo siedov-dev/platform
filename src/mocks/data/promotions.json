@@ -1,0 +1,7 @@
+[
+  { "id": "p1", "badge": "TOURNAMENT", "title": "Drops & Wins", "description": "€2,000,000 monthly prize pool across selected slots", "ctaKey": "promo.join" },
+  { "id": "p2", "badge": "WEEKLY", "title": "Cashback 15%", "description": "Get back 15% of your losses every Monday", "ctaKey": "promo.activate" },
+  { "id": "p3", "badge": "NEW", "title": "Friday Free Spins", "description": "100 free spins every Friday on top games", "ctaKey": "promo.claim" },
+  { "id": "p4", "badge": "VIP", "title": "High-Roller Race", "description": "Compete with top players for the €50,000 prize", "ctaKey": "promo.enter" },
+  { "id": "p5", "badge": "EVENT", "title": "Summer 2026", "description": "Daily missions, unique drops, exclusive rewards", "ctaKey": "promo.seeMore" }
+]

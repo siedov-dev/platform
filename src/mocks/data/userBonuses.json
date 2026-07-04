@@ -1,0 +1,47 @@
+[
+  {
+    "id": "ub1",
+    "type": "deposit",
+    "status": 1,
+    "statusName": "Active",
+    "name": "Welcome Pack",
+    "description": "100% up to 500 + 100 Free Spins",
+    "imgUrl": null,
+    "progressPercents": 35,
+    "balanceString": "120.00",
+    "balanceName": "money",
+    "isActive": true,
+    "isPending": false,
+    "isCancelable": true
+  },
+  {
+    "id": "ub2",
+    "type": "freespins",
+    "status": 4,
+    "statusName": "Pending",
+    "name": "Friday Free Spins",
+    "description": "100 Free Spins on Fortune Tiger",
+    "imgUrl": null,
+    "progressPercents": 0,
+    "balanceString": "100",
+    "balanceName": "spins",
+    "isActive": false,
+    "isPending": true,
+    "isCancelable": false
+  },
+  {
+    "id": "ub3",
+    "type": "cashback",
+    "status": 1,
+    "statusName": "Active",
+    "name": "Weekly Cashback",
+    "description": "15% cashback on weekly losses",
+    "imgUrl": null,
+    "progressPercents": 60,
+    "balanceString": "45.50",
+    "balanceName": "money",
+    "isActive": true,
+    "isPending": false,
+    "isCancelable": true
+  }
+]

@@ -1,0 +1,14 @@
+[
+  { "id": "m1", "league": "UEFA Champions League", "sport": "soccer", "teamA": "Real Madrid", "teamB": "Bayern", "odds": { "home": 1.85, "draw": 3.40, "away": 4.20 } },
+  { "id": "m2", "league": "Premier League", "sport": "soccer", "teamA": "Arsenal", "teamB": "Man City", "odds": { "home": 2.10, "draw": 3.30, "away": 3.20 } },
+  { "id": "m3", "league": "La Liga", "sport": "soccer", "teamA": "Barcelona", "teamB": "Atlético", "odds": { "home": 1.55, "draw": 3.80, "away": 5.50 } },
+  { "id": "m4", "league": "Serie A", "sport": "soccer", "teamA": "Inter", "teamB": "Milan", "odds": { "home": 2.05, "draw": 3.30, "away": 3.40 } },
+  { "id": "m5", "league": "Bundesliga", "sport": "soccer", "teamA": "Dortmund", "teamB": "Leipzig", "odds": { "home": 2.40, "draw": 3.25, "away": 2.85 } },
+  { "id": "t1", "league": "ATP Masters", "sport": "tennis", "teamA": "Djokovic", "teamB": "Alcaraz", "odds": { "home": 1.95, "draw": 0, "away": 1.85 } },
+  { "id": "t2", "league": "WTA Finals", "sport": "tennis", "teamA": "Swiatek", "teamB": "Sabalenka", "odds": { "home": 1.70, "draw": 0, "away": 2.10 } },
+  { "id": "b1", "league": "NBA", "sport": "basket", "teamA": "Lakers", "teamB": "Celtics", "odds": { "home": 2.05, "draw": 0, "away": 1.80 } },
+  { "id": "b2", "league": "EuroLeague", "sport": "basket", "teamA": "Real Madrid", "teamB": "Olympiacos", "odds": { "home": 1.60, "draw": 0, "away": 2.35 } },
+  { "id": "x1", "league": "UFC 320", "sport": "mma", "teamA": "Jones", "teamB": "Aspinall", "odds": { "home": 1.75, "draw": 0, "away": 2.05 } },
+  { "id": "h1", "league": "NHL", "sport": "hockey", "teamA": "Rangers", "teamB": "Bruins", "odds": { "home": 2.20, "draw": 3.50, "away": 2.60 } },
+  { "id": "n1", "league": "NFL", "sport": "nfl", "teamA": "Chiefs", "teamB": "Eagles", "odds": { "home": 1.90, "draw": 0, "away": 1.95 } }
+]

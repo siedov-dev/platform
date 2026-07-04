@@ -1,0 +1,77 @@
+import { useRef, useEffect, useState } from "react";
+import styles from "./BonusParkPage.module.css";
+import { transformFor } from "./perspective";
+
+const ASSET = "/bonus-park";
+
+function tileFor(r, c, seed) {
+  return ((r * 131 + c * 197 + r * c * 59 + seed * 103) % 10) + 1;
+}
+
+export default function TileField({
+  corners,
+  glowCorners,
+  cols,
+  rows,
+  seed,
+  selected,
+  litTile,
+  onTileClick,
+  showGlow,
+}) {
+  const hostRef = useRef(null);
+  const [size, setSize] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const host = hostRef.current;
+    const update = () => setSize({ w: host.clientWidth, h: host.clientHeight });
+    const ro = new ResizeObserver(update);
+    ro.observe(host);
+    update();
+    return () => ro.disconnect();
+  }, []);
+
+  const tileT = size.w > 0 ? transformFor(corners, size.w, size.h) : null;
+  const glowT = size.w > 0 && glowCorners ? transformFor(glowCorners, size.w, size.h) : null;
+
+  return (
+    <div ref={hostRef} className={styles.tileHost}>
+      <div
+        className={styles.tileGrid}
+        style={{
+          width: `${tileT ? tileT.gw : 1}px`,
+          height: `${tileT ? tileT.gh : 1}px`,
+          transform: tileT ? tileT.transform : "none",
+          transformOrigin: "0 0",
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          gridTemplateRows: `repeat(${rows}, 1fr)`,
+        }}
+      >
+        {Array.from({ length: rows * cols }, (_, i) => {
+          const r = Math.floor(i / cols);
+          const c = i % cols;
+          const lit = litTile === i;
+          return (
+            <div key={i} className={styles.cell} onClick={onTileClick ? () => onTileClick(i) : undefined}>
+              <img className={styles.tileImg} src={`${ASSET}/Tile_${tileFor(r, c, seed)}.png`} alt="" />
+              {lit && <img className={styles.tileGlow} src={`${ASSET}/Light.png`} alt="" />}
+            </div>
+          );
+        })}
+      </div>
+      {showGlow && glowT && (
+        <div
+          className={styles.glowLayer}
+          style={{ width: `${glowT.gw}px`, height: `${glowT.gh}px`, transform: glowT.transform, transformOrigin: "0 0" }}
+        >
+          <img
+            className={styles.fieldGlow}
+            src={`${ASSET}/Light_field.png`}
+            alt=""
+            style={{ animationDelay: `${(seed || 0) * 0.5}s` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,13 @@
+[
+  { "id": "popular", "nameKey": "cat.popular", "icon": "★" },
+  { "id": "new", "nameKey": "cat.new", "icon": "✷" },
+  { "id": "theatre", "nameKey": "cat.theatre", "icon": "♛" },
+  { "id": "opera", "nameKey": "cat.opera", "icon": "♫" },
+  { "id": "kingdom", "nameKey": "cat.kingdom", "icon": "♚" },
+  { "id": "roulette", "nameKey": "cat.roulette", "icon": "◎" },
+  { "id": "cards", "nameKey": "cat.cards", "icon": "♣" },
+  { "id": "live", "nameKey": "cat.live", "icon": "●" },
+  { "id": "jackpot", "nameKey": "cat.jackpot", "icon": "⚜" },
+  { "id": "crash", "nameKey": "cat.crash", "icon": "↑" },
+  { "id": "bonus", "nameKey": "cat.bonus", "icon": "❖" }
+]

@@ -1,0 +1,5 @@
+[
+  { "id": "crypto", "name": "Crypto", "type": "crypto", "minDeposit": 250, "maxDeposit": 20000000, "commission": 0 },
+  { "id": "visa", "name": "Visa P2P", "type": "card", "minDeposit": 4000, "maxDeposit": 200000, "commission": 0 },
+  { "id": "kaspi", "name": "Kaspi.kz", "type": "bank", "minDeposit": 4000, "maxDeposit": 200000, "commission": 0 }
+]

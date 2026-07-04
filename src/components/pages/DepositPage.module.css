@@ -1,0 +1,30 @@
+.bg { position: absolute; inset: 0; background: radial-gradient(80% 60% at 50% 0%,#2a1012,#150607 50%,#0a0304); }
+.scroll { position: absolute; top: 74px; left: 0; right: 0; bottom: 110px; overflow-y: auto; padding: 0 14px 20px; scrollbar-width: none; }
+.tabs { display: flex; gap: 8px; margin: 4px 0 16px; }
+.tab, .tabActive { flex: 1; padding: 11px 8px; border-radius: var(--radius-md); border: 1px solid var(--surface-border); background: var(--surface); color: var(--text-secondary); font: 700 13px var(--font-body); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.tabActive { background: linear-gradient(135deg,#3a1014,#150607); border-color: var(--gold-dark); color: #fff; }
+.tabIcon { width: 16px; height: 16px; display: grid; place-items: center; color: var(--gold); }
+.grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.card { border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--surface-border); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform .15s ease; }
+.card:active { transform: scale(.97); }
+.cardLogo { width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+.limit { font: 700 10px var(--font-body); color: var(--text-secondary); text-align: center; }
+.commission { font: 500 10px var(--font-body); color: var(--text-muted); margin-top: 3px; text-align: center; }
+.logoRow { display: flex; align-items: center; gap: 4px; }
+.accent { color: #2bb6a3; }
+.cryptoIcon { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #2bb6a3; display: grid; place-items: center; color: #2bb6a3; font: 900 11px var(--font-body); }
+.logoText { font: 900 8px var(--font-body); color: #fff; text-align: left; line-height: 1.05; }
+.visa { font: 900 11px var(--font-body); color: #1a1f71; font-style: italic; background: #fff; padding: 2px 4px; border-radius: 2px; line-height: 1; }
+.mc { position: relative; width: 18px; height: 12px; display: inline-block; }
+.mcR { position: absolute; left: 0; top: 0; width: 12px; height: 12px; border-radius: 50%; background: #eb001b; }
+.mcY { position: absolute; left: 6px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: #f79e1b; mix-blend-mode: screen; }
+.p2p { font: 800 7px var(--font-body); color: #fff; margin-left: 2px; background: #3a1c1e; padding: 1px 3px; border-radius: 3px; }
+.kaspiIcon { width: 20px; height: 20px; border-radius: 50%; background: #f14635; display: grid; place-items: center; color: #fff; font: 900 11px var(--font-body); }
+.kaspiText { font: 900 11px var(--font-body); color: #fff; line-height: 1; }
+.form { display: flex; flex-direction: column; gap: 12px; }
+.back { align-self: flex-start; background: none; border: none; color: var(--gold); font: 700 13px var(--font-body); cursor: pointer; padding: 4px 0; }
+.formCard { border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--surface-border); padding: 14px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.fieldLabel { font: 600 11px var(--font-body); color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+.amountInput { background: #0e0506; border: 1px solid var(--surface-border); border-radius: var(--radius-sm); padding: 12px 14px; color: #fff; font: 700 16px var(--font-body); }
+.confirm { padding: 13px; border: none; border-radius: var(--radius-pill); background: linear-gradient(180deg,var(--gold-light),var(--gold-deep)); color: var(--ink); font: 800 14px var(--font-body); cursor: pointer; }
+.confirm:disabled { opacity: .6; cursor: default; }

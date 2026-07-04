@@ -1,0 +1,11 @@
+[
+  { "id": "all", "name": "All", "gameCount": 1248, "categories": ["popular", "new", "theatre", "opera", "kingdom", "roulette", "cards", "live", "jackpot", "crash", "bonus"] },
+  { "id": "pragmatic", "name": "Pragmatic", "gameCount": 287, "categories": ["popular", "new", "theatre", "kingdom", "crash", "bonus"] },
+  { "id": "netent", "name": "NetEnt", "gameCount": 195, "categories": ["popular", "new", "opera", "kingdom", "jackpot"] },
+  { "id": "playngo", "name": "Play'n GO", "gameCount": 162, "categories": ["popular", "theatre", "opera", "bonus"] },
+  { "id": "evolution", "name": "Evolution", "gameCount": 134, "categories": ["popular", "live", "roulette", "cards"] },
+  { "id": "bgaming", "name": "BGaming", "gameCount": 118, "categories": ["popular", "new", "crash", "jackpot"] },
+  { "id": "yggdrasil", "name": "Yggdrasil", "gameCount": 98, "categories": ["popular", "kingdom", "jackpot", "bonus"] },
+  { "id": "spinomenal", "name": "Spinomenal", "gameCount": 86, "categories": ["popular", "theatre", "opera"] },
+  { "id": "habanero", "name": "Habanero", "gameCount": 77, "categories": ["popular", "new", "cards"] }
+]

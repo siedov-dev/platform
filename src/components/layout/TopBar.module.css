@@ -1,0 +1,35 @@
+.bar {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 18px;
+  z-index: 30;
+}
+
+.spacer {
+  width: 36px;
+  height: 36px;
+  display: inline-block;
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+  font: 700 14px var(--font-display);
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.closeRing {
+  color: #cbb38a;
+}
+
+.closeRing svg {
+  width: 28px;
+  height: 28px;
+}

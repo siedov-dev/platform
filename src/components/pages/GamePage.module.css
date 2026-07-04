@@ -1,0 +1,18 @@
+.wrap { position: absolute; inset: 0; background: radial-gradient(90% 70% at 50% 0%,#2a1012,#120607 60%,#0a0304); display: flex; flex-direction: column; }
+.bar { display: flex; align-items: center; justify-content: space-between; padding: 50px 14px 10px; gap: 10px; }
+.close { background: none; border: none; color: var(--gold); font: 700 14px var(--font-body); cursor: pointer; }
+.modes { display: flex; gap: 6px; }
+.mode { padding: 7px 14px; border-radius: var(--radius-pill); background: var(--surface); border: 1px solid var(--surface-border); color: var(--text-secondary); font: 700 12px var(--font-body); cursor: pointer; }
+.modeActive { background: linear-gradient(180deg,var(--gold-light),var(--gold-deep)); color: var(--ink); border-color: var(--gold-dark); }
+.frame { flex: 1; margin: 8px 14px 90px; border-radius: var(--radius-lg); border: 2px solid var(--gold-dark); background: #060203; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-heavy); }
+.frameState { display: flex; flex-direction: column; align-items: center; gap: 14px; color: var(--text-secondary); font: 600 13px var(--font-body); }
+.spinner { width: 44px; height: 44px; border-radius: 50%; border: 3px solid var(--surface-border); border-top-color: var(--gold); animation: gpspin .8s linear infinite; }
+@keyframes gpspin { to { transform: rotate(360deg); } }
+.err { color: var(--accent-red); font: 700 15px var(--font-display); }
+.retry { padding: 9px 24px; border: none; border-radius: var(--radius-pill); background: linear-gradient(180deg,var(--gold-light),var(--gold-deep)); color: var(--ink); font: 700 13px var(--font-body); cursor: pointer; }
+.stage { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px; text-align: center; }
+.crest { font: 400 56px var(--font-display); color: var(--gold); text-shadow: 0 0 20px rgba(217,177,90,.5); }
+.gameName { font: 700 20px var(--font-display); color: #fff; }
+.modeTag { font: 700 11px var(--font-body); color: var(--gold); text-transform: uppercase; letter-spacing: .1em; }
+.url { font: 500 10px var(--font-body); color: var(--text-muted); word-break: break-all; max-width: 240px; }
+.empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }

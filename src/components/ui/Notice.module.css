@@ -1,0 +1,4 @@
+.toast { position: absolute; left: 50%; bottom: 124px; transform: translateX(-50%); z-index: 90; max-width: 88%; padding: 12px 18px; border-radius: var(--radius-md); font: 600 13px var(--font-body); text-align: center; box-shadow: var(--shadow-heavy); cursor: pointer; animation: noticeIn .25s ease; }
+.success { background: linear-gradient(180deg,#2a5e2a,#163516); color: #eafcea; border: 1px solid #3c7a3c; }
+.error { background: linear-gradient(180deg,#7a2020,#3a0e10); color: #ffe8e8; border: 1px solid #a83232; }
+@keyframes noticeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }

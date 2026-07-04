@@ -1,0 +1,32 @@
+.card {
+  aspect-ratio: 3/4;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2a1012, #150607);
+  border: 1px solid rgba(217, 177, 90, 0.35);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(45deg, rgba(217, 177, 90, 0.1) 0 8px, rgba(217, 177, 90, 0.02) 8px 16px),
+    linear-gradient(180deg, var(--c1, #3a1014), var(--c2, #160608));
+}
+
+.bg::after {
+  content: attr(data-name);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 11px var(--font-display);
+  color: rgba(255, 220, 170, 0.92);
+  text-align: center;
+  padding: 6px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}

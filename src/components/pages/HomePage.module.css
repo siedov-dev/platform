@@ -1,0 +1,7 @@
+.page { position: absolute; inset: 0; }
+.bg { position: absolute; inset: 0; background-size: cover; background-position: center top; background-color: #0a0304; }
+.strip { position: absolute; left: 0; right: 0; bottom: 88px; z-index: 20; padding: 0 0 6px; }
+.stripTitle { display: flex; align-items: center; gap: 10px; padding: 0 16px 8px; font: 700 12px var(--font-display); color: var(--gold); letter-spacing: .12em; text-transform: uppercase; text-shadow: 0 1px 3px rgba(0,0,0,.7); }
+.stripTitle::before, .stripTitle::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(217,177,90,.55), transparent); }
+.rail { display: flex; gap: 8px; overflow-x: auto; padding: 0 12px 4px; scrollbar-width: none; scroll-snap-type: x mandatory; }
+.rail::-webkit-scrollbar { display: none; }

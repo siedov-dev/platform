@@ -10,6 +10,7 @@ use App\Http\Controllers\PyramidController;
 use App\Http\Controllers\CardsController;
 use App\Http\Controllers\WheelController;
 use App\Http\Controllers\SafeController;
+use App\Http\Controllers\PillarController; 
 
 Route::prefix('game')->group(function () {
     Route::post('/pyramid/start', [PyramidController::class, 'start']);
@@ -23,6 +24,10 @@ Route::prefix('game')->group(function () {
 
     Route::post('/safe/start', [SafeController::class, 'start']);
     Route::post('/safe/open', [SafeController::class, 'open']);
+
+    // ИГРА: СТОЛБ
+    Route::post('/pillar/play', [PillarController::class, 'play']); // Боевой эндпоинт для фронта
+    Route::get('/pillar/simulate', [PillarController::class, 'simulate']); // Эндпоинт для отчета о балансе (Stress Test)
 });
 
 // ==========================================

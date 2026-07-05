@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
-class PillarController extends Controller
+class LunoparkController extends Controller
 {
     public function play(Request $request)
     {

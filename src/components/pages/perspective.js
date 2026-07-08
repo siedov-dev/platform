@@ -52,13 +52,17 @@ function dist(a, b) {
   return Math.hypot(b.x - a.x, b.y - a.y);
 }
 
-export function transformFor(corners, sizeW, sizeH) {
+export function transformFor(corners, sizeW, sizeH, cols = 1, rows = 1, gapX = 0, gapY = 0) {
   const tl = { x: (corners.tl.x / 100) * sizeW, y: (corners.tl.y / 100) * sizeH };
   const tr = { x: (corners.tr.x / 100) * sizeW, y: (corners.tr.y / 100) * sizeH };
   const br = { x: (corners.br.x / 100) * sizeW, y: (corners.br.y / 100) * sizeH };
   const bl = { x: (corners.bl.x / 100) * sizeW, y: (corners.bl.y / 100) * sizeH };
-  const gw = Math.max(1, (dist(tl, tr) + dist(bl, br)) / 2);
-  const gh = Math.max(1, (dist(tl, bl) + dist(tr, br)) / 2);
+  const ew = Math.max(1, (dist(tl, tr) + dist(bl, br)) / 2);
+  const eh = Math.max(1, (dist(tl, bl) + dist(tr, br)) / 2);
+  const cellW = Math.max(1, Math.round((ew - gapX * (cols - 1)) / cols));
+  const cellH = Math.max(1, Math.round((eh - gapY * (rows - 1)) / rows));
+  const gw = cellW * cols + gapX * (cols - 1);
+  const gh = cellH * rows + gapY * (rows - 1);
   const m = projection(gw, gh, { tl, tr, br, bl });
-  return { transform: `matrix3d(${m.join(",")})`, gw, gh };
+  return { transform: `matrix3d(${m.join(",")})`, gw, gh, cellW, cellH };
 }

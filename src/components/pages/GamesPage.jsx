@@ -15,7 +15,7 @@ export default function GamesPage() {
   const [provSearch, setProvSearch] = useState("");
   const [gameSearch, setGameSearch] = useState("");
 
-  const { providers, categories, games, gamesLoading, loadGames, openGame } = useApp();
+  const { providers, categories, games, gamesLoading, loadGames, openGame, navigate } = useApp();
   const { t } = useI18n();
 
   const currentProv = providers.find((p) => p.id === providerId);
@@ -55,6 +55,15 @@ export default function GamesPage() {
           ))}
         </div>
         <div className={styles.gridWrap}>
+          <div className={styles.houseSection}>
+            <div className={styles.houseTitle}>Our games</div>
+            <div className={styles.houseRow}>
+              <button className={styles.houseCard} onClick={() => navigate("lunopark")}>
+                <span className={styles.houseEmoji}>🎡</span>
+                <span className={styles.houseName}>Lunapark</span>
+              </button>
+            </div>
+          </div>
           {gamesLoading ? (
             <div className={styles.gridState}>
               <div className={styles.gridSpinner} role="status" aria-label={t("status.loading")} />

@@ -9,17 +9,17 @@ import styles from "./BonusParkPage.module.css";
 const ASSET = "/bonus-park";
 
 const FIELDS = [
-  { key: "tl", cols: 10, rows: 10, seed: 0 },
-  { key: "tr", cols: 10, rows: 10, seed: 1 },
-  { key: "ml", cols: 10, rows: 12, seed: 2 },
-  { key: "mr", cols: 10, rows: 12, seed: 3 },
-  { key: "bl", cols: 10, rows: 10, seed: 4 },
-  { key: "br", cols: 10, rows: 10, seed: 5 },
+  { key: "tl", sector: 1, cols: 10, rows: 10, seed: 0, offset: 0 },
+  { key: "tr", sector: 2, cols: 10, rows: 10, seed: 1, offset: 100 },
+  { key: "ml", sector: 3, cols: 10, rows: 12, seed: 2, offset: 200 },
+  { key: "mr", sector: 4, cols: 10, rows: 12, seed: 3, offset: 320 },
+  { key: "bl", sector: 5, cols: 10, rows: 10, seed: 4, offset: 440 },
+  { key: "br", sector: 6, cols: 10, rows: 10, seed: 5, offset: 540 },
 ];
 
 const DEFAULT_FIELDS = {
   tl: { tl: { x: 25.39, y: 33.36 }, tr: { x: 44.9, y: 33.4 }, br: { x: 44.42, y: 43.04 }, bl: { x: 23.23, y: 42.97 } },
-  tr: { tl: { x: 56.17, y: 33.45 }, tr: { x: 76.12, y: 33.36 }, br: { x: 77.64, y: 40.45 }, bl: { x: 56.67, y: 40.49 } },
+  tr: { tl: { x: 56.17, y: 33.45 }, tr: { x: 76.12, y: 33.36 }, br: { x: 78.07, y: 42.95 }, bl: { x: 56.88, y: 42.95 } },
   ml: { tl: { x: 22.91, y: 44.9 }, tr: { x: 44.23, y: 44.85 }, br: { x: 43.61, y: 57.6 }, bl: { x: 20.39, y: 57.6 } },
   mr: { tl: { x: 56.99, y: 44.91 }, tr: { x: 78.55, y: 44.91 }, br: { x: 81.07, y: 57.56 }, bl: { x: 57.83, y: 57.56 } },
   bl: { tl: { x: 20.02, y: 59.93 }, tr: { x: 43.49, y: 59.95 }, br: { x: 42.86, y: 71.24 }, bl: { x: 17.54, y: 71.27 } },
@@ -95,17 +95,52 @@ function GridGame() {
   const [fields] = useState(loadFields);
   const [decor, setDecor] = useState(loadDecor);
   const [selectedZone, setSelectedZone] = useState(null);
+  const [zoomZone, setZoomZone] = useState(null);
   const [lit, setLit] = useState(null);
+  const [destroyed, setDestroyed] = useState(() => new Set());
   const [zones] = useState(loadZones);
 
-  const handleTileClick = (zoneKey, index) => {
-    if (selectedZone !== zoneKey) {
-      setSelectedZone(zoneKey);
+  const handleTileClick = (zoneKey, index, cellId) => {
+    if (zoomZone !== zoneKey) {
+      if (selectedZone !== zoneKey) {
+        setSelectedZone(zoneKey);
+        return;
+      }
+      setZoomZone(zoneKey);
       setLit(null);
-    } else {
-      setLit((prev) => (prev === index ? null : index));
+      return;
     }
+    if (lit !== index) {
+      setLit(index);
+      return;
+    }
+    setDestroyed((prev) => {
+      const next = new Set(prev);
+      next.add(cellId);
+      return next;
+    });
+    setLit(null);
   };
+
+  const exitZoom = () => {
+    setZoomZone(null);
+    setLit(null);
+  };
+
+  const zoomStyle = (() => {
+    if (!zoomZone) return undefined;
+    const c = fields[zoomZone];
+    const xs = [c.tl.x, c.tr.x, c.br.x, c.bl.x];
+    const ys = [c.tl.y, c.tr.y, c.br.y, c.bl.y];
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    const z = Math.min(72 / (maxX - minX), 72 / (maxY - minY), 3.4);
+    return { transform: `translate(${z * (50 - cx)}%, ${z * (50 - cy)}%) scale(${z})` };
+  })();
 
   const startDecorDrag = (id) => (e) => {
     e.preventDefault();
@@ -133,23 +168,33 @@ function GridGame() {
 
   return (
     <div className={styles.grid}>
+      {zoomZone && (
+        <button className={styles.zoomBack} onClick={exitZoom}>← Fields</button>
+      )}
       <div className={styles.gridStage}>
-        <div className={styles.gridInner} ref={stageRef}>
+        <div className={styles.gridInner} ref={stageRef} style={zoomStyle}>
           <img className={styles.gridBg} src={`${ASSET}/garden_long.png`} alt="Castle fields" />
-          {FIELDS.map((f) => (
-            <TileField
-              key={f.key}
-              corners={fields[f.key]}
-              glowCorners={zones[f.key]}
-              cols={f.cols}
-              rows={f.rows}
-              seed={f.seed}
-              selected={selectedZone === f.key}
-              showGlow={selectedZone === f.key}
-              litTile={selectedZone === f.key ? lit : null}
-              onTileClick={(i) => handleTileClick(f.key, i)}
-            />
-          ))}
+          {FIELDS.map((f) => {
+            const active = zoomZone === f.key;
+            const highlighted = !zoomZone && selectedZone === f.key;
+            const interactive = !zoomZone || active;
+            return (
+              <TileField
+                key={f.key}
+                corners={fields[f.key]}
+                glowCorners={zones[f.key]}
+                cols={f.cols}
+                rows={f.rows}
+                seed={f.seed}
+                offset={f.offset}
+                destroyed={destroyed}
+                selected={active}
+                showGlow={highlighted}
+                litTile={active ? lit : null}
+                onTileClick={interactive ? (i, cellId) => handleTileClick(f.key, i, cellId) : undefined}
+              />
+            );
+          })}
           {decor.map((d) =>
             d.type === "balloon" ? (
               <Balloons
@@ -189,15 +234,18 @@ function GamePopup({ title, onClose, children }) {
   );
 }
 
-function Park({ onBack, onOpen }) {
+function Park({ onOpen }) {
+  const { navigate } = useApp();
   return (
     <div className={styles.park}>
       <div className={styles.parkHead}>
-        <button className={styles.back} onClick={onBack}>← Back</button>
         <span className={styles.parkTitle}>Win Park</span>
       </div>
-      <p className={styles.parkNote}>Schematic — final art in progress</p>
       <div className={styles.parkGames}>
+        <button className={styles.parkCard} onClick={() => navigate("lunopark")}>
+          <span className={styles.parkCardTitle}>Lunapark</span>
+          <span className={styles.parkCardPlay}>Play</span>
+        </button>
         {MINI_GAMES.map((g) => (
           <button key={g.id} className={styles.parkCard} onClick={() => onOpen(g.id)}>
             <span className={styles.parkCardTitle}>{g.title}</span>
@@ -220,11 +268,9 @@ export default function BonusParkPage() {
     <div className={styles.page}>
       {view === "overview" && <Overview onPick={setView} />}
       {view === "grid" && <GridGame onBack={() => setView("overview")} />}
-      {view === "park" && <Park onBack={() => setView("overview")} onOpen={setPopup} />}
+      {view === "park" && <Park onOpen={setPopup} />}
 
-      {view === "overview" && (
-        <button className={styles.exit} onClick={() => navigate("home")}>✕</button>
-      )}
+      <button className={styles.exit} onClick={() => (view === "overview" ? navigate("home") : setView("overview"))}>✕</button>
 
       {active && (
         <GamePopup title={active.title} onClose={() => setPopup(null)}>

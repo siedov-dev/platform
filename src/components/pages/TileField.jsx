@@ -1,10 +1,10 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useLayoutEffect, useState } from "react";
 import styles from "./BonusParkPage.module.css";
 import { transformFor } from "./perspective";
 
 const ASSET = "/bonus-park";
 
-function tileFor(r, c, seed) {
+export function tileFor(r, c, seed) {
   return ((r * 131 + c * 197 + r * c * 59 + seed * 103) % 10) + 1;
 }
 
@@ -14,6 +14,11 @@ export default function TileField({
   cols,
   rows,
   seed,
+  offset = 0,
+  gapX = 0,
+  gapY = 0,
+  tileScale = 1.1,
+  destroyed,
   selected,
   litTile,
   onTileClick,
@@ -22,7 +27,7 @@ export default function TileField({
   const hostRef = useRef(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const host = hostRef.current;
     const update = () => setSize({ w: host.clientWidth, h: host.clientHeight });
     const ro = new ResizeObserver(update);
@@ -31,34 +36,46 @@ export default function TileField({
     return () => ro.disconnect();
   }, []);
 
-  const tileT = size.w > 0 ? transformFor(corners, size.w, size.h) : null;
+  const tileT = size.w > 0 ? transformFor(corners, size.w, size.h, cols, rows, gapX, gapY) : null;
   const glowT = size.w > 0 && glowCorners ? transformFor(glowCorners, size.w, size.h) : null;
 
   return (
     <div ref={hostRef} className={styles.tileHost}>
-      <div
-        className={styles.tileGrid}
-        style={{
-          width: `${tileT ? tileT.gw : 1}px`,
-          height: `${tileT ? tileT.gh : 1}px`,
-          transform: tileT ? tileT.transform : "none",
-          transformOrigin: "0 0",
-          gridTemplateColumns: `repeat(${cols}, 1fr)`,
-          gridTemplateRows: `repeat(${rows}, 1fr)`,
-        }}
-      >
-        {Array.from({ length: rows * cols }, (_, i) => {
+      {tileT && (
+        <div
+          className={styles.tileGrid}
+          style={{
+            width: `${tileT.gw}px`,
+            height: `${tileT.gh}px`,
+            transform: tileT.transform,
+            transformOrigin: "0 0",
+            gridTemplateColumns: `repeat(${cols}, ${tileT.cellW}px)`,
+            gridTemplateRows: `repeat(${rows}, ${tileT.cellH}px)`,
+            columnGap: `${gapX}px`,
+            rowGap: `${gapY}px`,
+            "--ts": tileScale,
+          }}
+        >
+          {Array.from({ length: rows * cols }, (_, i) => {
           const r = Math.floor(i / cols);
           const c = i % cols;
-          const lit = litTile === i;
+          const gone = destroyed ? destroyed.has(offset + i) : false;
+          const lit = !gone && litTile === i;
           return (
-            <div key={i} className={styles.cell} onClick={onTileClick ? () => onTileClick(i) : undefined}>
-              <img className={styles.tileImg} src={`${ASSET}/Tile_${tileFor(r, c, seed)}.png`} alt="" />
+            <div
+              key={i}
+              className={gone ? `${styles.cell} ${styles.cellGone}` : styles.cell}
+              onClick={!gone && onTileClick ? () => onTileClick(i, offset + i) : undefined}
+            >
+              <span className={styles.tileClip}>
+                <img className={styles.tileImg} src={`${ASSET}/Tile_${tileFor(r, c, seed)}.png`} alt="" />
+              </span>
               {lit && <img className={styles.tileGlow} src={`${ASSET}/Light.png`} alt="" />}
             </div>
           );
-        })}
-      </div>
+          })}
+        </div>
+      )}
       {showGlow && glowT && (
         <div
           className={styles.glowLayer}

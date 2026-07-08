@@ -11,6 +11,13 @@
 .catActive .catIcon { color: var(--gold-light); }
 .gridWrap { flex: 1; min-width: 0; overflow-y: auto; scrollbar-width: none; padding-bottom: 8px; }
 .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.houseSection { margin-bottom: 12px; }
+.houseTitle { font: 700 12px var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+.houseRow { display: flex; gap: 8px; flex-wrap: wrap; }
+.houseCard { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 92px; height: 92px; border-radius: 12px; border: 1px solid #7a4a1f; background: linear-gradient(160deg, #2a1a2e, #170d18); color: #f2e6d0; cursor: pointer; }
+.houseCard:hover { border-color: var(--gold); }
+.houseEmoji { font-size: 34px; }
+.houseName { font: 700 12px var(--font-body); color: var(--gold); }
 .gridState { display: flex; align-items: center; justify-content: center; min-height: 180px; color: var(--text-muted); font: 600 14px var(--font-body); }
 .gridSpinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--surface-border); border-top-color: var(--gold); animation: gridspin .8s linear infinite; }
 @keyframes gridspin { to { transform: rotate(360deg); } }

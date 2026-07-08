@@ -47,4 +47,5 @@ export const gamesApi = {
   wheelSpin: (gameId) => post("/wheel/spin", { game_id: gameId }),
   cardsStart: () => post("/cards/start"),
   cardsPlay: (gameId) => post("/cards/play", { game_id: gameId }),
+  lunoparkPlay: (userId, clusterId) => post("/lunopark/play", { user_id: userId, cluster_id: clusterId }),
 };

@@ -13,6 +13,7 @@ import SportPage from "@/components/pages/SportPage";
 import DepositPage from "@/components/pages/DepositPage";
 import GamePage from "@/components/pages/GamePage";
 import BonusParkPage from "@/components/pages/BonusParkPage";
+import Lunopark from "@/components/pages/Lunopark";
 import styles from "./App.module.css";
 
 const PAGES = {
@@ -21,6 +22,7 @@ const PAGES = {
   promotions: PromotionsPage,
   bonus: BonusPage,
   bonuspark: BonusParkPage,
+  lunopark: Lunopark,
   sport: SportPage,
   deposit: DepositPage,
   game: GamePage,

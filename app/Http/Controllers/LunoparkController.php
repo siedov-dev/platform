@@ -7,6 +7,28 @@ use Illuminate\Support\Facades\Cache;
 
 class LunoparkController extends Controller
 {
+    /**
+     * ГЕНЕРАЦИЯ СЕТКИ (Строго по ТЗ: 640 ячеек)
+     * 4 типа по 100 ячеек, 2 типа по 120 ячеек
+     */
+    public function generateGrid(): array
+    {
+        $distribution = [
+            1 => 100, 2 => 100, 3 => 100, 4 => 100,
+            5 => 120, 6 => 120
+        ];
+
+        $grid = [];
+        foreach ($distribution as $type => $count) {
+            $grid = array_merge($grid, array_fill(0, $count, $type));
+        }
+
+        // Перемешиваем, чтобы распределение было случайным, но количество — фиксированным
+        shuffle($grid);
+
+        return $grid;
+    }
+
     public function play(Request $request)
     {
         // Ожидаем от фронтенда user_id и cluster_id

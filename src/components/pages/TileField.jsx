@@ -11,18 +11,21 @@ export function tileFor(r, c, seed) {
 export default function TileField({
   corners,
   glowCorners,
+  coverCorners,
   cols,
   rows,
   seed,
   offset = 0,
   gapX = 0,
   gapY = 0,
-  tileScale = 1.1,
+  scaleX = 1.15,
+  scaleY = 1.15,
   destroyed,
   selected,
   litTile,
   onTileClick,
   showGlow,
+  coverSrc,
 }) {
   const hostRef = useRef(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -38,6 +41,7 @@ export default function TileField({
 
   const tileT = size.w > 0 ? transformFor(corners, size.w, size.h, cols, rows, gapX, gapY) : null;
   const glowT = size.w > 0 && glowCorners ? transformFor(glowCorners, size.w, size.h) : null;
+  const coverT = size.w > 0 && coverCorners ? transformFor(coverCorners, size.w, size.h) : null;
 
   return (
     <div ref={hostRef} className={styles.tileHost}>
@@ -53,7 +57,8 @@ export default function TileField({
             gridTemplateRows: `repeat(${rows}, ${tileT.cellH}px)`,
             columnGap: `${gapX}px`,
             rowGap: `${gapY}px`,
-            "--ts": tileScale,
+            "--tsx": scaleX,
+            "--tsy": scaleY,
           }}
         >
           {Array.from({ length: rows * cols }, (_, i) => {
@@ -76,17 +81,20 @@ export default function TileField({
           })}
         </div>
       )}
+      {coverSrc && coverT && (
+        <div
+          className={styles.coverLayer}
+          style={{ width: `${coverT.gw}px`, height: `${coverT.gh}px`, transform: coverT.transform, transformOrigin: "0 0" }}
+        >
+          <img className={styles.coverImg} src={coverSrc} alt="" />
+        </div>
+      )}
       {showGlow && glowT && (
         <div
           className={styles.glowLayer}
           style={{ width: `${glowT.gw}px`, height: `${glowT.gh}px`, transform: glowT.transform, transformOrigin: "0 0" }}
         >
-          <img
-            className={styles.fieldGlow}
-            src={`${ASSET}/Light_field.png`}
-            alt=""
-            style={{ animationDelay: `${(seed || 0) * 0.5}s` }}
-          />
+          <img className={styles.fieldGlow} src={`${ASSET}/Light_field.png`} alt="" />
         </div>
       )}
     </div>

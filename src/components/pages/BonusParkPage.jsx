@@ -17,6 +17,15 @@ const FIELDS = [
   { key: "br", sector: 6, cols: 10, rows: 10, seed: 5, offset: 540 },
 ];
 
+const COVER = {
+  tl: "Cover_Field.png",
+  ml: "Cover_Field.png",
+  bl: "Cover_Field.png",
+  tr: "Cover_Field_2.png",
+  mr: "Cover_Field_2.png",
+  br: "Cover_Field_2.png",
+};
+
 const DEFAULT_FIELDS = {
   tl: { tl: { x: 25.39, y: 33.36 }, tr: { x: 44.9, y: 33.4 }, br: { x: 44.42, y: 43.04 }, bl: { x: 23.23, y: 42.97 } },
   tr: { tl: { x: 56.17, y: 33.45 }, tr: { x: 76.12, y: 33.36 }, br: { x: 78.07, y: 42.95 }, bl: { x: 56.88, y: 42.95 } },
@@ -76,6 +85,39 @@ function loadZones() {
   return DEFAULT_ZONES;
 }
 
+const TILECFG_KEY = "bonuspark.tilecfg";
+const DEFAULT_TILECFG = { scaleX: 1.15, scaleY: 1.4 };
+
+function loadTileCfg() {
+  try {
+    const raw = localStorage.getItem(TILECFG_KEY);
+    if (raw) return { ...DEFAULT_TILECFG, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_TILECFG;
+  }
+  return DEFAULT_TILECFG;
+}
+
+const COVERS_KEY = "bonuspark.covers";
+const DEFAULT_COVERS = {
+  tl: { tl: { x: 23.22, y: 33.25 }, tr: { x: 45.02, y: 33.31 }, br: { x: 44.92, y: 43.01 }, bl: { x: 23.05, y: 42.95 } },
+  tr: { tl: { x: 53.86, y: 33.23 }, tr: { x: 76.32, y: 33.38 }, br: { x: 78.7, y: 42.99 }, bl: { x: 56.67, y: 42.91 } },
+  ml: { tl: { x: 20.81, y: 44.89 }, tr: { x: 44.32, y: 44.73 }, br: { x: 44.32, y: 57.6 }, bl: { x: 20.16, y: 57.61 } },
+  mr: { tl: { x: 54.35, y: 44.66 }, tr: { x: 78.6, y: 44.89 }, br: { x: 81.75, y: 57.58 }, bl: { x: 57.46, y: 57.56 } },
+  bl: { tl: { x: 17.88, y: 59.92 }, tr: { x: 43.52, y: 59.83 }, br: { x: 43.68, y: 71.35 }, bl: { x: 17.49, y: 71.3 } },
+  br: { tl: { x: 54.63, y: 59.75 }, tr: { x: 81.33, y: 59.93 }, br: { x: 84.11, y: 71.3 }, bl: { x: 58.08, y: 71.35 } },
+};
+
+function loadCovers() {
+  try {
+    const raw = localStorage.getItem(COVERS_KEY);
+    if (raw) return { ...DEFAULT_COVERS, ...JSON.parse(raw) };
+  } catch {
+    return { ...DEFAULT_COVERS };
+  }
+  return { ...DEFAULT_COVERS };
+}
+
 function Overview({ onPick }) {
   return (
     <div className={styles.overview}>
@@ -99,6 +141,8 @@ function GridGame() {
   const [lit, setLit] = useState(null);
   const [destroyed, setDestroyed] = useState(() => new Set());
   const [zones] = useState(loadZones);
+  const [cfg] = useState(loadTileCfg);
+  const [covers] = useState(loadCovers);
 
   const handleTileClick = (zoneKey, index, cellId) => {
     if (zoomZone !== zoneKey) {
@@ -183,14 +227,18 @@ function GridGame() {
                 key={f.key}
                 corners={fields[f.key]}
                 glowCorners={zones[f.key]}
+                coverCorners={covers[f.key]}
                 cols={f.cols}
                 rows={f.rows}
                 seed={f.seed}
                 offset={f.offset}
+                scaleX={cfg.scaleX}
+                scaleY={cfg.scaleY}
                 destroyed={destroyed}
                 selected={active}
                 showGlow={highlighted}
                 litTile={active ? lit : null}
+                coverSrc={!zoomZone ? `${ASSET}/${COVER[f.key]}` : null}
                 onTileClick={interactive ? (i, cellId) => handleTileClick(f.key, i, cellId) : undefined}
               />
             );

@@ -17,7 +17,7 @@ export default function TopBar() {
   const { t } = useI18n();
   const isHome = route === "home";
 
-  if (route === "bonus" || route === "bonuspark" || route === "lunopark") return null;
+  if (route === "bonus" || route === "bonuspark" || route === "lunopark" || route === "ferris") return null;
 
   return (
     <div className={styles.bar}>

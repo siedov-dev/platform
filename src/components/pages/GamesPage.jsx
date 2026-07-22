@@ -58,9 +58,9 @@ export default function GamesPage() {
           <div className={styles.houseSection}>
             <div className={styles.houseTitle}>Our games</div>
             <div className={styles.houseRow}>
-              <button className={styles.houseCard} onClick={() => navigate("lunopark")}>
-                <span className={styles.houseEmoji}>🎡</span>
-                <span className={styles.houseName}>Lunapark</span>
+              <button className={styles.houseCard} onClick={() => navigate("minigames")}>
+                <span className={styles.houseEmoji}>🎮</span>
+                <span className={styles.houseName}>All games</span>
               </button>
             </div>
           </div>

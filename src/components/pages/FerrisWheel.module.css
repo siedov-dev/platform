@@ -1,0 +1,50 @@
+.page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 50% 35%, #1d1236, #0a0714 70%);
+  color: #e8c66a;
+  overflow: hidden;
+}
+
+.back {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid #7a4a1f;
+  background: linear-gradient(180deg, #3a2410, #241407);
+  color: #e8c66a;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 14px 100px;
+}
+
+.canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0 auto;
+  transition: opacity 0.3s ease;
+}
+
+.loading {
+  position: absolute;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8c66a;
+}

@@ -1,0 +1,129 @@
+.wrap {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 163 / 167;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.layer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: block;
+}
+
+.coinBox {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 92%;
+  aspect-ratio: 163 / 167;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.coinImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.coinFill {
+  transition: clip-path 0.7s ease;
+}
+
+.fillLine {
+  position: absolute;
+  left: 50%;
+  width: 150%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: top 0.7s ease, opacity 0.45s ease;
+  pointer-events: none;
+}
+
+/* ---- impact burst (only when an orb hits the coin) ---- */
+.burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  filter: brightness(1.25) saturate(1.25);
+}
+
+/* strong glow behind the coin — artists exported it half-size, so render ~x2 */
+.glowBurst {
+  width: 230%;
+  z-index: 1;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: glowBurst 1.25s ease-out 1;
+}
+
+.beam {
+  width: 165%;
+  z-index: 4;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: beamBurst 1s ease-out 1;
+}
+
+.bolt {
+  z-index: 5;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px rgba(150, 210, 255, 0.9)) drop-shadow(0 0 8px rgba(255, 150, 220, 0.6));
+  animation: boltStrike 0.9s ease-out 1;
+}
+
+.spark {
+  z-index: 6;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: sparkPop 0.85s ease-out 1;
+}
+
+.flare {
+  width: 130%;
+  z-index: 7;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: flareBurst 1s ease-out 1;
+}
+
+@keyframes glowBurst {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+  25% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+@keyframes beamBurst {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes boltStrike {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  30% { opacity: 0.35; }
+  48% { opacity: 1; }
+  70% { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+@keyframes sparkPop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  40% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
+}
+
+@keyframes flareBurst {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  35% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.35); }
+}

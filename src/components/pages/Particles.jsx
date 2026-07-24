@@ -141,15 +141,17 @@ const Particles = forwardRef(function Particles(_, ref) {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
+      const sx = rect.width ? canvas.clientWidth / rect.width : 1;
+      const sy = rect.height ? canvas.clientHeight / rect.height : 1;
       itemsRef.current.push({
         type: "flash",
-        x: clientX - rect.left,
-        y: clientY - rect.top,
+        x: (clientX - rect.left) * sx,
+        y: (clientY - rect.top) * sy,
         t: 0,
         rot: 0,
         vr: 0,
         life: 1,
-        r0: Math.max(12, size),
+        r0: Math.max(12, size * sx),
         decay: 0.07,
       });
       start();
@@ -159,10 +161,12 @@ const Particles = forwardRef(function Particles(_, ref) {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
-      const x0 = fx - rect.left;
-      const y0 = fy - rect.top;
-      const x1 = tx - rect.left;
-      const y1 = ty - rect.top;
+      const sx = rect.width ? canvas.clientWidth / rect.width : 1;
+      const sy = rect.height ? canvas.clientHeight / rect.height : 1;
+      const x0 = (fx - rect.left) * sx;
+      const y0 = (fy - rect.top) * sy;
+      const x1 = (tx - rect.left) * sx;
+      const y1 = (ty - rect.top) * sy;
 
       itemsRef.current.push({
         type: "orb",
@@ -175,7 +179,7 @@ const Particles = forwardRef(function Particles(_, ref) {
         cx: (x0 + x1) / 2 + (y1 - y0) * 0.14,
         cy: (y0 + y1) / 2 - Math.abs(x1 - x0) * 0.28 - 25,
         p: 0,
-        speed: 0.016,
+        speed: 0.010,
         s: 6,
         life: 1,
         decay: 0,
@@ -190,16 +194,18 @@ const Particles = forwardRef(function Particles(_, ref) {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
-      const x = clientX - rect.left;
-      const y = clientY - rect.top;
+      const sx = rect.width ? canvas.clientWidth / rect.width : 1;
+      const sy = rect.height ? canvas.clientHeight / rect.height : 1;
+      const x = (clientX - rect.left) * sx;
+      const y = (clientY - rect.top) * sy;
       const items = itemsRef.current;
-      const s = Math.max(8, size);
+      const s = Math.max(8, size * sx);
 
-      items.push({ x, y, t: 0, rot: 0, vr: 0, life: 1, type: "flash", r0: s * 0.5, decay: 0.14 });
+      items.push({ x, y, t: 0, rot: 0, vr: 0, life: 1, type: "flash", r0: s * 0.5, decay: 0.09 });
 
       for (let i = 0; i < 44; i += 1) {
         const a = rnd(0, Math.PI * 2);
-        const sp = rnd(1.4, 4.8);
+        const sp = rnd(1.1, 3.8);
         items.push({
           x,
           y,
@@ -207,12 +213,12 @@ const Particles = forwardRef(function Particles(_, ref) {
           life: 1,
           type: "confetti",
           vx: Math.cos(a) * sp,
-          vy: Math.sin(a) * sp - rnd(1.2, 3),
-          g: 0.11,
+          vy: Math.sin(a) * sp - rnd(1, 2.4),
+          g: 0.075,
           s: s * rnd(0.1, 0.22),
-          vr: rnd(-0.34, 0.34),
+          vr: rnd(-0.26, 0.26),
           rot: rnd(0, Math.PI * 2),
-          decay: rnd(0.009, 0.017),
+          decay: rnd(0.006, 0.011),
           color: pick(CONFETTI_COLORS),
         });
       }

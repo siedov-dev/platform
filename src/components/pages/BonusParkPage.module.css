@@ -615,7 +615,7 @@
   object-fit: cover;
   display: block;
   transform: scale(var(--tsx, 1), var(--tsy, 1));
-  transition: opacity 0.4s ease;
+  transition: opacity 0.65s ease;
 }
 
 .cellGone .tileImg {
@@ -754,6 +754,32 @@
   background: #ff2d2d;
   border: 1px solid #fff;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+}
+
+.groupHandle {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  background: transparent;
+  border: none;
+  z-index: 42;
+  cursor: move;
+  touch-action: none;
+}
+
+.groupHandle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  border-radius: 50%;
+  background: #2ecc40;
+  border: 2px solid #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.85);
 }
 
 .readout {
@@ -1052,3 +1078,30 @@
   z-index: 3;
 }
 
+
+.zoomCtl {
+  position: absolute;
+  right: 10px;
+  bottom: 84px;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.zoomCtl button {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #7a4a1f;
+  background: rgba(20, 10, 10, 0.82);
+  color: #e8c66a;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.zoomCtl button:active {
+  background: rgba(40, 20, 10, 0.95);
+}

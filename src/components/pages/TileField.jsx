@@ -94,7 +94,7 @@ export default function TileField({
               }
             >
               <span className={styles.tileClip} style={{ inset: clipInset }}>
-                <img className={styles.tileImg} src={`${ASSET}/Tile_${tileFor(r, c, seed)}.png`} alt="" />
+                <img className={styles.tileImg} src={`${ASSET}/opt/Tile_${tileFor(r, c, seed)}.webp`} alt="" />
               </span>
             </div>
           );
@@ -114,7 +114,7 @@ export default function TileField({
           className={styles.glowLayer}
           style={{ width: `${glowT.gw}px`, height: `${glowT.gh}px`, transform: glowT.transform, transformOrigin: "0 0" }}
         >
-          <img className={styles.fieldGlow} src={`${ASSET}/Light_field.png`} alt="" />
+          <img className={styles.fieldGlow} src={`${ASSET}/opt/Light_field.webp`} alt="" />
         </div>
       )}
       {tileT && litTile != null && !(destroyed && destroyed.has(offset + litTile)) && (
@@ -133,7 +133,7 @@ export default function TileField({
             className={styles.topGlowCell}
             style={{ gridColumn: (litTile % cols) + 1, gridRow: Math.floor(litTile / cols) + 1 }}
           >
-            <img className={styles.tileGlow} src={`${ASSET}/Light.png`} alt="" />
+            <img className={styles.tileGlow} src={`${ASSET}/opt/Light.webp`} alt="" />
           </span>
         </div>
       )}

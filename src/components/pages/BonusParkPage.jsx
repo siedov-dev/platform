@@ -6,6 +6,8 @@ import Balloons from "./Balloons";
 import Flag from "./Flag";
 import FerrisSprite from "./FerrisSprite";
 import CarouselSprite from "./CarouselSprite";
+import HumanSprite from "./HumanSprite";
+import CoinFlash from "./CoinFlash";
 import styles from "./BonusParkPage.module.css";
 
 const ASSET = "/bonus-park";
@@ -15,8 +17,8 @@ const ENERGY_GOAL = 1042;
 const FIELDS = [
   { key: "tl", sector: 1, cols: 10, rows: 10, seed: 0, offset: 0, gapX: 0, gapY: 0 },
   { key: "tr", sector: 2, cols: 10, rows: 10, seed: 1, offset: 100, gapX: 0, gapY: 0 },
-  { key: "ml", sector: 3, cols: 10, rows: 12, seed: 2, offset: 200, gapX: 0, gapY: 0 },
-  { key: "mr", sector: 4, cols: 10, rows: 12, seed: 3, offset: 320, gapX: 0, gapY: 0 },
+  { key: "ml", sector: 3, cols: 10, rows: 12, seed: 2, offset: 200, gapX: -0.5, gapY: -0.5 },
+  { key: "mr", sector: 4, cols: 10, rows: 12, seed: 3, offset: 320, gapX: -0.5, gapY: -0.5 },
   { key: "bl", sector: 5, cols: 10, rows: 10, seed: 4, offset: 440, gapX: -0.5, gapY: -0.5 },
   { key: "br", sector: 6, cols: 10, rows: 10, seed: 5, offset: 540, gapX: -0.5, gapY: -0.5 },
 ];
@@ -24,8 +26,8 @@ const FIELDS = [
 const FLASK_KEY = "bonuspark.flask";
 const DEFAULT_FLASK = {
   pos: [
-    { x: 20.4, y: 31.62 },
-    { x: 79.46, y: 31.55 },
+    { x: 20.23, y: 31.32 },
+    { x: 80.92, y: 31.22 },
   ],
   w: 7,
 };
@@ -40,17 +42,19 @@ function loadFlask() {
   return DEFAULT_FLASK;
 }
 
-const COIN = { id: "coin", x: 50, y: 26.1 };
+const COINCFG = { x: 50.4, y: 26, w: 13 };
+
+const HUMAN = { x: 46.6, y: 38.9, w: 6.4, from: 0, to: 559, fps: 15 };
 
 const FLAGS_KEY = "bonuspark.flags";
 const DEFAULT_FLAGS = [
-  { id: "f1", img: "Flag_1.png", x: 24.49, y: 15.01, w: 4.4 },
-  { id: "f2", img: "Flag_2.png", x: 35.05, y: 12.07, w: 4.4 },
-  { id: "fc", img: "Flag_centr.png", x: 51.84, y: 11.66, w: 5 },
-  { id: "f3", img: "Flag_2.png", x: 67.69, y: 12.63, w: 4.4 },
-  { id: "f4", img: "Flag_1.png", x: 79.57, y: 14.16, w: 4.4 },
-  { id: "lb", img: "Flag_Blue_R.png", x: 3.87, y: 45.58, w: 4.5 },
-  { id: "lp", img: "Flag_Purple_L.png", x: 97.16, y: 46.53, w: 4.5 },
+  { id: "f1", img: "Flag_1.png", x: 24.79, y: 14.11, w: 4.4 },
+  { id: "f2", img: "Flag_2.png", x: 35.43, y: 11.21, w: 4.4 },
+  { id: "fc", img: "Flag_centr.png", x: 52.67, y: 10.54, w: 5 },
+  { id: "f3", img: "Flag_2.png", x: 69.14, y: 11.7, w: 4.4 },
+  { id: "f4", img: "Flag_1.png", x: 81.48, y: 13.05, w: 4.4 },
+  { id: "lb", img: "Flag_Blue_R.png", x: 2.68, y: 45.57, w: 4.5 },
+  { id: "lp", img: "Flag_Purple_L.png", x: 98.79, y: 46.3, w: 4.5 },
 ];
 
 function loadFlags() {
@@ -88,35 +92,35 @@ function Flask({ x, y, w, fill }) {
   return (
     <div className={styles.flask} style={{ left: `${x}%`, top: `${y}%`, width: `${w}%` }}>
       <div className={styles.flaskGlass}>
-        <img className={styles.flaskBg} src={`${ASSET}/bg_flask.png`} alt="" />
+        <img className={styles.flaskBg} src={`${ASSET}/opt/bg_flask.webp`} alt="" />
         <img
           className={styles.flaskFill}
-          src={`${ASSET}/inside_flask.png`}
+          src={`${ASSET}/opt/inside_flask.webp`}
           alt=""
           style={{ clipPath: `inset(${(1 - fill) * 100}% 0 0 0)` }}
         />
       </div>
-      <img className={styles.flaskFront} src={`${ASSET}/front_flask.png`} alt="" />
+      <img className={styles.flaskFront} src={`${ASSET}/opt/front_flask.webp`} alt="" />
     </div>
   );
 }
 
 const COVER = {
-  tl: "Cover_Field.png",
-  ml: "Cover_Field.png",
-  bl: "Cover_Field.png",
-  tr: "Cover_Field_2.png",
-  mr: "Cover_Field_2.png",
-  br: "Cover_Field_2.png",
+  tl: "opt/Cover_Field.webp",
+  ml: "opt/Cover_Field.webp",
+  bl: "opt/Cover_Field.webp",
+  tr: "opt/Cover_Field_2.webp",
+  mr: "opt/Cover_Field_2.webp",
+  br: "opt/Cover_Field_2.webp",
 };
 
 const DEFAULT_FIELDS = {
-  tl: { tl: { x: 19.5, y: 39.04 }, tr: { x: 43.48, y: 39.09 }, br: { x: 42.75, y: 47.03 }, bl: { x: 17.22, y: 47.03 } },
-  tr: { tl: { x: 56.63, y: 39.04 }, tr: { x: 80.38, y: 39.04 }, br: { x: 82.78, y: 46.97 }, bl: { x: 57.19, y: 46.95 } },
-  ml: { tl: { x: 16.94, y: 48.54 }, tr: { x: 42.53, y: 48.57 }, br: { x: 41.69, y: 58.98 }, bl: { x: 13.87, y: 58.95 } },
-  mr: { tl: { x: 57.36, y: 48.49 }, tr: { x: 83.06, y: 48.52 }, br: { x: 85.85, y: 58.92 }, bl: { x: 58.2, y: 58.98 } },
-  bl: { tl: { x: 13.5, y: 60.76 }, tr: { x: 41.69, y: 60.92 }, br: { x: 40.77, y: 70.17 }, bl: { x: 10.51, y: 70.21 } },
-  br: { tl: { x: 58, y: 60.83 }, tr: { x: 86.21, y: 60.88 }, br: { x: 89.29, y: 70.26 }, bl: { x: 59.03, y: 70.31 } },
+  tl: { tl: { x: 19.43, y: 38.79 }, tr: { x: 43.73, y: 38.87 }, br: { x: 43.13, y: 47.1 }, bl: { x: 16.98, y: 47.04 } },
+  tr: { tl: { x: 57.43, y: 38.87 }, tr: { x: 81.94, y: 38.86 }, br: { x: 84.22, y: 47.03 }, bl: { x: 58.02, y: 46.98 } },
+  ml: { tl: { x: 16.59, y: 48.55 }, tr: { x: 43.07, y: 48.55 }, br: { x: 42.15, y: 59.31 }, bl: { x: 13.69, y: 59.3 } },
+  mr: { tl: { x: 58.3, y: 48.58 }, tr: { x: 84.71, y: 48.6 }, br: { x: 87.64, y: 59.31 }, bl: { x: 59.16, y: 59.32 } },
+  bl: { tl: { x: 12.98, y: 61.21 }, tr: { x: 42, y: 61.29 }, br: { x: 41.27, y: 70.84 }, bl: { x: 10.02, y: 70.86 } },
+  br: { tl: { x: 59.07, y: 61.28 }, tr: { x: 88, y: 61.31 }, br: { x: 90.88, y: 70.96 }, bl: { x: 59.86, y: 70.94 } },
 };
 
 const FIELDS_KEY = "bonuspark.fields";
@@ -133,10 +137,10 @@ function loadFields() {
 
 const DECOR_KEY = "bonuspark.decor";
 const DEFAULT_DECOR = [
-  { id: "b1", type: "balloon", x: 4.05, y: 65.07 },
-  { id: "b2", type: "balloon", x: 78.02, y: 65.54 },
-  { id: "f1", type: "flag", x: 68.15, y: 78.23, rot: 6, flip: false },
-  { id: "f2", type: "flag", x: 33.71, y: 78.41, rot: 6, flip: true },
+  { id: "b1", type: "balloon", x: -5.98, y: 63.4 },
+  { id: "b2", type: "balloon", x: 84.16, y: 63.41 },
+  { id: "f1", type: "flag", x: 72.28, y: 76.26, rot: 6, flip: false },
+  { id: "f2", type: "flag", x: 29.39, y: 76.5, rot: 6, flip: true },
 ];
 
 function loadDecor() {
@@ -151,12 +155,12 @@ function loadDecor() {
 
 const ZONE_KEY = "bonuspark.zones";
 const DEFAULT_ZONES = {
-  tl: { tl: { x: 19.28, y: 37.52 }, tr: { x: 46.77, y: 37.55 }, br: { x: 43.42, y: 47.49 }, bl: { x: 15.38, y: 47.46 } },
-  tr: { tl: { x: 55.78, y: 37.56 }, tr: { x: 83.52, y: 37.36 }, br: { x: 83.38, y: 47.34 }, bl: { x: 55.58, y: 47.41 } },
-  ml: { tl: { x: 16.72, y: 46.46 }, tr: { x: 46.43, y: 46.43 }, br: { x: 42.36, y: 59.57 }, bl: { x: 12.14, y: 59.49 } },
-  mr: { tl: { x: 56.47, y: 46.51 }, tr: { x: 86.41, y: 46.25 }, br: { x: 86.63, y: 59.54 }, bl: { x: 56.75, y: 59.49 } },
-  bl: { tl: { x: 13.07, y: 58.84 }, tr: { x: 46.31, y: 58.79 }, br: { x: 41.28, y: 70.83 }, bl: { x: 8.76, y: 70.59 } },
-  br: { tl: { x: 56.87, y: 58.93 }, tr: { x: 89.8, y: 58.84 }, br: { x: 89.91, y: 70.73 }, bl: { x: 56.87, y: 70.78 } },
+  tl: { tl: { x: 18.97, y: 37.07 }, tr: { x: 47.41, y: 37.14 }, br: { x: 43.73, y: 47.58 }, bl: { x: 15.15, y: 47.51 } },
+  tr: { tl: { x: 56.49, y: 37.18 }, tr: { x: 84.99, y: 37.18 }, br: { x: 84.99, y: 47.53 }, bl: { x: 56.38, y: 47.44 } },
+  ml: { tl: { x: 16.36, y: 46.42 }, tr: { x: 47.15, y: 46.33 }, br: { x: 42.85, y: 59.96 }, bl: { x: 11.68, y: 59.86 } },
+  mr: { tl: { x: 57.29, y: 46.37 }, tr: { x: 88, y: 46.44 }, br: { x: 88.41, y: 59.91 }, bl: { x: 57.23, y: 59.92 } },
+  bl: { tl: { x: 12.53, y: 59.28 }, tr: { x: 46.33, y: 59.34 }, br: { x: 41.61, y: 71.45 }, bl: { x: 7.89, y: 71.42 } },
+  br: { tl: { x: 58.12, y: 59.33 }, tr: { x: 91.78, y: 59.32 }, br: { x: 91.58, y: 71.48 }, bl: { x: 57.94, y: 71.37 } },
 };
 
 function loadZones() {
@@ -182,14 +186,15 @@ function loadTileCfg() {
   return DEFAULT_TILECFG;
 }
 
+
 const COVERS_KEY = "bonuspark.covers";
 const DEFAULT_COVERS = {
-  tl: { tl: { x: 17.16, y: 39.01 }, tr: { x: 43.53, y: 39.01 }, br: { x: 43.37, y: 47.08 }, bl: { x: 17.16, y: 47.08 } },
-  tr: { tl: { x: 53.74, y: 38.99 }, tr: { x: 80.44, y: 39.01 }, br: { x: 83.45, y: 47 }, bl: { x: 57.19, y: 47 } },
-  ml: { tl: { x: 14.43, y: 48.47 }, tr: { x: 42.53, y: 48.47 }, br: { x: 42.42, y: 59.03 }, bl: { x: 13.76, y: 58.98 } },
-  mr: { tl: { x: 54.24, y: 48.36 }, tr: { x: 83.01, y: 48.44 }, br: { x: 86.68, y: 58.95 }, bl: { x: 58.14, y: 59 } },
-  bl: { tl: { x: 10.69, y: 60.74 }, tr: { x: 41.78, y: 60.83 }, br: { x: 41.59, y: 70.21 }, bl: { x: 10.4, y: 70.31 } },
-  br: { tl: { x: 54.62, y: 60.68 }, tr: { x: 86.33, y: 60.84 }, br: { x: 90.11, y: 70.31 }, bl: { x: 58.72, y: 70.31 } },
+  tl: { tl: { x: 17.07, y: 38.75 }, tr: { x: 43.76, y: 38.82 }, br: { x: 43.76, y: 47.1 }, bl: { x: 16.94, y: 47.05 } },
+  tr: { tl: { x: 54.45, y: 38.77 }, tr: { x: 81.9, y: 38.84 }, br: { x: 84.99, y: 47.03 }, bl: { x: 57.97, y: 46.98 } },
+  ml: { tl: { x: 14.06, y: 48.53 }, tr: { x: 43.14, y: 48.47 }, br: { x: 42.8, y: 59.36 }, bl: { x: 13.69, y: 59.29 } },
+  mr: { tl: { x: 55.12, y: 48.46 }, tr: { x: 84.67, y: 48.61 }, br: { x: 88.43, y: 59.34 }, bl: { x: 59.11, y: 59.29 } },
+  bl: { tl: { x: 10.19, y: 61.15 }, tr: { x: 42.09, y: 61.22 }, br: { x: 42.02, y: 70.92 }, bl: { x: 9.86, y: 70.9 } },
+  br: { tl: { x: 55.59, y: 61.16 }, tr: { x: 87.99, y: 61.3 }, br: { x: 91.76, y: 70.97 }, bl: { x: 59.8, y: 70.95 } },
 };
 
 function loadCovers() {
@@ -236,6 +241,8 @@ function GridGame() {
   const particlesRef = useRef(null);
   const [flask, setFlask] = useState(loadFlask);
   const [flags, setFlags] = useState(loadFlags);
+  const [coinFill, setCoinFill] = useState(0);
+  const [coinPulse, setCoinPulse] = useState(0);
 
   const startFlagDrag = (id) => (e) => {
     e.preventDefault();
@@ -271,11 +278,16 @@ function GridGame() {
     hookTimer.current = setTimeout(() => setHookOn(false), 900);
   };
 
-  const flashAt = (target, coin = false) => {
+  const flashAt = (target) => {
     flashId.current += 1;
     const id = flashId.current;
-    setTankFlashes((list) => [...list, { id, x: target.x, y: target.y, coin }]);
+    setTankFlashes((list) => [...list, { id, x: target.x, y: target.y, coin: false }]);
     setTimeout(() => setTankFlashes((list) => list.filter((f) => f.id !== id)), 900);
+  };
+
+  const flashCoin = (amount) => {
+    setCoinPulse((p) => p + 1);
+    setCoinFill((f) => Math.min(1, f + amount));
   };
 
   const handleTileClick = (zoneKey, index, cellId, rect) => {
@@ -304,7 +316,7 @@ function GridGame() {
         const inner = stageRef.current.getBoundingClientRect();
         const tx = inner.left + (tank.x / 100) * inner.width;
         const ty = inner.top + (tank.y / 100) * inner.height;
-        particlesRef.current?.flyEnergy(cx, cy, tx, ty, () => flashAt(tank, false));
+        particlesRef.current?.flyEnergy(cx, cy, tx, ty, () => flashAt(tank));
       }
     }
     if (zoneKey !== "tl" && zoneKey !== "tr") {
@@ -318,7 +330,7 @@ function GridGame() {
     setLit(null);
   };
 
-  const flyEnergyOnExit = (zoneKey, isTop) => {
+  const flyEnergyOnExit = (zoneKey, isTop, destroyedNow) => {
     const inner = stageRef.current;
     if (!inner || !particlesRef.current) return;
     const rect = inner.getBoundingClientRect();
@@ -326,19 +338,20 @@ function GridGame() {
     const fx = rect.left + (((c.tl.x + c.tr.x + c.br.x + c.bl.x) / 4 / 100) * rect.width);
     const fy = rect.top + (((c.tl.y + c.tr.y + c.br.y + c.bl.y) / 4 / 100) * rect.height);
 
-    const send = (target, delay, coin) => {
+    const send = (target, delay, onArrive) => {
       const tx = rect.left + (target.x / 100) * rect.width;
       const ty = rect.top + (target.y / 100) * rect.height;
       setTimeout(() => {
-        particlesRef.current?.flyEnergy(fx, fy, tx, ty, () => flashAt(target, coin));
+        particlesRef.current?.flyEnergy(fx, fy, tx, ty, onArrive);
       }, delay);
     };
 
+    const coinArrive = () => flashCoin(destroyedNow * 0.01);
     if (isTop) {
-      send(COIN, 0, true);
+      send(COINCFG, 0, coinArrive);
     } else {
-      flask.pos.forEach((_, i) => send(flaskTarget(i), i * 160, false));
-      send(COIN, 330, true);
+      flask.pos.forEach((_, i) => send(flaskTarget(i), i * 160, () => flashAt(flaskTarget(i))));
+      send(COINCFG, 330, coinArrive);
     }
   };
 
@@ -349,7 +362,7 @@ function GridGame() {
     setZoomZone(null);
     setLit(null);
     if (zone && destroyedNow > 0) {
-      setTimeout(() => flyEnergyOnExit(zone, isTop), 950);
+      setTimeout(() => flyEnergyOnExit(zone, isTop, destroyedNow), 950);
     }
   };
 
@@ -401,7 +414,7 @@ function GridGame() {
       {hookOn && <div key={hookKey} className={styles.screenHook} />}
       <div className={styles.gridStage}>
         <div className={styles.gridInner} ref={stageRef} style={zoomStyle}>
-          <img className={styles.gridBg} src={`${ASSET}/down_bg.jpg`} alt="Castle fields" />
+          <img className={styles.gridBg} src={`${ASSET}/opt/down_bg.webp`} alt="Castle fields" draggable={false} />
           {flags.map((f, i) => (
             <WindFlag
               key={f.id}
@@ -417,6 +430,26 @@ function GridGame() {
           {flask.pos.map((p, i) => (
             <Flask key={i} x={p.x} y={p.y} w={flask.w} fill={Math.min(1, destroyed.size / ENERGY_GOAL)} />
           ))}
+          <CoinFlash
+            fill={coinFill}
+            pulseKey={coinPulse}
+            style={{ left: `${COINCFG.x}%`, top: `${COINCFG.y}%`, width: `${COINCFG.w}%` }}
+          />
+          {!zoomZone && (
+            <HumanSprite
+              className={styles.uparkWheel}
+              animate
+              from={HUMAN.from}
+              to={HUMAN.to}
+              fps={HUMAN.fps}
+              style={{
+                left: `${HUMAN.x}%`,
+                top: `${HUMAN.y}%`,
+                width: `${HUMAN.w}%`,
+                transform: "translate(-50%, -100%)",
+              }}
+            />
+          )}
           {tankFlashes.map((f) => (
             <span
               key={f.id}

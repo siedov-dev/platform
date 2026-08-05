@@ -1,0 +1,17 @@
+[2026-06-24 15:28:11] local.ERROR: cURL error 7: Failed to connect to 127.0.0.1 port 23105 after 2019 ms: Couldn't connect to server (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for http://127.0.0.1:23105/isblocked/5.45.72.167  
+[2026-06-24 15:28:11] local.ERROR: C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Http\Client\PendingRequest.php  
+[2026-06-24 15:28:11] local.ERROR: 855  
+[2026-06-24 15:28:11] local.ERROR: #0 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Support\helpers.php(260): Illuminate\Http\Client\PendingRequest->Illuminate\Http\Client\{closure}(1)
+#1 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Http\Client\PendingRequest.php(821): retry(0, Object(Closure), 100, Object(Closure))
+#2 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Http\Client\PendingRequest.php(699): Illuminate\Http\Client\PendingRequest->send('GET', 'http://127.0.0....', Array)
+#3 C:\Users\devmo\platform\app\Services\IpInfo\IpInfo.php(102): Illuminate\Http\Client\PendingRequest->get('http://127.0.0....', Array)
+#4 C:\Users\devmo\platform\app\Http\Middleware\CheckIpBlock.php(22): App\Services\IpInfo\IpInfo::isBlocked('5.45.72.167')
+#5 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): App\Http\Middleware\CheckIpBlock->handle(Object(Illuminate\Http\Request), Object(Closure))
+#6 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(39): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#7 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Http\Middleware\TrustProxies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#8 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(116): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#9 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(165): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#10 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(134): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#11 C:\Users\devmo\platform\public\index.php(54): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#12 C:\Users\devmo\platform\vendor\laravel\framework\src\Illuminate\Foundation\resources\server.php(16): require_once('C:\\Users\\devmo\\...')
+#13 {main}  

@@ -31,40 +31,25 @@ class ResolveLocale
         'uz' => ['uz_UZ', 'uz_UZ.UTF-8'],
     ];
 
-
     const LANGS = [
-        'UA' => 'ua',
-        'RU' => 'ru',
-        'EN' => 'en',
-        'US' => 'en',
-        'GB' => 'en',
-        'HI' => 'hi',
-        'KZ' => 'kz',
-        'DE' => 'de',
-        'FR' => 'fr',
-        'IT' => 'it',
-        'PT' => 'pt',
-        'ES' => 'es',
-        'SK' => 'sk',
-        'UZ' => 'uz',
+        'UA' => 'ua', 'RU' => 'ru', 'EN' => 'en', 'US' => 'en', 'GB' => 'en',
+        'HI' => 'hi', 'KZ' => 'kz', 'DE' => 'de', 'FR' => 'fr', 'IT' => 'it',
+        'PT' => 'pt', 'ES' => 'es', 'SK' => 'sk', 'UZ' => 'uz',
     ];
 
     const DISABLED = [
-        'api',
+        'api', // Это уже было, теперь добавим проверку ниже
         'telescope',
         'captcha',
     ];
 
-
-    /**
-     * Handle an incoming request.
-     *
-     * @param Request $request
-     * @param Closure $next
-     * @return mixed
-     */
     public function handle($request, Closure $next)
     {
+        // Добавляем прямую проверку на API-запросы, чтобы полностью исключить их из логики локализации
+        if ($request->is('api/*')) {
+            return $next($request);
+        }
+
         $locale = \Illuminate\Support\Facades\Request::segment(1);
 
         if (in_array($locale, self::DISABLED)) return $next($request);
@@ -103,7 +88,7 @@ class ResolveLocale
             Cookie::queue($cook);
         }
 
-        if ( !empty($locale)) {
+        if (!empty($locale)) {
             App::setLocale($locale);
             if (array_key_exists($locale, self::LOCALES)) {
                 setlocale(LC_TIME, self::LOCALES[$locale]);

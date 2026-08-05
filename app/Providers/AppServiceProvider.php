@@ -30,9 +30,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        URL::defaults(['locale' => 'aa']); //default local that makes localization detect real local
-        URL::forceScheme('https');
+        // Отключили автоматическое добавление префикса локали и принудительный HTTPS,
+        // чтобы API отвечало на запросы без редиректов.
+        
+        // URL::defaults(['locale' => 'aa']); 
+        // URL::forceScheme('https');
+        
         //
-//        Log::info('Incoming request: ' . request()->fullUrl());
+        // Log::info('Incoming request: ' . request()->fullUrl());
     }
 }

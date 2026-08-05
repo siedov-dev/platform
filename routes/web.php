@@ -378,3 +378,7 @@ Route::group(['prefix' => '{locale}'], function() {
 });
 
 Route::post('/authWs/token', [\App\Http\Controllers\SocketController::class, 'wsConnect'])->name('ws.token');
+
+Route::get('/lunopark', function () {
+    return view('phone.slc.lunopark.game');
+});

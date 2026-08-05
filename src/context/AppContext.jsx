@@ -106,35 +106,31 @@ export function AppProvider({ children }) {
   const bootstrap = useCallback(async () => {
     dispatch({ type: COMMAND_TYPES.SET_LOADING, payload: true });
     dispatch({ type: COMMAND_TYPES.SET_ERROR, payload: null });
-    try {
-      const [user, balance, categories, providers, games, popularGames, promotions, paymentMethods, matches, favorites] =
-        await Promise.all([
-          api.getUser(),
-          api.getBalance(),
-          api.getCategories(),
-          api.getProviders(),
-          api.getGames({ provider: "all", category: "popular" }),
-          api.getPopularGames(),
-          api.getPromotions(),
-          api.getPaymentMethods(),
-          api.getMatches(),
-          api.getFavorites(),
-        ]);
-      dispatch({ type: COMMAND_TYPES.SET_USER, payload: user });
-      dispatch({ type: COMMAND_TYPES.SET_BALANCE, payload: balance });
-      dispatch({ type: COMMAND_TYPES.SET_CATEGORIES, payload: categories });
-      dispatch({ type: COMMAND_TYPES.SET_PROVIDERS, payload: providers });
-      dispatch({ type: COMMAND_TYPES.SET_GAMES, payload: games.items });
-      dispatch({ type: COMMAND_TYPES.SET_POPULAR_GAMES, payload: popularGames });
-      dispatch({ type: COMMAND_TYPES.SET_PROMOTIONS, payload: promotions });
-      dispatch({ type: COMMAND_TYPES.SET_MATCHES, payload: matches });
-      dispatch({ type: COMMAND_TYPES.SET_PAYMENT_METHODS, payload: paymentMethods });
-      dispatch({ type: COMMAND_TYPES.SET_FAVORITES, payload: favorites.ids });
-    } catch (err) {
-      dispatch({ type: COMMAND_TYPES.SET_ERROR, payload: err.message });
-    } finally {
-      dispatch({ type: COMMAND_TYPES.SET_LOADING, payload: false });
-    }
+    const safe = (p, fallback) => p.catch(() => fallback);
+    const [user, balance, categories, providers, games, popularGames, promotions, paymentMethods, matches, favorites] =
+      await Promise.all([
+        safe(api.getUser(), null),
+        safe(api.getBalance(), null),
+        safe(api.getCategories(), []),
+        safe(api.getProviders(), []),
+        safe(api.getGames({ provider: "all", category: "popular" }), { items: [] }),
+        safe(api.getPopularGames(), []),
+        safe(api.getPromotions(), []),
+        safe(api.getPaymentMethods(), []),
+        safe(api.getMatches(), []),
+        safe(api.getFavorites(), { ids: [] }),
+      ]);
+    if (user) dispatch({ type: COMMAND_TYPES.SET_USER, payload: user });
+    if (balance) dispatch({ type: COMMAND_TYPES.SET_BALANCE, payload: balance });
+    dispatch({ type: COMMAND_TYPES.SET_CATEGORIES, payload: categories });
+    dispatch({ type: COMMAND_TYPES.SET_PROVIDERS, payload: providers });
+    dispatch({ type: COMMAND_TYPES.SET_GAMES, payload: games?.items || [] });
+    dispatch({ type: COMMAND_TYPES.SET_POPULAR_GAMES, payload: popularGames });
+    dispatch({ type: COMMAND_TYPES.SET_PROMOTIONS, payload: promotions });
+    dispatch({ type: COMMAND_TYPES.SET_MATCHES, payload: matches });
+    dispatch({ type: COMMAND_TYPES.SET_PAYMENT_METHODS, payload: paymentMethods });
+    dispatch({ type: COMMAND_TYPES.SET_FAVORITES, payload: favorites?.ids || [] });
+    dispatch({ type: COMMAND_TYPES.SET_LOADING, payload: false });
   }, []);
 
   useEffect(() => {

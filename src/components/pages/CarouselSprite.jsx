@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
-const BASE = "/bonus-park/Carousel";
+const OPT = true;
+const BASE = OPT ? "/bonus-park/Carousel_opt" : "/bonus-park/Carousel";
 const ATLAS = "carousel";
 const ATLASES = 4;
 const TOTAL_FRAMES = 79;
-const FPS = 24;
+const RPM = 8;
 
 export default function CarouselSprite({ className, style, onPointerDown }) {
   const canvasRef = useRef(null);
@@ -52,25 +53,30 @@ export default function CarouselSprite({ className, style, onPointerDown }) {
     canvas.width = frames[0].w;
     canvas.height = frames[0].h;
 
-    const draw = (index) => {
-      const f = frames[index];
+    let pos = 0;
+    let shown = 0;
+    let last = performance.now();
+    let raf = 0;
+
+    const draw = (idx) => {
+      const f = frames[idx];
       if (!f) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(images[f.atlas], f.x, f.y, f.w, f.h, 0, 0, canvas.width, canvas.height);
     };
 
-    const step = 1000 / FPS;
-    let frame = 0;
-    let last = performance.now();
-    let raf = 0;
+    const framesPerMs = ((RPM / 60) * TOTAL_FRAMES) / 1000;
 
     draw(0);
     const loop = (now) => {
       raf = requestAnimationFrame(loop);
-      if (now - last >= step) {
-        last = now - ((now - last) % step);
-        frame = (frame + 1) % TOTAL_FRAMES;
-        draw(frame);
+      const dt = now - last;
+      last = now;
+      pos = (pos + dt * framesPerMs) % TOTAL_FRAMES;
+      const idx = Math.floor(pos);
+      if (idx !== shown) {
+        shown = idx;
+        draw(idx);
       }
     };
     raf = requestAnimationFrame(loop);

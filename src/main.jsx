@@ -11,7 +11,7 @@ async function enableMocking() {
   await worker.start({ onUnhandledRequest: "bypass" });
 }
 
-enableMocking().then(() => {
+function render() {
   createRoot(document.getElementById("root")).render(
     <StrictMode>
       <I18nProvider initialLang="en">
@@ -21,4 +21,8 @@ enableMocking().then(() => {
       </I18nProvider>
     </StrictMode>
   );
-});
+}
+
+enableMocking()
+  .catch((err) => console.warn("[mock] init failed, rendering anyway:", err))
+  .finally(render);

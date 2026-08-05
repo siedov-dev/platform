@@ -61,8 +61,6 @@ export default function TileField({
     [coverCorners, size.w, size.h]
   );
 
-  const clipInset = `${gapY / 2}px ${gapX / 2}px`;
-
   return (
     <div ref={hostRef} className={styles.tileHost}>
       {tileT && (
@@ -73,8 +71,10 @@ export default function TileField({
             height: `${tileT.gh}px`,
             transform: tileT.transform,
             transformOrigin: "0 0",
-            gridTemplateColumns: `repeat(${cols}, ${tileT.cellW}px)`,
-            gridTemplateRows: `repeat(${rows}, ${tileT.cellH}px)`,
+            gridTemplateColumns: `repeat(${cols}, 1fr)`,
+            gridTemplateRows: `repeat(${rows}, 1fr)`,
+            columnGap: `${gapX}px`,
+            rowGap: `${gapY}px`,
             "--tsx": scaleX,
             "--tsy": scaleY,
           }}
@@ -93,13 +93,24 @@ export default function TileField({
                   : undefined
               }
             >
-              <span className={styles.tileClip} style={{ inset: clipInset }}>
+              <span className={styles.tileClip}>
                 <img className={styles.tileImg} src={`${ASSET}/opt/Tile_${tileFor(r, c, seed)}.webp`} alt="" />
               </span>
             </div>
           );
           })}
         </div>
+      )}
+      {tileT && (
+        <div
+          className={styles.tileEdgeLayer}
+          style={{
+            width: `${tileT.gw}px`,
+            height: `${tileT.gh}px`,
+            transform: tileT.transform,
+            transformOrigin: "0 0",
+          }}
+        />
       )}
       {coverSrc && coverT && (
         <div
@@ -125,8 +136,8 @@ export default function TileField({
             height: `${tileT.gh}px`,
             transform: tileT.transform,
             transformOrigin: "0 0",
-            gridTemplateColumns: `repeat(${cols}, ${tileT.cellW}px)`,
-            gridTemplateRows: `repeat(${rows}, ${tileT.cellH}px)`,
+            gridTemplateColumns: `repeat(${cols}, 1fr)`,
+            gridTemplateRows: `repeat(${rows}, 1fr)`,
           }}
         >
           <span

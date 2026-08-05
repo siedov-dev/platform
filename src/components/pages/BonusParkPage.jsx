@@ -7,12 +7,43 @@ import Flag from "./Flag";
 import FerrisSprite from "./FerrisSprite";
 import CarouselSprite from "./CarouselSprite";
 import HumanSprite from "./HumanSprite";
+import Human9Walker from "./Human9Walker";
 import CoinFlash from "./CoinFlash";
+import { LootPopup, GameIntroPopup } from "./TilePopups";
+import { MINI_GAMES } from "./MiniGames";
 import styles from "./BonusParkPage.module.css";
 
 const ASSET = "/bonus-park";
 
 const ENERGY_GOAL = 1042;
+
+const OUTCOME_SEQ = ["energy", "money", "game", "energy", "game", "money", "game", "energy", "game"];
+
+const GAPS_KEY = "bonuspark.seam5";
+const SEAM_BASE = { w: -5.2, d: -5.6, inset: 0.4 };
+const DEFAULT_SEAM = {
+  tl: { w: -5.2, d: -5.6, inset: 0.2 },
+  tr: { w: -5.2, d: -5.6, inset: 1.1 },
+  ml: { w: -5.2, d: -5.6, inset: 0.4 },
+  mr: { w: -5.2, d: -5.6, inset: 0 },
+  bl: { w: -5.2, d: -5.6, inset: 0.6 },
+  br: { w: -5.2, d: -5.6, inset: 0.3 },
+};
+
+function loadGaps() {
+  try {
+    const raw = localStorage.getItem(GAPS_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      const out = {};
+      for (const k of Object.keys(DEFAULT_SEAM)) out[k] = { ...SEAM_BASE, ...(p[k] || {}) };
+      return out;
+    }
+  } catch {
+    return JSON.parse(JSON.stringify(DEFAULT_SEAM));
+  }
+  return JSON.parse(JSON.stringify(DEFAULT_SEAM));
+}
 
 const FIELDS = [
   { key: "tl", sector: 1, cols: 10, rows: 10, seed: 0, offset: 0, gapX: 0, gapY: 0 },
@@ -26,8 +57,8 @@ const FIELDS = [
 const FLASK_KEY = "bonuspark.flask";
 const DEFAULT_FLASK = {
   pos: [
-    { x: 20.23, y: 31.32 },
-    { x: 80.92, y: 31.22 },
+    { x: 20.23, y: 31.11 },
+    { x: 81.15, y: 30.9 },
   ],
   w: 7,
 };
@@ -46,15 +77,71 @@ const COINCFG = { x: 50.4, y: 26, w: 13 };
 
 const HUMAN = { x: 46.6, y: 38.9, w: 6.4, from: 0, to: 559, fps: 15 };
 
+const WALKPATH = [
+  { x: -3.4, y: 72.7 },
+  { x: 5.6, y: 75.7 },
+  { x: 25.5, y: 71.9 },
+  { x: 45.9, y: 71.6 },
+  { x: 56.4, y: 64.9 },
+  { x: 60.1, y: 62.5 },
+  { x: 70.4, y: 58.6 },
+  { x: 68.5, y: 55.7 },
+  { x: 72, y: 53.8 },
+  { x: 57.8, y: 49.9 },
+  { x: 50.7, y: 51 },
+  { x: 44.3, y: 49.8 },
+  { x: 31.5, y: 53.7 },
+  { x: 35.3, y: 56 },
+  { x: 31.2, y: 58.3 },
+  { x: 44, y: 63.3 },
+  { x: 30.3, y: 64.1 },
+  { x: 11.1, y: 67.9 },
+  { x: -1.3, y: 65.6 },
+];
+
+const GRAPH9_KEY = "bonuspark.walkgraph10";
+
+const DEFAULT_GRAPH9 = {
+  nodes: [
+    { x: -2.67, y: 62.17 }, { x: 12.21, y: 65.35 }, { x: 6.49, y: 71.16 }, { x: 7.86, y: 73.06 },
+    { x: 13.82, y: 71.69 }, { x: 21.6, y: 70 }, { x: 28.93, y: 68.62 }, { x: 33.05, y: 68.2 },
+    { x: 47.94, y: 68.52 }, { x: 55.04, y: 66.4 }, { x: 56.87, y: 61.65 }, { x: 59.62, y: 59.85 },
+    { x: 63.97, y: 58.26 }, { x: 69.47, y: 55.94 }, { x: 66.26, y: 53.29 }, { x: 70.38, y: 51.28 },
+    { x: 66.03, y: 49.49 }, { x: 59.85, y: 48.01 }, { x: 53.89, y: 48.43 }, { x: 45.88, y: 47.79 },
+    { x: 33.05, y: 51.28 }, { x: 36.26, y: 52.76 }, { x: 35.8, y: 54.14 }, { x: 32.82, y: 55.83 },
+    { x: 38.55, y: 58.26 }, { x: 44.27, y: 60.8 }, { x: 49.31, y: 64.29 }, { x: 57.1, y: 68.62 },
+    { x: 65.11, y: 68.2 }, { x: 77.25, y: 68.94 }, { x: 88.93, y: 72.22 }, { x: 94.66, y: 70.1 },
+    { x: 91.22, y: 65.35 }, { x: 103.13, y: 61.65 },
+  ],
+  edges: [
+    [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10],
+    [10, 11], [11, 12], [12, 13], [13, 14], [14, 15], [15, 16], [16, 17], [17, 18], [18, 19], [19, 20],
+    [20, 21], [21, 22], [22, 23], [23, 24], [24, 25], [25, 26], [26, 27], [27, 28], [28, 29], [29, 30],
+    [30, 31], [31, 32], [32, 33],
+  ],
+};
+
+const STOP9 = [];
+
+function loadGraph9() {
+  try {
+    const raw = localStorage.getItem(GRAPH9_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    return DEFAULT_GRAPH9;
+  }
+  return DEFAULT_GRAPH9;
+}
+
 const FLAGS_KEY = "bonuspark.flags";
 const DEFAULT_FLAGS = [
   { id: "f1", img: "Flag_1.png", x: 24.79, y: 14.11, w: 4.4 },
   { id: "f2", img: "Flag_2.png", x: 35.43, y: 11.21, w: 4.4 },
-  { id: "fc", img: "Flag_centr.png", x: 52.67, y: 10.54, w: 5 },
+  { id: "fc", img: "Flag_centr.png", x: 52.75, y: 10.26, w: 5 },
   { id: "f3", img: "Flag_2.png", x: 69.14, y: 11.7, w: 4.4 },
   { id: "f4", img: "Flag_1.png", x: 81.48, y: 13.05, w: 4.4 },
-  { id: "lb", img: "Flag_Blue_R.png", x: 2.68, y: 45.57, w: 4.5 },
-  { id: "lp", img: "Flag_Purple_L.png", x: 98.79, y: 46.3, w: 4.5 },
+  { id: "lb", img: "Flag_Blue_R.png", x: 2.59, y: 44.87, w: 4.5 },
+  { id: "lp", img: "Flag_Purple_L.png", x: 99.25, y: 45.4, w: 4.5 },
 ];
 
 function loadFlags() {
@@ -75,22 +162,33 @@ function WindFlag({ img, x, y, w, delay, dur, onPointerDown }) {
       src={`${ASSET}/${img}`}
       alt=""
       draggable={false}
+      onPointerDown={onPointerDown}
       style={{
         left: `${x}%`,
         top: `${y}%`,
         width: `${w}%`,
         animationDelay: banner ? "0s" : delay,
         animationDuration: banner ? undefined : dur,
-        cursor: onPointerDown ? "grab" : "default",
+        pointerEvents: onPointerDown ? "auto" : "none",
+        cursor: onPointerDown ? "move" : undefined,
       }}
-      onPointerDown={onPointerDown}
     />
   );
 }
 
-function Flask({ x, y, w, fill }) {
+function Flask({ x, y, w, fill, onPointerDown }) {
   return (
-    <div className={styles.flask} style={{ left: `${x}%`, top: `${y}%`, width: `${w}%` }}>
+    <div
+      className={styles.flask}
+      onPointerDown={onPointerDown}
+      style={{
+        left: `${x}%`,
+        top: `${y}%`,
+        width: `${w}%`,
+        pointerEvents: onPointerDown ? "auto" : undefined,
+        cursor: onPointerDown ? "move" : undefined,
+      }}
+    >
       <div className={styles.flaskGlass}>
         <img className={styles.flaskBg} src={`${ASSET}/opt/bg_flask.webp`} alt="" />
         <img
@@ -115,13 +213,22 @@ const COVER = {
 };
 
 const DEFAULT_FIELDS = {
-  tl: { tl: { x: 19.43, y: 38.79 }, tr: { x: 43.73, y: 38.87 }, br: { x: 43.13, y: 47.1 }, bl: { x: 16.98, y: 47.04 } },
-  tr: { tl: { x: 57.43, y: 38.87 }, tr: { x: 81.94, y: 38.86 }, br: { x: 84.22, y: 47.03 }, bl: { x: 58.02, y: 46.98 } },
-  ml: { tl: { x: 16.59, y: 48.55 }, tr: { x: 43.07, y: 48.55 }, br: { x: 42.15, y: 59.31 }, bl: { x: 13.69, y: 59.3 } },
-  mr: { tl: { x: 58.3, y: 48.58 }, tr: { x: 84.71, y: 48.6 }, br: { x: 87.64, y: 59.31 }, bl: { x: 59.16, y: 59.32 } },
-  bl: { tl: { x: 12.98, y: 61.21 }, tr: { x: 42, y: 61.29 }, br: { x: 41.27, y: 70.84 }, bl: { x: 10.02, y: 70.86 } },
-  br: { tl: { x: 59.07, y: 61.28 }, tr: { x: 88, y: 61.31 }, br: { x: 90.88, y: 70.96 }, bl: { x: 59.86, y: 70.94 } },
+  tl: { tl: { x: 19.43, y: 38.5 }, tr: { x: 43.84, y: 38.57 }, br: { x: 43.13, y: 46.81 }, bl: { x: 16.98, y: 46.75 } },
+  tr: { tl: { x: 57.43, y: 38.54 }, tr: { x: 81.94, y: 38.53 }, br: { x: 84.22, y: 46.7 }, bl: { x: 58.02, y: 46.65 } },
+  ml: { tl: { x: 16.59, y: 48.33 }, tr: { x: 43.07, y: 48.33 }, br: { x: 42.15, y: 59.09 }, bl: { x: 13.69, y: 59.08 } },
+  mr: { tl: { x: 58.3, y: 48.36 }, tr: { x: 84.72, y: 48.35 }, br: { x: 87.71, y: 59.06 }, bl: { x: 59.16, y: 59.1 } },
+  bl: { tl: { x: 12.98, y: 60.99 }, tr: { x: 42.1, y: 61.01 }, br: { x: 41.32, y: 70.7 }, bl: { x: 10.02, y: 70.64 } },
+  br: { tl: { x: 59.3, y: 61.06 }, tr: { x: 88.23, y: 61.09 }, br: { x: 91.11, y: 70.74 }, bl: { x: 60.09, y: 70.72 } },
 };
+
+function shrinkQuad(q, pct) {
+  if (!pct) return q;
+  const k = 1 - pct / 100;
+  const cx = (q.tl.x + q.tr.x + q.br.x + q.bl.x) / 4;
+  const cy = (q.tl.y + q.tr.y + q.br.y + q.bl.y) / 4;
+  const f = (p) => ({ x: cx + (p.x - cx) * k, y: cy + (p.y - cy) * k });
+  return { tl: f(q.tl), tr: f(q.tr), br: f(q.br), bl: f(q.bl) };
+}
 
 const FIELDS_KEY = "bonuspark.fields";
 
@@ -137,10 +244,10 @@ function loadFields() {
 
 const DECOR_KEY = "bonuspark.decor";
 const DEFAULT_DECOR = [
-  { id: "b1", type: "balloon", x: -5.98, y: 63.4 },
-  { id: "b2", type: "balloon", x: 84.16, y: 63.41 },
-  { id: "f1", type: "flag", x: 72.28, y: 76.26, rot: 6, flip: false },
-  { id: "f2", type: "flag", x: 29.39, y: 76.5, rot: 6, flip: true },
+  { id: "b1", type: "balloon", x: -7.82, y: 63.51 },
+  { id: "b2", type: "balloon", x: 85.28, y: 63.74 },
+  { id: "f1", type: "flag", x: 71.59, y: 76.59, rot: 6, flip: false },
+  { id: "f2", type: "flag", x: 30.31, y: 76.5, rot: 6, flip: true },
 ];
 
 function loadDecor() {
@@ -155,12 +262,12 @@ function loadDecor() {
 
 const ZONE_KEY = "bonuspark.zones";
 const DEFAULT_ZONES = {
-  tl: { tl: { x: 18.97, y: 37.07 }, tr: { x: 47.41, y: 37.14 }, br: { x: 43.73, y: 47.58 }, bl: { x: 15.15, y: 47.51 } },
-  tr: { tl: { x: 56.49, y: 37.18 }, tr: { x: 84.99, y: 37.18 }, br: { x: 84.99, y: 47.53 }, bl: { x: 56.38, y: 47.44 } },
-  ml: { tl: { x: 16.36, y: 46.42 }, tr: { x: 47.15, y: 46.33 }, br: { x: 42.85, y: 59.96 }, bl: { x: 11.68, y: 59.86 } },
-  mr: { tl: { x: 57.29, y: 46.37 }, tr: { x: 88, y: 46.44 }, br: { x: 88.41, y: 59.91 }, bl: { x: 57.23, y: 59.92 } },
-  bl: { tl: { x: 12.53, y: 59.28 }, tr: { x: 46.33, y: 59.34 }, br: { x: 41.61, y: 71.45 }, bl: { x: 7.89, y: 71.42 } },
-  br: { tl: { x: 58.12, y: 59.33 }, tr: { x: 91.78, y: 59.32 }, br: { x: 91.58, y: 71.48 }, bl: { x: 57.94, y: 71.37 } },
+  tl: { tl: { x: 18.97, y: 36.78 }, tr: { x: 47.41, y: 36.85 }, br: { x: 43.73, y: 47.29 }, bl: { x: 15.15, y: 47.22 } },
+  tr: { tl: { x: 56.49, y: 36.85 }, tr: { x: 84.99, y: 36.85 }, br: { x: 84.99, y: 47.2 }, bl: { x: 56.38, y: 47.11 } },
+  ml: { tl: { x: 16.36, y: 46.2 }, tr: { x: 47.15, y: 46.11 }, br: { x: 42.85, y: 59.74 }, bl: { x: 11.68, y: 59.64 } },
+  mr: { tl: { x: 57.29, y: 46.15 }, tr: { x: 88, y: 46.22 }, br: { x: 88.41, y: 59.69 }, bl: { x: 57.23, y: 59.7 } },
+  bl: { tl: { x: 12.53, y: 59.06 }, tr: { x: 46.33, y: 59.12 }, br: { x: 41.61, y: 71.23 }, bl: { x: 7.89, y: 71.2 } },
+  br: { tl: { x: 58.35, y: 59.11 }, tr: { x: 92.01, y: 59.1 }, br: { x: 91.81, y: 71.26 }, bl: { x: 58.17, y: 71.15 } },
 };
 
 function loadZones() {
@@ -189,12 +296,12 @@ function loadTileCfg() {
 
 const COVERS_KEY = "bonuspark.covers";
 const DEFAULT_COVERS = {
-  tl: { tl: { x: 17.07, y: 38.75 }, tr: { x: 43.76, y: 38.82 }, br: { x: 43.76, y: 47.1 }, bl: { x: 16.94, y: 47.05 } },
-  tr: { tl: { x: 54.45, y: 38.77 }, tr: { x: 81.9, y: 38.84 }, br: { x: 84.99, y: 47.03 }, bl: { x: 57.97, y: 46.98 } },
-  ml: { tl: { x: 14.06, y: 48.53 }, tr: { x: 43.14, y: 48.47 }, br: { x: 42.8, y: 59.36 }, bl: { x: 13.69, y: 59.29 } },
-  mr: { tl: { x: 55.12, y: 48.46 }, tr: { x: 84.67, y: 48.61 }, br: { x: 88.43, y: 59.34 }, bl: { x: 59.11, y: 59.29 } },
-  bl: { tl: { x: 10.19, y: 61.15 }, tr: { x: 42.09, y: 61.22 }, br: { x: 42.02, y: 70.92 }, bl: { x: 9.86, y: 70.9 } },
-  br: { tl: { x: 55.59, y: 61.16 }, tr: { x: 87.99, y: 61.3 }, br: { x: 91.76, y: 70.97 }, bl: { x: 59.8, y: 70.95 } },
+  tl: { tl: { x: 17.07, y: 38.46 }, tr: { x: 43.84, y: 38.53 }, br: { x: 43.76, y: 46.81 }, bl: { x: 16.94, y: 46.76 } },
+  tr: { tl: { x: 54.45, y: 38.44 }, tr: { x: 81.9, y: 38.51 }, br: { x: 84.99, y: 46.7 }, bl: { x: 57.97, y: 46.65 } },
+  ml: { tl: { x: 14.06, y: 48.31 }, tr: { x: 43.14, y: 48.25 }, br: { x: 42.8, y: 59.14 }, bl: { x: 13.69, y: 59.07 } },
+  mr: { tl: { x: 55.12, y: 48.24 }, tr: { x: 84.59, y: 48.32 }, br: { x: 88.43, y: 59.09 }, bl: { x: 59.11, y: 59.07 } },
+  bl: { tl: { x: 10.19, y: 60.93 }, tr: { x: 42.09, y: 61 }, br: { x: 42.02, y: 70.7 }, bl: { x: 9.86, y: 70.68 } },
+  br: { tl: { x: 55.82, y: 60.94 }, tr: { x: 88.22, y: 61.08 }, br: { x: 91.99, y: 70.75 }, bl: { x: 60.03, y: 70.73 } },
 };
 
 function loadCovers() {
@@ -243,31 +350,10 @@ function GridGame() {
   const [flags, setFlags] = useState(loadFlags);
   const [coinFill, setCoinFill] = useState(0);
   const [coinPulse, setCoinPulse] = useState(0);
-
-  const startFlagDrag = (id) => (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const rect0 = stageRef.current.getBoundingClientRect();
-    const item = flags.find((f) => f.id === id);
-    const offX = e.clientX - (rect0.left + (item.x / 100) * rect0.width);
-    const offY = e.clientY - (rect0.top + (item.y / 100) * rect0.height);
-    const move = (ev) => {
-      const rect = stageRef.current.getBoundingClientRect();
-      const x = Math.round(((ev.clientX - offX - rect.left) / rect.width) * 100 * 100) / 100;
-      const y = Math.round(((ev.clientY - offY - rect.top) / rect.height) * 100 * 100) / 100;
-      setFlags((prev) => {
-        const next = prev.map((f) => (f.id === id ? { ...f, x, y } : f));
-        localStorage.setItem(FLAGS_KEY, JSON.stringify(next));
-        return next;
-      });
-    };
-    const up = () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-    };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
-  };
+  const [tilePopup, setTilePopup] = useState(null);
+  const outcomeIdx = useRef(0);
+  const gameIdx = useRef(0);
+  const [gaps, setGaps] = useState(loadGaps);
 
   const flaskTarget = (i) => ({ x: flask.pos[i].x, y: flask.pos[i].y + flask.w * 0.11 });
 
@@ -305,22 +391,34 @@ function GridGame() {
       setLit(index);
       return;
     }
-    zoomDestroyed.current += 1;
+    const outcome = OUTCOME_SEQ[outcomeIdx.current % OUTCOME_SEQ.length];
+    outcomeIdx.current += 1;
     if (rect) {
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
       particlesRef.current?.burst(cx, cy, rect.width);
 
-      const tank = zoneKey === "tl" ? flaskTarget(0) : zoneKey === "tr" ? flaskTarget(1) : null;
-      if (tank && stageRef.current) {
-        const inner = stageRef.current.getBoundingClientRect();
-        const tx = inner.left + (tank.x / 100) * inner.width;
-        const ty = inner.top + (tank.y / 100) * inner.height;
-        particlesRef.current?.flyEnergy(cx, cy, tx, ty, () => flashAt(tank));
+      if (outcome === "energy") {
+        const tank = zoneKey === "tl" ? flaskTarget(0) : zoneKey === "tr" ? flaskTarget(1) : null;
+        if (tank && stageRef.current) {
+          const inner = stageRef.current.getBoundingClientRect();
+          const tx = inner.left + (tank.x / 100) * inner.width;
+          const ty = inner.top + (tank.y / 100) * inner.height;
+          particlesRef.current?.flyEnergy(cx, cy, tx, ty, () => flashAt(tank));
+        }
       }
     }
-    if (zoneKey !== "tl" && zoneKey !== "tr") {
-      triggerHook();
+    if (outcome === "energy") {
+      zoomDestroyed.current += 1;
+      if (zoneKey !== "tl" && zoneKey !== "tr") {
+        triggerHook();
+      }
+    } else if (outcome === "money") {
+      setTilePopup({ type: "money", tile: cellId });
+    } else {
+      const game = MINI_GAMES[gameIdx.current % MINI_GAMES.length];
+      gameIdx.current += 1;
+      setTilePopup({ type: "game", game, tile: cellId, stage: "intro" });
     }
     setDestroyed((prev) => {
       const next = new Set(prev);
@@ -381,30 +479,6 @@ function GridGame() {
     return { transform: `translate(${z * (50 - cx)}%, ${z * (50 - cy)}%) scale(${z})` };
   })();
 
-  const startDecorDrag = (id) => (e) => {
-    e.preventDefault();
-    const rect0 = stageRef.current.getBoundingClientRect();
-    const item = decor.find((d) => d.id === id);
-    const offX = e.clientX - (rect0.left + (item.x / 100) * rect0.width);
-    const offY = e.clientY - (rect0.top + (item.y / 100) * rect0.height);
-    const move = (ev) => {
-      const rect = stageRef.current.getBoundingClientRect();
-      const x = ((ev.clientX - offX - rect.left) / rect.width) * 100;
-      const y = ((ev.clientY - offY - rect.top) / rect.height) * 100;
-      setDecor((prev) => {
-        const next = prev.map((d) => (d.id === id ? { ...d, x, y } : d));
-        localStorage.setItem(DECOR_KEY, JSON.stringify(next));
-        return next;
-      });
-    };
-    const up = () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-    };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
-  };
-
   return (
     <div className={styles.grid}>
       {zoomZone && (
@@ -412,9 +486,32 @@ function GridGame() {
       )}
       <Particles ref={particlesRef} />
       {hookOn && <div key={hookKey} className={styles.screenHook} />}
-      <div className={styles.gridStage}>
-        <div className={styles.gridInner} ref={stageRef} style={zoomStyle}>
-          <img className={styles.gridBg} src={`${ASSET}/opt/down_bg.webp`} alt="Castle fields" draggable={false} />
+      {tilePopup?.type === "money" && (
+        <LootPopup
+          tile={tilePopup.tile}
+          onClaim={() => {
+            flashCoin(0.01);
+            setTilePopup(null);
+          }}
+          onClose={() => setTilePopup(null)}
+        />
+      )}
+      {tilePopup?.type === "game" && tilePopup.stage === "intro" && (
+        <GameIntroPopup
+          name={tilePopup.game.title}
+          tile={tilePopup.tile}
+          onStart={() => setTilePopup({ ...tilePopup, stage: "play" })}
+          onClose={() => setTilePopup(null)}
+        />
+      )}
+      {tilePopup?.type === "game" && tilePopup.stage === "play" && (
+        <GamePopup title={tilePopup.game.title} onClose={() => setTilePopup(null)}>
+          <tilePopup.game.Comp />
+        </GamePopup>
+      )}
+      <div className={styles.gridStage} style={zoomStyle}>
+        <div className={`${styles.gridInner} ${styles.rasterPinOn}`} ref={stageRef}>
+          <img className={styles.gridBg} src={`${ASSET}/Bg_Over/Down_Bg.png`} alt="Castle fields" draggable={false} />
           {flags.map((f, i) => (
             <WindFlag
               key={f.id}
@@ -424,7 +521,6 @@ function GridGame() {
               w={f.w}
               delay={`${-(i * 0.73).toFixed(2)}s`}
               dur={`${(3.4 + (i % 4) * 0.55).toFixed(2)}s`}
-              onPointerDown={startFlagDrag(f.id)}
             />
           ))}
           {flask.pos.map((p, i) => (
@@ -464,17 +560,17 @@ function GridGame() {
             return (
               <TileField
                 key={f.key}
-                corners={fields[f.key]}
+                corners={shrinkQuad(fields[f.key], gaps[f.key].inset)}
                 glowCorners={zones[f.key]}
                 coverCorners={covers[f.key]}
                 cols={f.cols}
                 rows={f.rows}
                 seed={f.seed}
                 offset={f.offset}
-                gapX={f.gapX}
-                gapY={f.gapY}
-                scaleX={cfg.scaleX}
-                scaleY={cfg.scaleY}
+                gapX={0}
+                gapY={0}
+                scaleX={1 - gaps[f.key].w * 0.02}
+                scaleY={1 - gaps[f.key].d * 0.06}
                 destroyed={destroyed}
                 selected={active}
                 showGlow={highlighted}
@@ -491,8 +587,7 @@ function GridGame() {
               <Balloons
                 key={d.id}
                 scale={0.42}
-                style={{ left: `${d.x}%`, top: `${d.y}%`, pointerEvents: "auto", cursor: "grab" }}
-                onPointerDown={startDecorDrag(d.id)}
+                style={{ left: `${d.x}%`, top: `${d.y}%`, pointerEvents: "none" }}
               />
             ) : (
               <Flag
@@ -500,8 +595,7 @@ function GridGame() {
                 scale={0.6}
                 rot={d.rot}
                 flip={d.flip}
-                style={{ left: `${d.x}%`, top: `${d.y}%`, pointerEvents: "auto", cursor: "grab" }}
-                onPointerDown={startDecorDrag(d.id)}
+                style={{ left: `${d.x}%`, top: `${d.y}%`, pointerEvents: "none" }}
               />
             )
           )}
@@ -525,32 +619,306 @@ export function GamePopup({ title, onClose, children }) {
   );
 }
 
-const UPARK = {
-  wheel: { x: 2.9, y: 40, w: 32.5 },
-  bush: { x: -6, y: 53.9, w: 26 },
-  carousel: { x: 69.2, y: 45.7, w: 38 },
+const UPARK_KEY = "bonuspark.upark3";
+const DEFAULT_UPARK = {
+  wheel: { x: 6.6, y: 38.5, w: 30.5 },
+  bush: { x: -2, y: 51.5, w: 24 },
+  carousel: { x: 71, y: 43.9, w: 34 },
+  crP: { x: 48.3, y: 37.2, w: 7.5 },
+  crR: { x: 48.05, y: 42.71, w: 8 },
+  crY: { x: 47.8, y: 48.45, w: 8.5 },
+  crB: { x: 47.8, y: 54.7, w: 8.5 },
+  coin: { x: 46.4, y: 79.5, w: 10 },
+  flask1: { x: 25.8, y: 86.7, w: 5.5 },
+  flask2: { x: 77.5, y: 86.6, w: 5.5 },
+  star1: { x: 59.95, y: 55.69, w: 7.5 },
+  star2: { x: 64.81, y: 53.75, w: 7.5 },
+  star3: { x: 62.45, y: 54.75, w: 7.5 },
+  star4: { x: 36.45, y: 55.98, w: 7.5 },
+  star5: { x: 33.25, y: 54.84, w: 7.5 },
+  star6: { x: 29.81, y: 53.37, w: 7.5 },
+  uf1: { x: 29.46, y: 71.78, w: 3.4 },
+  uf2: { x: 38.42, y: 69.37, w: 3.4 },
+  ufc: { x: 53.12, y: 68.7, w: 4 },
+  uf3: { x: 67.12, y: 69.61, w: 2.9 },
+  uf4: { x: 77.84, y: 70.78, w: 3.4 },
 };
 
+const UPARK_FLAGS = {
+  uf1: "Flag_1.png",
+  uf2: "Flag_2.png",
+  ufc: "Flag_centr.png",
+  uf3: "Flag_2.png",
+  uf4: "Flag_1.png",
+};
+
+const TILEPHOTO_KEY = "bonuspark.tilesphoto3";
+const DEFAULT_TILEPHOTO = {
+  a: {
+    tl: { x: 55.2, y: 92.8 },
+    tr: { x: 78.3, y: 92.8 },
+    br: { x: 80.9, y: 99.8 },
+    bl: { x: 57.9, y: 99.8 },
+  },
+  b: {
+    tl: { x: 22.8, y: 92.8 },
+    tr: { x: 45.8, y: 92.8 },
+    br: { x: 45.6, y: 99.9 },
+    bl: { x: 22.9, y: 99.9 },
+  },
+};
+
+function loadTilePhoto() {
+  try {
+    const raw = localStorage.getItem(TILEPHOTO_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p.a && p.b) return p;
+    }
+  } catch {
+    return { ...DEFAULT_TILEPHOTO };
+  }
+  return { ...DEFAULT_TILEPHOTO };
+}
+
+function homographyMatrix(w, h, p) {
+  const adj = (m) => [
+    m[4] * m[8] - m[5] * m[7], m[2] * m[7] - m[1] * m[8], m[1] * m[5] - m[2] * m[4],
+    m[5] * m[6] - m[3] * m[8], m[0] * m[8] - m[2] * m[6], m[2] * m[3] - m[0] * m[5],
+    m[3] * m[7] - m[4] * m[6], m[1] * m[6] - m[0] * m[7], m[0] * m[4] - m[1] * m[3],
+  ];
+  const mult = (a, b) => {
+    const c = [];
+    for (let i = 0; i < 3; i += 1) {
+      for (let j = 0; j < 3; j += 1) {
+        let s = 0;
+        for (let k = 0; k < 3; k += 1) s += a[3 * i + k] * b[3 * k + j];
+        c[3 * i + j] = s;
+      }
+    }
+    return c;
+  };
+  const multV = (m, v) => [
+    m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
+    m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
+    m[6] * v[0] + m[7] * v[1] + m[8] * v[2],
+  ];
+  const basis = (x1, y1, x2, y2, x3, y3, x4, y4) => {
+    const m = [x1, x2, x3, y1, y2, y3, 1, 1, 1];
+    const v = multV(adj(m), [x4, y4, 1]);
+    return mult(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]]);
+  };
+  const s = basis(0, 0, w, 0, 0, h, w, h);
+  const d = basis(p[0].x, p[0].y, p[1].x, p[1].y, p[3].x, p[3].y, p[2].x, p[2].y);
+  const t = mult(d, adj(s));
+  const n = t.map((v) => v / t[8]);
+  return `matrix3d(${n[0]},${n[3]},0,${n[6]},${n[1]},${n[4]},0,${n[7]},0,0,1,0,${n[2]},${n[5]},0,1)`;
+}
+
+function TilesPhoto({ quad, onPointerDown }) {
+  const ref = useRef(null);
+  const [dim, setDim] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const host = ref.current.parentElement;
+    const measure = () => setDim({ w: host.clientWidth, h: host.clientHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(host);
+    return () => ro.disconnect();
+  }, []);
+
+  const pts = [quad.tl, quad.tr, quad.br, quad.bl].map((p) => ({
+    x: (p.x / 100) * dim.w,
+    y: (p.y / 100) * dim.h,
+  }));
+  const tf = dim.w > 0 ? homographyMatrix(dim.w, dim.h, pts) : "none";
+
+  return (
+    <div
+      ref={ref}
+      onPointerDown={onPointerDown}
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: "100%",
+        height: "100%",
+        transformOrigin: "0 0",
+        transform: tf,
+        pointerEvents: "none",
+        zIndex: 2,
+      }}
+    >
+      <img
+        src={`${ASSET}/Tiles/field_cut.webp`}
+        alt=""
+        draggable={false}
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "block",
+          pointerEvents: onPointerDown ? "auto" : "none",
+          cursor: onPointerDown ? "move" : undefined,
+        }}
+      />
+    </div>
+  );
+}
+
+const UPARK_Z = { star1: 8, star2: 7, star3: 6, star4: 8, star5: 7, star6: 6 };
+
+const CRYSTAL_CFG = {
+  crP: {
+    off: "crystal/crystal_Purple_off.png",
+    on: "crystal/crystal_Purple_on.png",
+    ray: "crystal/rays crystal_Purple.png",
+    onBox: { left: -44.79, top: -43.75, w: 197.92, h: 143.75 },
+  },
+  crR: {
+    off: "crystal/crystal_Red_off.png",
+    on: "crystal/crystal_Red_on.png",
+    ray: "crystal/rays crystal_Red.png",
+    onBox: { left: -52.08, top: -44.06, w: 204.17, h: 144.06 },
+  },
+  crY: {
+    off: "crystal/crystal_Yellow_off.png",
+    on: "crystal/crystal_Yellow_on.png",
+    ray: "crystal/rays_crystal_Yellow.png",
+    onBox: { left: -72.04, top: -52.45, w: 250.54, h: 152.45 },
+  },
+  crB: {
+    off: "crystal/crystal_Blue_off.png",
+    on: "crystal/crystal_Blue_on.png",
+    ray: "crystal/rays crystal_Blue.png",
+    onBox: { left: -55.91, top: -47.18, w: 202.15, h: 148.59 },
+  },
+};
+
+const STAR_KEYS = ["star1", "star2", "star3", "star4", "star5", "star6"];
+const STAR_MIRROR = new Set(["star4", "star5", "star6"]);
+
+function CrystalSpot({ x, y, w, cfg, on }) {
+  return (
+    <div style={{ position: "absolute", left: `${x}%`, top: `${y}%`, width: `${w}%`, zIndex: 2, pointerEvents: "none" }}>
+      <img className={styles.groundShadow} src={`${ASSET}/${cfg.off}`} alt="" draggable={false} />
+      <img src={`${ASSET}/${cfg.off}`} alt="" draggable={false} style={{ width: "100%", display: "block" }} />
+      <div className={styles.crystalOnWrap} style={{ opacity: on ? 1 : 0 }}>
+        <img className={styles.crystalRays} src={`${ASSET}/${cfg.ray}`} alt="" draggable={false} />
+        <img
+          src={`${ASSET}/${cfg.on}`}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+            left: `${cfg.onBox.left}%`,
+            top: `${cfg.onBox.top}%`,
+            width: `${cfg.onBox.w}%`,
+            height: `${cfg.onBox.h}%`,
+            maxWidth: "none",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function StarSpot({ x, y, w, on, mirror, z }) {
+  const flip = mirror ? "scaleX(-1)" : undefined;
+  return (
+    <div style={{ position: "absolute", left: `${x}%`, top: `${y}%`, width: `${w}%`, zIndex: z, pointerEvents: "none" }}>
+      <img className={styles.groundShadow} src={`${ASSET}/Bg_Over/Star_Off.png`} alt="" draggable={false} />
+      <img
+        src={`${ASSET}/Bg_Over/Star_Off.png`}
+        alt=""
+        draggable={false}
+        style={{ width: "100%", display: "block", transform: flip }}
+      />
+      <img
+        src={`${ASSET}/Bg_Over/Star_On.png`}
+        alt=""
+        draggable={false}
+        className={styles.starOnImg}
+        style={{ opacity: on ? 1 : 0, transform: flip }}
+      />
+    </div>
+  );
+}
+
+function loadUpark() {
+  try {
+    const raw = localStorage.getItem(UPARK_KEY);
+    if (raw) return { ...DEFAULT_UPARK, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_UPARK;
+  }
+  return DEFAULT_UPARK;
+}
+
 function UpperPark() {
+  const [graph] = useState(loadGraph9);
+  const [upark] = useState(loadUpark);
+  const [tilePhoto] = useState(loadTilePhoto);
+  const [lit] = useState({});
+
   return (
     <div className={styles.upark}>
       <div className={styles.uparkInner}>
-        <img className={styles.uparkBg} src={`${ASSET}/upper_bg.jpg`} alt="Park" />
+        <img className={styles.uparkBg} src={`${ASSET}/Bg_Over/Up_Bg.png`} alt="Park" />
         <FerrisSprite
           className={styles.uparkWheel}
-          style={{ left: `${UPARK.wheel.x}%`, top: `${UPARK.wheel.y}%`, width: `${UPARK.wheel.w}%` }}
+          style={{ left: `${upark.wheel.x}%`, top: `${upark.wheel.y}%`, width: `${upark.wheel.w}%` }}
         />
         <CarouselSprite
           className={styles.uparkWheel}
-          style={{ left: `${UPARK.carousel.x}%`, top: `${UPARK.carousel.y}%`, width: `${UPARK.carousel.w}%` }}
+          style={{ left: `${upark.carousel.x}%`, top: `${upark.carousel.y}%`, width: `${upark.carousel.w}%` }}
         />
         <img
           className={styles.uparkBush}
           src={`${ASSET}/bush_wheel.png`}
           alt=""
           draggable={false}
-          style={{ left: `${UPARK.bush.x}%`, top: `${UPARK.bush.y}%`, width: `${UPARK.bush.w}%` }}
+          style={{ left: `${upark.bush.x}%`, top: `${upark.bush.y}%`, width: `${upark.bush.w}%` }}
         />
+        <TilesPhoto quad={tilePhoto.a} />
+        <TilesPhoto quad={tilePhoto.b} />
+        <img
+          className={styles.uparkWheel}
+          src={`${ASSET}/Flash_Coin_Lights/Coin_Spielmen_Off.png`}
+          alt=""
+          draggable={false}
+          style={{ left: `${upark.coin.x}%`, top: `${upark.coin.y}%`, width: `${upark.coin.w}%` }}
+        />
+        {Object.keys(CRYSTAL_CFG).map((k) => (
+          <CrystalSpot key={k} x={upark[k].x} y={upark[k].y} w={upark[k].w} cfg={CRYSTAL_CFG[k]} on={!!lit[k]} />
+        ))}
+        {STAR_KEYS.map((k) => (
+          <StarSpot
+            key={k}
+            x={upark[k].x}
+            y={upark[k].y}
+            w={upark[k].w}
+            on={!!lit[k]}
+            mirror={STAR_MIRROR.has(k)}
+            z={UPARK_Z[k]}
+          />
+        ))}
+        <Flask x={upark.flask1.x} y={upark.flask1.y} w={upark.flask1.w} fill={0} />
+        <Flask x={upark.flask2.x} y={upark.flask2.y} w={upark.flask2.w} fill={0} />
+        {Object.keys(UPARK_FLAGS).map((k, i) => (
+          <WindFlag
+            key={k}
+            img={UPARK_FLAGS[k]}
+            x={upark[k].x}
+            y={upark[k].y}
+            w={upark[k].w}
+            delay={`${-(i * 0.73).toFixed(2)}s`}
+            dur={`${(3.4 + (i % 4) * 0.55).toFixed(2)}s`}
+          />
+        ))}
+        {graph.nodes.length >= 2 && graph.edges.length >= 1 && (
+          <Human9Walker nodes={graph.nodes} edges={graph.edges} stops={STOP9} w={6} speed={0.2} />
+        )}
       </div>
     </div>
   );

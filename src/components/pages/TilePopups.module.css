@@ -1,0 +1,335 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  background: rgba(8, 4, 3, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: tpFade 0.25s ease;
+}
+
+@keyframes tpFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.popup {
+  position: relative;
+  width: 84%;
+  max-width: 330px;
+  background: #1c1214;
+  border: 1px solid #4a3420;
+  border-radius: 14px;
+  padding: 14px 16px 18px;
+  overflow: hidden;
+  transition: max-width 0.45s ease, width 0.45s ease;
+  animation: tpPop 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@keyframes tpPop {
+  from {
+    transform: scale(0.82);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.popupWide {
+  width: 94%;
+  max-width: 370px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(232, 198, 106, 0.18);
+  margin-bottom: 14px;
+}
+
+.title {
+  color: #e8c66a;
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.close {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbb;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.icon {
+  font-size: 44px;
+  text-align: center;
+  margin: 6px 0 10px;
+  filter: drop-shadow(0 4px 10px rgba(242, 201, 76, 0.35));
+}
+
+.text {
+  color: #fff;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+
+.mainBtn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 24px;
+  background: #f2c94c;
+  color: #241505;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(242, 201, 76, 0.35);
+}
+
+.mainBtn:active {
+  transform: translateY(1px);
+}
+
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti span {
+  position: absolute;
+  top: -8px;
+  border-radius: 1px;
+  animation: tpConfetti linear infinite;
+}
+
+@keyframes tpConfetti {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(340px) rotate(320deg);
+    opacity: 0;
+  }
+}
+
+.gameArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.gameHint {
+  color: #e8c66a;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  min-height: 20px;
+}
+
+.btnRow {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.subBtn {
+  flex: 1;
+  padding: 11px;
+  border: 1px solid #7a4a1f;
+  border-radius: 20px;
+  background: rgba(242, 201, 76, 0.12);
+  color: #e8c66a;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cardsRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.card {
+  position: relative;
+  width: 74px;
+  height: 104px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: transparent;
+  perspective: 400px;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.cardBack,
+.cardFace {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  backface-visibility: hidden;
+  transition: transform 0.55s ease;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.cardBack {
+  background: repeating-linear-gradient(135deg, #7a2030 0 8px, #5c1523 8px 16px);
+  border: 2px solid #e8c66a;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.cardFace {
+  background: #f7ecd2;
+  border: 2px solid #e8c66a;
+  color: #7a2030;
+  transform: rotateY(180deg);
+}
+
+.cardOpen .cardBack {
+  transform: rotateY(180deg);
+}
+
+.cardOpen .cardFace {
+  transform: rotateY(360deg);
+}
+
+.cardOpen:not(.cardPicked) {
+  opacity: 0.45;
+}
+
+.coin {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe9a6, #f2c94c 55%, #b8860b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  box-shadow: 0 6px 18px rgba(242, 201, 76, 0.4);
+}
+
+.coinFlip {
+  animation: tpCoinFlip 0.35s linear infinite;
+}
+
+@keyframes tpCoinFlip {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(360deg);
+  }
+}
+
+.wheelBox {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.wheelPin {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #e8c66a;
+  font-size: 18px;
+  z-index: 2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid #e8c66a;
+  background: conic-gradient(
+    #7a2030 0deg 45deg,
+    #24421f 45deg 90deg,
+    #1f2c52 90deg 135deg,
+    #6a4a12 135deg 180deg,
+    #7a2030 180deg 225deg,
+    #24421f 225deg 270deg,
+    #1f2c52 270deg 315deg,
+    #6a4a12 315deg 360deg
+  );
+  transition: transform 3.2s cubic-bezier(0.15, 0.7, 0.1, 1);
+  position: relative;
+}
+
+.wheelLabel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -14px;
+  margin-top: -8px;
+  width: 28px;
+  text-align: center;
+  color: #f7ecd2;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pyramid {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 6px;
+}
+
+.pyramidRow {
+  display: flex;
+  gap: 6px;
+}
+
+.brick {
+  width: 64px;
+  height: 40px;
+  border: 2px solid #7a4a1f;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #f2c94c, #c99a1e);
+  color: #241505;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.brickOpen {
+  background: #f7ecd2;
+  border-color: #e8c66a;
+}

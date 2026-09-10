@@ -1,0 +1,159 @@
+@font-face {
+  font-family: "PyrUncial";
+  src: url("/bonus-park/Piramid_Bg_Select/Uncial_Antiqua/UncialAntiqua-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PyrSans";
+  src: url("/bonus-park/Piramid_Bg_Select/DM_Sans/static/DMSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PyrSans";
+  src: url("/bonus-park/Piramid_Bg_Select/DM_Sans/static/DMSans-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-display: swap;
+}
+
+.board {
+  position: relative;
+  width: 100%;
+  padding: 22px 0 22px;
+  transform-origin: 50% 50%;
+}
+
+.panel {
+  position: relative;
+  padding: 3px;
+  border-radius: 26px;
+  background: linear-gradient(180deg, #f6d98c 0%, #dfae4a 22%, #c8912e 48%, #dfae4a 74%, #f4d585 100%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+}
+
+.inner {
+  position: relative;
+  padding: 8px 12px 14px;
+  border-radius: 23px;
+  background: radial-gradient(56% 27% at 50% 10%, #6b2daa 0%, #4a1a78 46%, rgba(40, 12, 64, 0) 100%),
+    linear-gradient(180deg, #200936 0%, #180626 55%, #110419 100%);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 214, 120, 0.42), inset 0 0 34px rgba(0, 0, 0, 0.5);
+}
+
+.crown {
+  position: absolute;
+  left: 50%;
+  top: -27px;
+  z-index: 4;
+  width: 65px;
+  height: auto;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+}
+
+.decor {
+  position: absolute;
+  left: 50%;
+  bottom: -24px;
+  z-index: 4;
+  width: 67px;
+  height: auto;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+}
+
+.title {
+  margin: 8px 0 12px;
+  text-align: center;
+  font-family: "PyrUncial", "Times New Roman", serif;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: 0.5px;
+  color: #ffd968;
+  background: linear-gradient(180deg, #fff6c4 8%, #ffd451 46%, #e79b1c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 0 rgba(86, 30, 8, 0.85)) drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
+}
+
+.lineWrap {
+  position: relative;
+  height: 0;
+}
+
+.line {
+  position: absolute;
+  left: 5%;
+  top: 0;
+  display: block;
+  width: 90%;
+  height: auto;
+  transform: translateY(-47.8%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timer {
+  margin: 10px auto 0;
+  padding: 3px 13px;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  background: rgba(14, 5, 30, 0.72);
+  box-shadow: inset 0 0 0 1.5px rgba(233, 187, 88, 0.75), 0 2px 5px rgba(0, 0, 0, 0.45);
+}
+
+.clock {
+  position: relative;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 2px solid #f0c25a;
+  background: radial-gradient(circle at 50% 38%, #fff2c8 0%, #e0a83a 70%, #a9721c 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.clock::before,
+.clock::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 1.6px;
+  border-radius: 1px;
+  background: #4a2a05;
+  transform-origin: 50% 100%;
+}
+
+.clock::before {
+  height: 5px;
+  transform: translateX(-50%) rotate(38deg);
+}
+
+.clock::after {
+  height: 6.4px;
+  transform: translateX(-50%) rotate(-72deg);
+}
+
+.timerVal {
+  font-family: "PyrSans", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+}

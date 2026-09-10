@@ -1,0 +1,29 @@
+.box {
+  position: absolute;
+}
+
+.edit {
+  outline: 1px dashed rgba(120, 230, 255, 0.9);
+  cursor: move;
+}
+
+.tag {
+  position: absolute;
+  left: 0;
+  top: -14px;
+  padding: 0 4px;
+  font-size: 9px;
+  line-height: 13px;
+  color: #06202a;
+  background: rgba(120, 230, 255, 0.9);
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+
+.hot {
+  outline: 2px solid #ffd76a;
+  outline-offset: 1px;
+  box-shadow: 0 0 10px rgba(255, 200, 80, 0.7);
+}

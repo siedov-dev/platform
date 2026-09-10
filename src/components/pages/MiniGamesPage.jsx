@@ -29,10 +29,10 @@ export default function MiniGamesPage() {
         </div>
       </div>
 
-      <button className={styles.exit} onClick={() => navigate("games")}>✕</button>
+      <button className={styles.exit} style={{ top: 12 }} onClick={() => navigate("games")}>✕</button>
 
       {active && (
-        <GamePopup title={active.title} onClose={() => setPopup(null)}>
+        <GamePopup title={active.title} bare={active.bare} onClose={() => setPopup(null)}>
           <active.Comp />
         </GamePopup>
       )}

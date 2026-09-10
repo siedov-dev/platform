@@ -1,3 +1,5 @@
+console.log("[park] build 2026-08-27 13:12");
+window.__PARK_BUILD__ = "2026-08-27 13:12";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { I18nProvider } from "@/i18n/I18nProvider";
@@ -12,7 +14,13 @@ async function enableMocking() {
 }
 
 function render() {
-  createRoot(document.getElementById("root")).render(
+  let host = document.getElementById("root");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "root";
+    document.body.appendChild(host);
+  }
+  createRoot(host).render(
     <StrictMode>
       <I18nProvider initialLang="en">
         <AppProvider>

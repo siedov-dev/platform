@@ -2,9 +2,13 @@ import { useApp } from "@/context/AppContext";
 import { useI18n } from "@/i18n/I18nProvider";
 import styles from "./BottomNav.module.css";
 
+const PARK_ROUTES = new Set(["bonuspark", "parkmap", "parktop", "parkbot"]);
+
 export default function BottomNav() {
   const { route, navigate } = useApp();
   const { t } = useI18n();
+
+  if (PARK_ROUTES.has(route) || route === "exchange" || route === "lunopark" || route === "ferris") return null;
 
   const tabs = [
     { id: "games", label: t("nav.allGames") },

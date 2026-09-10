@@ -4,6 +4,8 @@ import IconButton from "@/components/ui/IconButton";
 import { Burger, Headset, CloseRing } from "@/components/ui/Icons";
 import styles from "./TopBar.module.css";
 
+const PARK_ROUTES = new Set(["bonuspark", "parkmap", "parktop", "parkbot"]);
+
 const TITLES = {
   games: "games.title",
   promotions: "promo.title",
@@ -17,7 +19,8 @@ export default function TopBar() {
   const { t } = useI18n();
   const isHome = route === "home";
 
-  if (route === "bonus" || route === "bonuspark" || route === "lunopark" || route === "ferris") return null;
+  if (PARK_ROUTES.has(route) || route === "bonus" || route === "lunopark" || route === "ferris") return null;
+  if (route === "minigames" || route === "exchange") return null;
 
   return (
     <div className={styles.bar}>

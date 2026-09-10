@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useApp } from "@/context/AppContext";
 import TileField from "./TileField";
 import Particles from "./Particles";
@@ -6,20 +6,48 @@ import Balloons from "./Balloons";
 import Flag from "./Flag";
 import FerrisSprite from "./FerrisSprite";
 import CarouselSprite from "./CarouselSprite";
-import HumanSprite from "./HumanSprite";
-import Human9Walker from "./Human9Walker";
+import CenterGlow from "./CenterGlow";
+import ParkBox from "./ParkBox";
+import MonitorScreen from "./MonitorScreen";
+import ParkHud from "./ParkHud";
+import PlayerRow from "./PlayerRow";
+import ParkLoader from "./ParkLoader";
+import TrainRide from "./TrainRide";
+
 import CoinFlash from "./CoinFlash";
-import { LootPopup, GameIntroPopup } from "./TilePopups";
+import usePopFrom, { usePopTo } from "./usePopFrom";
 import { MINI_GAMES } from "./MiniGames";
+import CashWin from "./CashWin";
+import { WalletProvider, useWallet, centerOf } from "./parkWallet";
 import styles from "./BonusParkPage.module.css";
 
 const ASSET = "/bonus-park";
 
 const ENERGY_GOAL = 1042;
+const SAFE_GOAL = 4;
 
-const OUTCOME_SEQ = ["energy", "money", "game", "energy", "game", "money", "game", "energy", "game"];
+const AUTO_HOLD_MS = 1355;
+const AUTO_STOP_MS = 460;
 
-const GAPS_KEY = "bonuspark.seam5";
+const OUTCOME_SEQ = ["energy", "money", "game", "cash", "energy", "game", "money", "game", "cash", "energy", "game"];
+const CASH_NOMS = [100, 50, 25, 15, 13, 10, 8, 7, 5];
+const TAKEN_FIELDS = new Set(["mr", "bl"]);
+const JOKERS = new Set(["coinflip", "coinhand", "matches"]);
+const JOKER_PAY = 50;
+const TILE_COST = 1;
+const COIN_FULL_PAY = 1;
+const COIN_UNITS = 100;
+const PURPLE_TOTAL = 29;
+const BANK_HOLD_MS = 1100;
+const BANK_COIN_MS = 1000;
+const BANK_MIN_MS = 460;
+const BANK_FLASH_MS = 720;
+const BANK_DROP_MS = 280;
+const SPIN_COST = 1;
+const CASH_SHOW_MS = 2200;
+const POP_OUT_MS = 420;
+
+const GAPS_KEY = "bonuspark.seam6";
 const SEAM_BASE = { w: -5.2, d: -5.6, inset: 0.4 };
 const DEFAULT_SEAM = {
   tl: { w: -5.2, d: -5.6, inset: 0.2 },
@@ -54,13 +82,26 @@ const FIELDS = [
   { key: "br", sector: 6, cols: 10, rows: 10, seed: 5, offset: 540, gapX: -0.5, gapY: -0.5 },
 ];
 
-const FLASK_KEY = "bonuspark.flask";
+const SECTOR_OF = Object.fromEntries(FIELDS.map((f) => [f.key, f.sector]));
+const KEY_OF_SECTOR = Object.fromEntries(FIELDS.map((f) => [String(f.sector), f.key]));
+
+const urlSector = () => KEY_OF_SECTOR[new URLSearchParams(window.location.search).get("sector")] || null;
+
+const setUrlSector = (key) => {
+  const u = new URL(window.location.href);
+  if (key) u.searchParams.set("sector", String(SECTOR_OF[key]));
+  else u.searchParams.delete("sector");
+  if (u.toString() !== window.location.href) window.history.replaceState(null, "", u.toString());
+};
+
+
+const FLASK_KEY = "bonuspark.flask3";
 const DEFAULT_FLASK = {
   pos: [
-    { x: 20.23, y: 31.11 },
-    { x: 81.15, y: 30.9 },
+    { x: 28.43, y: 29.82 },
+    { x: 72.68, y: 29.53 },
   ],
-  w: 7,
+  w: 5.225,
 };
 
 function loadFlask() {
@@ -73,7 +114,18 @@ function loadFlask() {
   return DEFAULT_FLASK;
 }
 
-const COINCFG = { x: 50.4, y: 26, w: 13 };
+const COIN_KEY = "bonuspark.coin3";
+const DEFAULT_COIN = { x: 50.3, y: 23.39, w: 10.695 };
+
+function loadCoin() {
+  try {
+    const raw = localStorage.getItem(COIN_KEY);
+    if (raw) return { ...DEFAULT_COIN, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_COIN;
+  }
+  return DEFAULT_COIN;
+}
 
 const HUMAN = { x: 46.6, y: 38.9, w: 6.4, from: 0, to: 559, fps: 15 };
 
@@ -123,6 +175,374 @@ const DEFAULT_GRAPH9 = {
 
 const STOP9 = [];
 
+const UI_KEY = "bonuspark.ui5";
+const PATH_KEY = "bonuspark.sparkpath7";
+
+const DEFAULT_UI = {
+  spin: { x: 37.65, y: 80.3, w: 27 },
+  monitor: { x: 14.13, y: 25.77, w: 69.31, h: 8.09 },
+  glow: { x: 33.9, y: 23.68, w: 31.5, h: 9.1 },
+};
+
+const WIN_CHANCE = 0.5;
+
+const SYMS = ["ice", "hat", "cocktail", "key", "mask", "ring", "crown", "coin", "crystal"];
+const WILD = "hat";
+const PLAIN = SYMS.filter((s) => s !== "coin" && s !== "crystal");
+const NOHAT = PLAIN.filter((s) => s !== WILD);
+
+const SYM_RU = {
+  ice: "мороженое",
+  hat: "шляпа",
+  cocktail: "коктейль",
+  key: "ключ",
+  mask: "маска",
+  ring: "замок",
+  crown: "корона",
+  coin: "монета",
+  crystal: "кристалл",
+};
+
+const ru = (r) => r.map((k) => SYM_RU[k] || k).join(" / ");
+
+const rnd = (list) => list[Math.floor(Math.random() * list.length)];
+const shuffle = (a) => {
+  const n = a.slice();
+  for (let i = n.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [n[i], n[j]] = [n[j], n[i]];
+  }
+  return n;
+};
+const two = (pool) => {
+  const a = rnd(pool);
+  const b = rnd(pool.filter((s) => s !== a));
+  return [a, b];
+};
+
+const wildMix = (sym) => {
+  const v = Math.random();
+  if (v < 0.5) return [sym, sym, sym];
+  if (v < 0.8) return shuffle([sym, sym, WILD]);
+  return shuffle([sym, WILD, WILD]);
+};
+
+const COMBOS = [
+  { pay: 1, build: () => shuffle(["coin", ...two(NOHAT)]) },
+  {
+    pay: 2,
+    build: () =>
+      Math.random() < 0.5
+        ? shuffle(["coin", "coin", rnd(NOHAT)])
+        : shuffle(["coin", WILD, rnd(NOHAT)]),
+  },
+  { pay: 3, build: () => (Math.random() < 0.8 ? wildMix("ice") : shuffle(["coin", WILD, WILD])) },
+  { pay: 5, build: () => wildMix("cocktail") },
+  { pay: 10, build: () => wildMix("key") },
+  { pay: 15, build: () => wildMix("mask") },
+  { pay: 50, build: () => wildMix("ring") },
+  { pay: 100, build: () => wildMix("crown") },
+  { pay: 200, build: () => [WILD, WILD, WILD] },
+  { pay: 0, screen: true, build: () => shuffle(["crystal", rnd(NOHAT), rnd(NOHAT)]) },
+];
+
+const DEMO_SEQ = [
+  ["crown", "hat", "ice"],
+  ["crown", "hat", "crown"],
+  ["mask", "mask", "hat"],
+  8, 8, 0, 0, 9, 9, 9, 9, "lose", 8, 0, "lose", 1, 2, "lose", 3, 4, "lose", 5, 6, "lose", 7, "lose"];
+
+const CAR_PRIZE_SEQ = [25, 50, 100];
+const CAR_STOP_AT = { 25: [1.68, 5.04, 8.36], 50: [0, 6.68], 100: [3.32] };
+
+const pickStop = (v) => (Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : v);
+const CAR_CARS = { 25: 2, 50: 1, 100: 0 };
+
+const WHEEL_PRIZE_SEQ = [100, 200, 500];
+const WHEEL_STOP_AT = { 100: 5.36, 200: 6.08, 500: 0 };
+
+const RIDE_LAND_MS = 2600;
+
+const CRYSTAL_GLOW_MS = 180;
+
+const CRYSTAL_ORDER = ["crB", "crY", "crR", "crP"];
+
+const PAY_TABLE = { ice: 3, cocktail: 5, key: 10, mask: 15, ring: 50, crown: 100, hat: 200 };
+const WIN_NUMS = [1, 2, 3, 5, 10, 15, 25, 50, 100, 200, 500];
+
+const GAME_PRELOAD = [
+  `${ASSET}/Piramid_Bg_Select/Castle.png`,
+  `${ASSET}/Piramid_Bg_Select/Shot_1000.png`,
+  `${ASSET}/Piramid_Bg_Select/Burger777_Icon.png`,
+  `${ASSET}/Piramid_Bg_Select/Carousel.png`,
+  `${ASSET}/Piramid_Bg_Select/Wheel.png`,
+  `${ASSET}/Piramid_Bg_Select/Flash_Light_blue_2.png`,
+  `${ASSET}/Piramid_Bg_Select/Crown_PopUp.png`,
+  `${ASSET}/Piramid_Bg_Select/Decor_PopUp.png`,
+  `${ASSET}/Pyramid_Game/Pyramid_Line.png`,
+  `${ASSET}/Ui_Exchange_HUD/Icn_Currency.png`,
+  `${ASSET}/Evnt_FW/Arrow_Evnt_Ferris%20wheel.png`,
+  `${ASSET}/Evnt_FW/Evnt_FW_Base.png`,
+  `${ASSET}/Evnt_FW/Evnt_FW_wheel.png`,
+  `${ASSET}/Evnt_FW/Evnt_FW_Centr.png`,
+  `${ASSET}/Evnt_FW/Evnt_FW_Leg.png`,
+  `${ASSET}/Evnt_FW/Evnt_FW_Cabin_Blue.png`,
+  `${ASSET}/Evnt_FW/Evnt_FW_Cabin_Purple.png`,
+  `${ASSET}/Evnt_FW/Evnt_FW_Cabin_Red.png`,
+  `${ASSET}/Evnt_FW/Evnt_FW_Cabin__Green.png`,
+  `${ASSET}/Cards_Game/Card_all_0000_Layer-287-copy-14.webp`,
+  `${ASSET}/Cards_Game/Shine_Card-Win.webp`,
+  `${ASSET}/Cards_Game/Light_Fx_Card.webp`,
+];
+
+const GAME_FONTS = ['16px "PyrUncial"', '700 16px "PyrSans"', '900 16px "PyrSans"'];
+
+const SPECIAL_SYMS = new Set(["coin", "crystal"]);
+
+const lineOf = (r) => {
+  if (r.some((x) => SPECIAL_SYMS.has(x))) return null;
+  const rest = r.filter((x) => x !== WILD);
+  if (rest.length === 0) return WILD;
+  return new Set(rest).size === 1 ? rest[0] : null;
+};
+
+const payFor = (r) => {
+  if (r.includes("crystal")) return 0;
+  const hats = r.filter((s) => s === WILD).length;
+  if (hats === 3) return PAY_TABLE[WILD];
+  const coins = r.filter((s) => s === "coin").length;
+  const rest = r.filter((s) => s !== WILD && s !== "coin");
+  if (coins > 0) {
+    if (coins === 1 && hats === 2) return 3;
+    if (coins === 2 && hats === 0) return 2;
+    if (coins === 1 && hats === 1) return 2;
+    return 1;
+  }
+  const uniq = [...new Set(rest)];
+  if (uniq.length === 1) return PAY_TABLE[uniq[0]] || 0;
+  if (hats === 1 && uniq.length === 2) return 1;
+  return 0;
+};
+
+const SCREEN_FLAT = false;
+const GLOW_DY_ARC = [6.55, -4.14, -2.41];
+const GLOW_ROT_ARC = [-3.6, -2.5, 2.4];
+const GLOW_DY = GLOW_DY_ARC;
+const GLOW_ROT = SCREEN_FLAT ? [0, 0, 0] : GLOW_ROT_ARC;
+
+const DEFAULT_PATH = [
+  { x: 13.89, y: 27.03 },
+  { x: 17.59, y: 26.86 },
+  { x: 21.3, y: 26.69 },
+  { x: 28.7, y: 26.43 },
+  { x: 36.11, y: 26.22 },
+  { x: 43.52, y: 26.05 },
+  { x: 50.93, y: 25.96 },
+  { x: 58.33, y: 25.92 },
+  { x: 65.74, y: 25.96 },
+  { x: 73.15, y: 26.05 },
+  { x: 80.56, y: 26.22 },
+  { x: 85.19, y: 26.3 },
+  { x: 85.19, y: 33.28 },
+  { x: 80.56, y: 33.11 },
+  { x: 73.15, y: 33.02 },
+  { x: 65.74, y: 32.89 },
+  { x: 58.33, y: 32.85 },
+  { x: 50.93, y: 32.89 },
+  { x: 43.52, y: 32.98 },
+  { x: 36.11, y: 33.15 },
+  { x: 28.7, y: 33.32 },
+  { x: 21.3, y: 33.62 },
+  { x: 17.59, y: 33.75 },
+  { x: 13.89, y: 33.92 },
+];
+
+const SPARK_DUR = 1.25;
+
+const GLOW_SYMBOL = "coin";
+
+const RIDE_PERIOD = { wheel: 3, carousel: 3 };
+
+const RIDE_RUN_MS = 9000;
+
+function loadJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+  return fallback;
+}
+
+function saveJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+const PBS = "/bonus-park/Piramid_Bg_Select";
+const YF = `${PBS}/Yacht_Fountain`;
+const DECO_EDIT_EVENT = "bonuspark-deco-edit";
+const DECO_DUMP_EVENT = "bonuspark-deco-dump";
+
+const DECO_UP_KEY = "bonuspark.decoUp3";
+const DEFAULT_DECO_UP = [
+  { id: "hat", src: `${PBS}/Gold_Hat_map.png`, x: 39.94, y: 62.16, w: 22.78 },
+  { id: "people", src: `${PBS}/People_Up.png`, x: -5.7, y: 34.71, w: 116.26 },
+  { id: "fountain1", src: `${YF}/fountain_1.png`, x: 25.77, y: 34.6, w: 5.95 },
+  { id: "fountain2a", src: `${YF}/fountain_2.png`, x: 29.34, y: 42.49, w: 4.41 },
+  { id: "fountain2b", src: `${YF}/fountain_2.png`, x: 83.49, y: 33.3, w: 6.49 },
+  { id: "fountain2c", src: `${YF}/fountain_2.png`, x: 69.65, y: 42.28, w: 6.88 },
+  { id: "fountain3", src: `${YF}/fountain_3.png`, x: 46.42, y: 33.11, w: 4.58 },
+  { id: "yacht1", src: `${YF}/Yacht_1.png`, x: 56.37, y: 12.67, w: 10.51 },
+  { id: "yacht2", src: `${YF}/Yacht_2.png`, x: 90.58, y: 22.72, w: 3.93 },
+  { id: "yacht3", src: `${YF}/Yacht_3.png`, x: 42.98, y: 12.48, w: 5 },
+  { id: "yacht4", src: `${YF}/Yacht_4.png`, x: 2.2, y: 25.86, w: 3.02 },
+];
+
+const DECO_DOWN_KEY = "bonuspark.decoDown3";
+const DEFAULT_DECO_DOWN = [{ id: "people", src: `${PBS}/People_Down.png`, x: 4.92, y: 1.75, w: 91.81 }];
+
+function loadDeco(key, defaults) {
+  const saved = loadJson(key, null);
+  if (!Array.isArray(saved)) return defaults.map((d) => ({ ...d }));
+  return defaults.map((d) => {
+    const hit = saved.find((s) => s && s.id === d.id);
+    return hit ? { ...d, x: hit.x, y: hit.y, w: hit.w } : { ...d };
+  });
+}
+
+function ParkDecor({ storeKey, defaults }) {
+  const [items, setItems] = useState(() => loadDeco(storeKey, defaults));
+  const [edit, setEdit] = useState(false);
+  const [sel, setSel] = useState(null);
+  const layerRef = useRef(null);
+
+  useEffect(() => {
+    const onEdit = (e) => setEdit(!!e.detail);
+    const onDump = () => console.log(storeKey, JSON.stringify(items.map((i) => ({ id: i.id, x: i.x, y: i.y, w: i.w }))));
+    window.addEventListener(DECO_EDIT_EVENT, onEdit);
+    window.addEventListener(DECO_DUMP_EVENT, onDump);
+    return () => {
+      window.removeEventListener(DECO_EDIT_EVENT, onEdit);
+      window.removeEventListener(DECO_DUMP_EVENT, onDump);
+    };
+  }, [items, storeKey]);
+
+  useEffect(() => {
+    window.decoEdit = (on) => {
+      const next = on === undefined ? !document.body.dataset.deco : !!on;
+      if (next) document.body.dataset.deco = "1";
+      else delete document.body.dataset.deco;
+      window.dispatchEvent(new CustomEvent(DECO_EDIT_EVENT, { detail: next }));
+      return next ? "редактор декора включён" : "редактор декора выключен";
+    };
+    window.dumpDeco = () => {
+      window.dispatchEvent(new CustomEvent(DECO_DUMP_EVENT));
+      return "данные в консоли";
+    };
+    return () => {
+      delete window.decoEdit;
+      delete window.dumpDeco;
+    };
+  }, []);
+
+  const patch = (id, next) =>
+    setItems((prev) => {
+      const out = prev.map((it) => (it.id === id ? { ...it, ...next } : it));
+      saveJson(storeKey, out.map((i) => ({ id: i.id, x: i.x, y: i.y, w: i.w })));
+      return out;
+    });
+
+  const startDrag = (id, kind) => (e) => {
+    if (!edit) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setSel(id);
+    const mode = kind === "move" && e.shiftKey ? "size" : kind;
+    const layer = layerRef.current;
+    const host = layer.getBoundingClientRect();
+    const k = host.width / (layer.offsetWidth || 1) || 1;
+    const node = kind === "move" ? e.currentTarget : e.currentTarget.parentElement;
+    const base = items.find((it) => it.id === id);
+    const sx = e.clientX;
+    const sy = e.clientY;
+    let dxp = 0;
+    let dyp = 0;
+    let nw = base.w;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* капту не поддержали */
+    }
+    const move = (ev) => {
+      ev.preventDefault();
+      const dx = ev.clientX - sx;
+      const dy = ev.clientY - sy;
+      if (mode === "move") {
+        dxp = (dx / host.width) * 100;
+        dyp = (dy / host.height) * 100;
+        node.style.transform = `translate(${(dx / k).toFixed(2)}px, ${(dy / k).toFixed(2)}px)`;
+      } else {
+        nw = Math.max(0.5, base.w + (dx / host.width) * 100);
+        node.style.width = `${nw.toFixed(2)}%`;
+      }
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+      node.style.transform = "";
+      if (mode === "move") patch(id, { x: +(base.x + dxp).toFixed(2), y: +(base.y + dyp).toFixed(2) });
+      else patch(id, { w: +nw.toFixed(2) });
+    };
+    window.addEventListener("pointermove", move, { passive: false });
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+  };
+
+  return (
+    <div ref={layerRef} className={`${styles.decoLayer} ${edit ? styles.decoLayerEdit : ""}`}>
+      {items.map((it, i) => (
+        <span
+          key={it.id}
+          className={`${styles.decoItem} ${edit ? styles.decoItemEdit : ""} ${sel === it.id ? styles.decoItemOn : ""}`}
+          style={{ left: `${it.x}%`, top: `${it.y}%`, width: `${it.w}%`, zIndex: i + 1 }}
+          onPointerDown={startDrag(it.id, "move")}
+        >
+          <img className={styles.decoImg} src={it.src} alt="" draggable={false} />
+          {edit && <span className={styles.decoHandle} onPointerDown={startDrag(it.id, "size")} />}
+          {edit && <span className={styles.decoTag}>{it.id}</span>}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+const GLOW_KEY = "bonuspark.glow2";
+const GLOW_EVENT = "bonuspark.glow2";
+
+function loadGlow() {
+  try {
+    return localStorage.getItem(GLOW_KEY) !== "0";
+  } catch {
+    return true;
+  }
+}
+
+export function setBonusParkGlow(on) {
+  const next = !!on;
+  try {
+    localStorage.setItem(GLOW_KEY, next ? "1" : "0");
+  } catch {
+    /* storage unavailable */
+  }
+  window.dispatchEvent(new CustomEvent(GLOW_EVENT, { detail: next }));
+}
+
 function loadGraph9() {
   try {
     const raw = localStorage.getItem(GRAPH9_KEY);
@@ -133,15 +553,15 @@ function loadGraph9() {
   return DEFAULT_GRAPH9;
 }
 
-const FLAGS_KEY = "bonuspark.flags";
+const FLAGS_KEY = "bonuspark.flags3";
 const DEFAULT_FLAGS = [
-  { id: "f1", img: "Flag_1.png", x: 24.79, y: 14.11, w: 4.4 },
-  { id: "f2", img: "Flag_2.png", x: 35.43, y: 11.21, w: 4.4 },
-  { id: "fc", img: "Flag_centr.png", x: 52.75, y: 10.26, w: 5 },
-  { id: "f3", img: "Flag_2.png", x: 69.14, y: 11.7, w: 4.4 },
-  { id: "f4", img: "Flag_1.png", x: 81.48, y: 13.05, w: 4.4 },
-  { id: "lb", img: "Flag_Blue_R.png", x: 2.59, y: 44.87, w: 4.5 },
-  { id: "lp", img: "Flag_Purple_L.png", x: 99.25, y: 45.4, w: 4.5 },
+  { id: "f1", img: "Flag_1.png", x: 32.03, y: 12.73, w: 3.8 },
+  { id: "f2", img: "Flag_2.png", x: 39.74, y: 9.87, w: 3.99 },
+  { id: "fc", img: "Flag_centr.png", x: 52.15, y: 9.08, w: 3.917 },
+  { id: "f3", img: "Flag_2.png", x: 64.46, y: 10.05, w: 3.99 },
+  { id: "f4", img: "Flag_1.png", x: 73.09, y: 11.62, w: 3.619 },
+  { id: "lb", img: "Flag_Blue_R.png", x: 15.8, y: 44.55, w: 4.5 },
+  { id: "lp", img: "Flag_Purple_L.png", x: 85.92, y: 45.31, w: 4.5 },
 ];
 
 function loadFlags() {
@@ -154,15 +574,18 @@ function loadFlags() {
   return DEFAULT_FLAGS;
 }
 
-function WindFlag({ img, x, y, w, delay, dur, onPointerDown }) {
+function WindFlag({ img, x, y, w, delay, dur, onPointerDown, onPointerMove, onPointerUp, className = "" }) {
   const banner = img.includes("Blue") || img.includes("Purple");
   return (
     <img
-      className={banner ? styles.windBanner : styles.windFlag}
+      className={`${banner ? styles.windBanner : styles.windFlag} ${className}`}
       src={`${ASSET}/${img}`}
       alt=""
       draggable={false}
       onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
       style={{
         left: `${x}%`,
         top: `${y}%`,
@@ -203,6 +626,45 @@ function Flask({ x, y, w, fill, onPointerDown }) {
   );
 }
 
+const HUD2 = `${ASSET}/Ui_Exchange_HUD`;
+
+const FLASK_MARK_LV = [100, 57.6, 33.12, 5.8, 0];
+
+function ParkFlask({ x, y, w, fill, tone, icon, label, steps = 0, chipDy = 0, edit, picked, onGrab, onMove, onDrop }) {
+  const clamped = Math.max(0, Math.min(1, fill));
+  const step = steps ? Math.max(0, Math.min(steps, Math.round(clamped * steps))) : 0;
+  const lv = steps ? FLASK_MARK_LV[step].toFixed(2) : ((1 - clamped) * 100).toFixed(2);
+  return (
+    <div
+      className={`${styles.pflask} ${edit ? styles.editable : ""} ${picked ? styles.picked : ""}`}
+      style={{ left: `${x}%`, top: `${y}%`, width: `${w}%` }}
+      onPointerDown={edit ? onGrab : undefined}
+      onPointerMove={edit ? onMove : undefined}
+      onPointerUp={edit ? onDrop : undefined}
+      onPointerCancel={edit ? onDrop : undefined}
+    >
+      <div className={styles.pflaskGlass}>
+        <img className={styles.pflaskBg} src={`${ASSET}/opt/bg_flask.webp`} alt="" draggable={false} />
+        <img
+          className={styles.pflaskFill}
+          src={`${HUD2}/inside_flask_${tone}.png`}
+          alt=""
+          draggable={false}
+          style={{ "--lv": `${lv}%` }}
+        />
+      </div>
+      <img className={styles.pflaskFront} src={`${ASSET}/opt/front_flask.webp`} alt="" draggable={false} />
+      <span
+        className={`${styles.pflaskChip} ${tone === "Purple" ? styles.pflaskChipPurple : ""}`}
+        style={{ "--chipdy": `${chipDy}%`, "--chipk": (w / 6.46).toFixed(4) }}
+      >
+        <img className={styles.pflaskChipIcn} src={`${HUD2}/${icon}`} alt="" draggable={false} />
+        <span className={styles.pflaskChipVal}>{label}</span>
+      </span>
+    </div>
+  );
+}
+
 const COVER = {
   tl: "opt/Cover_Field.webp",
   ml: "opt/Cover_Field.webp",
@@ -213,12 +675,12 @@ const COVER = {
 };
 
 const DEFAULT_FIELDS = {
-  tl: { tl: { x: 19.43, y: 38.5 }, tr: { x: 43.84, y: 38.57 }, br: { x: 43.13, y: 46.81 }, bl: { x: 16.98, y: 46.75 } },
-  tr: { tl: { x: 57.43, y: 38.54 }, tr: { x: 81.94, y: 38.53 }, br: { x: 84.22, y: 46.7 }, bl: { x: 58.02, y: 46.65 } },
-  ml: { tl: { x: 16.59, y: 48.33 }, tr: { x: 43.07, y: 48.33 }, br: { x: 42.15, y: 59.09 }, bl: { x: 13.69, y: 59.08 } },
-  mr: { tl: { x: 58.3, y: 48.36 }, tr: { x: 84.72, y: 48.35 }, br: { x: 87.71, y: 59.06 }, bl: { x: 59.16, y: 59.1 } },
-  bl: { tl: { x: 12.98, y: 60.99 }, tr: { x: 42.1, y: 61.01 }, br: { x: 41.32, y: 70.7 }, bl: { x: 10.02, y: 70.64 } },
-  br: { tl: { x: 59.3, y: 61.06 }, tr: { x: 88.23, y: 61.09 }, br: { x: 91.11, y: 70.74 }, bl: { x: 60.09, y: 70.72 } },
+  tl: { tl: { x: 27.78, y: 37.4 }, tr: { x: 45.58, y: 37.45 }, br: { x: 45.04, y: 45.69 }, bl: { x: 26, y: 45.64 } },
+  tr: { tl: { x: 55.46, y: 37.39 }, tr: { x: 73.43, y: 37.38 }, br: { x: 75.19, y: 45.64 }, bl: { x: 55.86, y: 45.69 } },
+  ml: { tl: { x: 25.71, y: 47.24 }, tr: { x: 45.01, y: 47.31 }, br: { x: 44.31, y: 58.12 }, bl: { x: 23.55, y: 58.08 } },
+  mr: { tl: { x: 56.1, y: 47.27 }, tr: { x: 75.36, y: 47.27 }, br: { x: 77.49, y: 58.09 }, bl: { x: 56.77, y: 58.12 } },
+  bl: { tl: { x: 23.04, y: 60.07 }, tr: { x: 44.28, y: 60.04 }, br: { x: 43.77, y: 69.85 }, bl: { x: 20.97, y: 69.82 } },
+  br: { tl: { x: 56.77, y: 60.13 }, tr: { x: 77.85, y: 60.13 }, br: { x: 79.97, y: 69.86 }, bl: { x: 57.22, y: 69.88 } },
 };
 
 function shrinkQuad(q, pct) {
@@ -230,7 +692,7 @@ function shrinkQuad(q, pct) {
   return { tl: f(q.tl), tr: f(q.tr), br: f(q.br), bl: f(q.bl) };
 }
 
-const FIELDS_KEY = "bonuspark.fields";
+const FIELDS_KEY = "bonuspark.fields3";
 
 function loadFields() {
   try {
@@ -242,12 +704,12 @@ function loadFields() {
   return DEFAULT_FIELDS;
 }
 
-const DECOR_KEY = "bonuspark.decor";
+const DECOR_KEY = "bonuspark.decor3";
 const DEFAULT_DECOR = [
-  { id: "b1", type: "balloon", x: -7.82, y: 63.51 },
-  { id: "b2", type: "balloon", x: 85.28, y: 63.74 },
-  { id: "f1", type: "flag", x: 71.59, y: 76.59, rot: 6, flip: false },
-  { id: "f2", type: "flag", x: 30.31, y: 76.5, rot: 6, flip: true },
+  { id: "b1", type: "balloon", x: 1.41, y: 56.17, s: 0.784 },
+  { id: "b2", type: "balloon", x: 76.59, y: 55.32, s: 0.784 },
+  { id: "f1", type: "flag", x: 66.97, y: 75.4, rot: 6, flip: false },
+  { id: "f2", type: "flag", x: 34.92, y: 75.48, rot: 6, flip: true },
 ];
 
 function loadDecor() {
@@ -260,7 +722,7 @@ function loadDecor() {
   return DEFAULT_DECOR;
 }
 
-const ZONE_KEY = "bonuspark.zones";
+const ZONE_KEY = "bonuspark.zones3";
 const DEFAULT_ZONES = {
   tl: { tl: { x: 18.97, y: 36.78 }, tr: { x: 47.41, y: 36.85 }, br: { x: 43.73, y: 47.29 }, bl: { x: 15.15, y: 47.22 } },
   tr: { tl: { x: 56.49, y: 36.85 }, tr: { x: 84.99, y: 36.85 }, br: { x: 84.99, y: 47.2 }, bl: { x: 56.38, y: 47.11 } },
@@ -294,14 +756,14 @@ function loadTileCfg() {
 }
 
 
-const COVERS_KEY = "bonuspark.covers";
+const COVERS_KEY = "bonuspark.covers3";
 const DEFAULT_COVERS = {
-  tl: { tl: { x: 17.07, y: 38.46 }, tr: { x: 43.84, y: 38.53 }, br: { x: 43.76, y: 46.81 }, bl: { x: 16.94, y: 46.76 } },
-  tr: { tl: { x: 54.45, y: 38.44 }, tr: { x: 81.9, y: 38.51 }, br: { x: 84.99, y: 46.7 }, bl: { x: 57.97, y: 46.65 } },
-  ml: { tl: { x: 14.06, y: 48.31 }, tr: { x: 43.14, y: 48.25 }, br: { x: 42.8, y: 59.14 }, bl: { x: 13.69, y: 59.07 } },
-  mr: { tl: { x: 55.12, y: 48.24 }, tr: { x: 84.59, y: 48.32 }, br: { x: 88.43, y: 59.09 }, bl: { x: 59.11, y: 59.07 } },
-  bl: { tl: { x: 10.19, y: 60.93 }, tr: { x: 42.09, y: 61 }, br: { x: 42.02, y: 70.7 }, bl: { x: 9.86, y: 70.68 } },
-  br: { tl: { x: 55.82, y: 60.94 }, tr: { x: 88.22, y: 61.08 }, br: { x: 91.99, y: 70.75 }, bl: { x: 60.03, y: 70.73 } },
+  tl: { tl: { x: 26.06, y: 37.4 }, tr: { x: 45.58, y: 37.33 }, br: { x: 45.44, y: 45.73 }, bl: { x: 25.93, y: 45.6 } },
+  tr: { tl: { x: 53.52, y: 37.36 }, tr: { x: 73.37, y: 37.39 }, br: { x: 75.5, y: 45.58 }, bl: { x: 55.97, y: 45.69 } },
+  ml: { tl: { x: 23.7, y: 47.24 }, tr: { x: 45.14, y: 47.21 }, br: { x: 44.85, y: 58.09 }, bl: { x: 23.49, y: 58 } },
+  mr: { tl: { x: 53.87, y: 47.22 }, tr: { x: 75.35, y: 47.19 }, br: { x: 78.01, y: 58.08 }, bl: { x: 56.67, y: 58.15 } },
+  bl: { tl: { x: 21.07, y: 60.06 }, tr: { x: 44.18, y: 60.07 }, br: { x: 44.17, y: 69.85 }, bl: { x: 21, y: 69.81 } },
+  br: { tl: { x: 54.29, y: 60.08 }, tr: { x: 77.83, y: 60.13 }, br: { x: 80.51, y: 69.75 }, bl: { x: 57.22, y: 69.79 } },
 };
 
 function loadCovers() {
@@ -314,26 +776,65 @@ function loadCovers() {
   return { ...DEFAULT_COVERS };
 }
 
+const hasMouse = () =>
+  typeof window !== "undefined" && typeof window.matchMedia === "function"
+    ? window.matchMedia("(hover: hover) and (pointer: fine)").matches
+    : false;
+
 function Overview({ onPick }) {
+  const [armed, setArmed] = useState(null);
+
+  const tap = (key) => {
+    if (hasMouse()) {
+      onPick(key);
+      return;
+    }
+    if (armed !== key) {
+      setArmed(key);
+      return;
+    }
+    onPick(key);
+  };
+
   return (
     <div className={styles.overview}>
-      <img className={styles.overviewImg} src={`${ASSET}/main_vertical.png`} alt="Bonus location" />
-      <button className={`${styles.half} ${styles.top}`} onClick={() => onPick("park")}>
+      <img className={styles.overviewImg} src={`${ASSET}/main_vertical.webp`} alt="Bonus location" />
+      <button
+        type="button"
+        className={`${styles.half} ${styles.top} ${armed === "park" ? styles.halfArmed : ""}`}
+        onClick={() => tap("park")}
+      >
         <span className={styles.halfLabel}>Park</span>
       </button>
-      <button className={`${styles.half} ${styles.bottom}`} onClick={() => onPick("grid")}>
+      <button
+        type="button"
+        className={`${styles.half} ${styles.bottom} ${armed === "grid" ? styles.halfArmed : ""}`}
+        onClick={() => tap("grid")}
+      >
         <span className={styles.halfLabel}>Fields</span>
       </button>
     </div>
   );
 }
 
-function GridGame() {
+function GridGame({ onPopup, onZoomState, onCoinRing }) {
+  const wallet = useWallet();
   const stageRef = useRef(null);
+
+  useEffect(() => {
+    const ph = document.querySelector("[class*='phone']");
+    if (!ph) return undefined;
+    ph.dataset.framed = "grid";
+    document.body.dataset.frame = "grid";
+    return () => {
+      delete ph.dataset.framed;
+      delete document.body.dataset.frame;
+    };
+  }, []);
   const [fields, setFields] = useState(loadFields);
   const [decor, setDecor] = useState(loadDecor);
-  const [selectedZone, setSelectedZone] = useState(null);
-  const [zoomZone, setZoomZone] = useState(null);
+  const [selectedZone, setSelectedZone] = useState(urlSector);
+  const [zoomZone, setZoomZone] = useState(urlSector);
   const [lit, setLit] = useState(null);
   const [destroyed, setDestroyed] = useState(() => new Set());
   const [zones, setZones] = useState(loadZones);
@@ -344,18 +845,371 @@ function GridGame() {
   const [hookOn, setHookOn] = useState(false);
   const hookTimer = useRef(null);
   const flashId = useRef(0);
-  const zoomDestroyed = useRef(0);
+  const safeSum = useRef(0);
   const particlesRef = useRef(null);
   const [flask, setFlask] = useState(loadFlask);
   const [flags, setFlags] = useState(loadFlags);
   const [coinFill, setCoinFill] = useState(0);
   const [coinPulse, setCoinPulse] = useState(0);
+  const [coinFullKey, setCoinFullKey] = useState(0);
+  const [energy, setEnergy] = useState(0);
+  const [safes, setSafes] = useState(0);
+  const [coin, setCoin] = useState(loadCoin);
+  const [edit, setEdit] = useState(false);
+  const [sel, setSel] = useState(null);
+  const [layer, setLayer] = useState("field");
+  const [view, setView] = useState({ z: 1, x: 50, y: 50 });
+
+  const dragRef = useRef(null);
   const [tilePopup, setTilePopup] = useState(null);
+  const popupCb = useRef(onPopup);
+  popupCb.current = onPopup;
+
+  useEffect(() => {
+    popupCb.current?.(!!tilePopup);
+  }, [tilePopup]);
+  const [marks, setMarks] = useState({});
+  const [boardSeed, setBoardSeed] = useState(0);
+  const purpleFound = useRef(0);
+  const restartPending = useRef(false);
   const outcomeIdx = useRef(0);
   const gameIdx = useRef(0);
   const [gaps, setGaps] = useState(loadGaps);
 
-  const flaskTarget = (i) => ({ x: flask.pos[i].x, y: flask.pos[i].y + flask.w * 0.11 });
+  const coinRef = useRef(coin);
+  coinRef.current = coin;
+
+  const saveJson = (key, val) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(val));
+    } catch {
+      /* хранилище недоступно */
+    }
+  };
+
+  const editStart = (kind, id, corner) => (e) => {
+    if (!edit) return;
+    e.stopPropagation();
+    e.preventDefault();
+    const host = stageRef.current;
+    if (!host) return;
+    const r = host.getBoundingClientRect();
+    setSel({ kind: kind === "corner" ? "quad" : kind, id });
+    dragRef.current = { kind, id, corner, r, sx: e.clientX, sy: e.clientY, moved: false };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+
+  const editMove = (e) => {
+    const d = dragRef.current;
+    if (!d) return;
+    const dx = ((e.clientX - d.sx) / d.r.width) * 100;
+    const dy = ((e.clientY - d.sy) / d.r.height) * 100;
+    if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05) return;
+    d.moved = true;
+    d.sx = e.clientX;
+    d.sy = e.clientY;
+    if (d.kind === "flask") {
+      setFlask((f) => {
+        const pos = f.pos.map((p, i) => (i === d.id ? { x: +(p.x + dx).toFixed(2), y: +(p.y + dy).toFixed(2) } : p));
+        const next = { ...f, pos };
+        saveJson(FLASK_KEY, next);
+        return next;
+      });
+    } else if (d.kind === "coin") {
+      setCoin((c) => {
+        const next = { ...c, x: +(c.x + dx).toFixed(2), y: +(c.y + dy).toFixed(2) };
+        saveJson(COIN_KEY, next);
+        return next;
+      });
+    } else if (d.kind === "decor") {
+      setDecor((list) => {
+        const next = list.map((it) =>
+          it.id === d.id ? { ...it, x: +(it.x + dx).toFixed(2), y: +(it.y + dy).toFixed(2) } : it
+        );
+        saveJson(DECOR_KEY, next);
+        return next;
+      });
+    } else if (d.kind === "flag") {
+      setFlags((list) => {
+        const next = list.map((it) =>
+          it.id === d.id ? { ...it, x: +(it.x + dx).toFixed(2), y: +(it.y + dy).toFixed(2) } : it
+        );
+        saveJson(FLAGS_KEY, next);
+        return next;
+      });
+    } else if (d.kind === "quad") {
+      moveQuad(d.id, dx, dy);
+    } else if (d.kind === "corner") {
+      moveCorner(d.id, d.corner, dx, dy);
+    }
+  };
+
+  const editEnd = () => {
+    dragRef.current = null;
+  };
+
+  const sizeSel = (k) => {
+    if (!sel) return;
+    if (sel.kind === "quad") {
+      scaleQuad(sel.id, k);
+    } else if (sel.kind === "flask") {
+      setFlask((f) => {
+        const next = { ...f, w: +(f.w * k).toFixed(3) };
+        saveJson(FLASK_KEY, next);
+        return next;
+      });
+    } else if (sel.kind === "coin") {
+      setCoin((c) => {
+        const next = { ...c, w: +(c.w * k).toFixed(3) };
+        saveJson(COIN_KEY, next);
+        return next;
+      });
+    } else if (sel.kind === "decor") {
+      setDecor((list) => {
+        const next = list.map((it) => (it.id === sel.id ? { ...it, s: +((it.s || 1) * k).toFixed(3) } : it));
+        saveJson(DECOR_KEY, next);
+        return next;
+      });
+    } else if (sel.kind === "flag") {
+      setFlags((list) => {
+        const next = list.map((it) => (it.id === sel.id ? { ...it, w: +(it.w * k).toFixed(3) } : it));
+        saveJson(FLAGS_KEY, next);
+        return next;
+      });
+    }
+  };
+
+  const LAYERS = {
+    field: { get: () => fields, set: setFields, key: FIELDS_KEY },
+    cover: { get: () => covers, set: setCovers, key: COVERS_KEY },
+    zone: { get: () => zones, set: setZones, key: ZONE_KEY },
+  };
+
+  const quadOf = (id) => LAYERS[layer].get()[id];
+
+  const putQuad = (id, q) => {
+    const L = LAYERS[layer];
+    L.set((prev) => {
+      const next = { ...prev, [id]: q };
+      saveJson(L.key, next);
+      return next;
+    });
+  };
+
+  const moveQuad = (id, dx, dy) => {
+    const q = quadOf(id);
+    if (!q) return;
+    const shift = (p) => ({ x: +(p.x + dx).toFixed(2), y: +(p.y + dy).toFixed(2) });
+    putQuad(id, { tl: shift(q.tl), tr: shift(q.tr), br: shift(q.br), bl: shift(q.bl) });
+  };
+
+  const moveCorner = (id, corner, dx, dy) => {
+    const q = quadOf(id);
+    if (!q) return;
+    putQuad(id, { ...q, [corner]: { x: +(q[corner].x + dx).toFixed(2), y: +(q[corner].y + dy).toFixed(2) } });
+  };
+
+  const scaleQuad = (id, k) => {
+    const q = quadOf(id);
+    if (!q) return;
+    const cx = (q.tl.x + q.tr.x + q.br.x + q.bl.x) / 4;
+    const cy = (q.tl.y + q.tr.y + q.br.y + q.bl.y) / 4;
+    const s = (p) => ({ x: +(cx + (p.x - cx) * k).toFixed(2), y: +(cy + (p.y - cy) * k).toFixed(2) });
+    putQuad(id, { tl: s(q.tl), tr: s(q.tr), br: s(q.br), bl: s(q.bl) });
+  };
+
+  const onZoomWheel = (e) => {
+    const host = stageRef.current;
+    if (!host) return;
+    e.preventDefault();
+    const r = host.getBoundingClientRect();
+    const cx = ((e.clientX - r.left) / r.width) * 100;
+    const cy = ((e.clientY - r.top) / r.height) * 100;
+    const up = e.deltaY < 0;
+    setView((v) => {
+      const z1 = Math.max(1, Math.min(6, v.z * (up ? 1.18 : 1 / 1.18)));
+      if (z1 === v.z) return v;
+      if (z1 <= 1.001) return { z: 1, x: 50, y: 50 };
+      const half = 50 / z1;
+      const clamp = (t) => Math.min(100 - half, Math.max(half, t));
+      return {
+        z: z1,
+        x: +clamp(cx - (v.z / z1) * (cx - v.x)).toFixed(2),
+        y: +clamp(cy - (v.z / z1) * (cy - v.y)).toFixed(2),
+      };
+    });
+  };
+
+  const dumpAll = () => {
+    console.log(
+      JSON.stringify(
+        { flask, coin, decor, flags, fields, gaps, covers, zones },
+        null,
+        1
+      )
+    );
+  };
+
+  const flaskTarget = (i) => ({ x: flask.pos[i].x, y: flask.pos[i].y + flask.w * 0.154 });
+
+  const flyTarget = (inner, t) => {
+    const rect = inner.getBoundingClientRect();
+    return { x: rect.left + (t.x / 100) * rect.width, y: rect.top + (t.y / 100) * rect.height };
+  };
+
+  const tilePopupRef = useRef(null);
+  tilePopupRef.current = tilePopup;
+
+  const lossTimers = useRef([]);
+  useEffect(() => () => lossTimers.current.forEach(clearTimeout), []);
+
+  const popOutTimer = useRef(0);
+
+  const closePopup = () => {
+    const pop = tilePopupRef.current;
+    if (!pop || pop.closing) return;
+    setTilePopup({ ...pop, closing: true });
+    clearTimeout(popOutTimer.current);
+    popOutTimer.current = setTimeout(() => setTilePopup(null), POP_OUT_MS);
+  };
+
+  useEffect(() => () => clearTimeout(popOutTimer.current), []);
+
+  const closeCash = () => {
+    const pop = tilePopupRef.current;
+    if (!pop || pop.closing) return;
+    const at = centerOf('[class*="bareBody"]') || pop.from;
+    closePopup();
+    if (pop.type === "cash") wallet?.award("cash", pop.value, at);
+  };
+
+  useEffect(() => {
+    if (tilePopup?.type !== "cash") return undefined;
+    const t = setTimeout(closeCash, CASH_SHOW_MS);
+    return () => clearTimeout(t);
+  }, [tilePopup]);
+
+  const energyRef = useRef(energy);
+  energyRef.current = energy;
+  const coinFillRef = useRef(coinFill);
+  coinFillRef.current = coinFill;
+  const bankBusy = useRef(false);
+  const bankRaf = useRef(0);
+  const bankTimers = useRef([]);
+  const [bankFocus, setBankFocus] = useState(false);
+  const [safeFill, setSafeFill] = useState(null);
+  const [coinLive, setCoinLive] = useState(false);
+  const [coinDrop, setCoinDrop] = useState(false);
+
+  const restartBoard = () => {
+    purpleFound.current = 0;
+    restartPending.current = false;
+    setLit(null);
+    setDestroyed(new Set());
+    setMarks({});
+    setBoardSeed((n) => n + 1);
+  };
+
+  const runBank = () => {
+    const inner = stageRef.current;
+    const at = inner ? flyTarget(inner, coinRef.current) : null;
+    const total = energyRef.current;
+    let left = total;
+    let coin = coinFillRef.current;
+
+    const done = () => {
+      setEnergy(0);
+      setSafes(0);
+      setSafeFill(null);
+      setCoinLive(false);
+      setCoinDrop(false);
+      bankTimers.current.push(
+        setTimeout(() => {
+          setBankFocus(false);
+          bankBusy.current = false;
+          if (restartPending.current) restartBoard();
+        }, 900)
+      );
+    };
+
+    const pour = () => {
+      const need = (1 - coin) * COIN_UNITS;
+      const take = Math.min(need, left);
+      if (take <= 0.001) {
+        done();
+        return;
+      }
+      const fromCoin = coin;
+      const fromLeft = left;
+      const dur = Math.max(BANK_MIN_MS, (take / COIN_UNITS) * BANK_COIN_MS);
+      const t0 = performance.now();
+      const step = () => {
+        const k = Math.min(1, (performance.now() - t0) / dur);
+        const moved = take * k;
+        setEnergy(Math.max(0, Math.round(fromLeft - moved)));
+        setSafeFill(total > 0 ? (SAFE_GOAL * (fromLeft - moved)) / total : 0);
+        setCoinFill(Math.min(1, fromCoin + moved / COIN_UNITS));
+        if (k < 1) {
+          bankRaf.current = requestAnimationFrame(step);
+          return;
+        }
+        left = fromLeft - take;
+        coin = fromCoin + take / COIN_UNITS;
+        if (coin < 0.999) {
+          done();
+          return;
+        }
+        setCoinFullKey((x) => x + 1);
+        wallet?.award("coins", COIN_FULL_PAY, at);
+        bankTimers.current.push(
+          setTimeout(() => {
+            coin = 0;
+            setCoinDrop(true);
+            setCoinFill(0);
+          }, BANK_FLASH_MS / 2)
+        );
+        bankTimers.current.push(setTimeout(() => setCoinDrop(false), BANK_FLASH_MS / 2 + BANK_DROP_MS));
+        bankTimers.current.push(setTimeout(pour, BANK_FLASH_MS));
+      };
+      bankRaf.current = requestAnimationFrame(step);
+    };
+
+    setCoinLive(true);
+    pour();
+  };
+
+  useEffect(() => {
+    if (safes < SAFE_GOAL || bankBusy.current) return undefined;
+    bankBusy.current = true;
+    safeSum.current = 0;
+    setLit(null);
+    setBankFocus(true);
+    bankTimers.current.push(setTimeout(runBank, BANK_HOLD_MS));
+    return undefined;
+  }, [safes]);
+
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(bankRaf.current);
+      bankTimers.current.forEach(clearTimeout);
+    },
+    []
+  );
+
+  useEffect(() => {
+    window.parkSafe = () => setSafes((s) => Math.min(SAFE_GOAL, s + 1));
+    window.parkCoin = (v) => setCoinFill((f) => Math.max(0, Math.min(1, v == null ? 1 : v)));
+    window.parkEnergy = (v) => setEnergy(Math.max(0, Math.min(ENERGY_GOAL, v == null ? 100 : v)));
+    window.parkPurple = (n) => { purpleFound.current = n == null ? PURPLE_TOTAL - 1 : n; return purpleFound.current; };
+    window.parkEdit = (on) => setEdit((v) => (on === undefined ? !v : !!on));
+    return () => {
+      delete window.parkSafe;
+      delete window.parkCoin;
+      delete window.parkEnergy;
+      delete window.parkPurple;
+      delete window.parkEdit;
+    };
+  }, []);
 
   const triggerHook = () => {
     setHookKey((k) => k + 1);
@@ -364,10 +1218,10 @@ function GridGame() {
     hookTimer.current = setTimeout(() => setHookOn(false), 900);
   };
 
-  const flashAt = (target) => {
+  const flashAt = (target, tone) => {
     flashId.current += 1;
     const id = flashId.current;
-    setTankFlashes((list) => [...list, { id, x: target.x, y: target.y, coin: false }]);
+    setTankFlashes((list) => [...list, { id, x: target.x, y: target.y, coin: false, tone }]);
     setTimeout(() => setTankFlashes((list) => list.filter((f) => f.id !== id)), 900);
   };
 
@@ -376,13 +1230,34 @@ function GridGame() {
     setCoinFill((f) => Math.min(1, f + amount));
   };
 
+  const coinFullRef = useRef(false);
+
+  useEffect(() => {
+    if (coinFill < 1) {
+      coinFullRef.current = false;
+      return undefined;
+    }
+    if (coinFullRef.current) return undefined;
+    coinFullRef.current = true;
+    setCoinFullKey((k) => k + 1);
+    const inner = stageRef.current;
+    const at = inner ? flyTarget(inner, coinRef.current) : null;
+    const t1 = setTimeout(() => wallet?.award("coins", COIN_FULL_PAY, at), 520);
+    const t2 = setTimeout(() => setCoinFill(0), 780);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [coinFill]);
+
   const handleTileClick = (zoneKey, index, cellId, rect) => {
+    if (bankFocus) return;
+    const popFrom = rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, w: rect.width } : null;
     if (zoomZone !== zoneKey) {
       if (selectedZone !== zoneKey) {
         setSelectedZone(zoneKey);
         return;
       }
-      zoomDestroyed.current = 0;
       setZoomZone(zoneKey);
       setLit(null);
       return;
@@ -391,6 +1266,7 @@ function GridGame() {
       setLit(index);
       return;
     }
+    if (wallet && !wallet.spend("tickets", TILE_COST)) return;
     const outcome = OUTCOME_SEQ[outcomeIdx.current % OUTCOME_SEQ.length];
     outcomeIdx.current += 1;
     if (rect) {
@@ -398,27 +1274,60 @@ function GridGame() {
       const cy = rect.top + rect.height / 2;
       particlesRef.current?.burst(cx, cy, rect.width);
 
-      if (outcome === "energy") {
-        const tank = zoneKey === "tl" ? flaskTarget(0) : zoneKey === "tr" ? flaskTarget(1) : null;
-        if (tank && stageRef.current) {
-          const inner = stageRef.current.getBoundingClientRect();
+      if (stageRef.current) {
+        const inner = stageRef.current.getBoundingClientRect();
+        const shoot = (i, tone, onArrive) => {
+          const tank = flaskTarget(i);
           const tx = inner.left + (tank.x / 100) * inner.width;
           const ty = inner.top + (tank.y / 100) * inner.height;
-          particlesRef.current?.flyEnergy(cx, cy, tx, ty, () => flashAt(tank));
+          particlesRef.current?.flyEnergy(
+            cx,
+            cy,
+            tx,
+            ty,
+            () => {
+              flashAt(tank, tone === "purple" ? "purple" : undefined);
+              onArrive();
+            },
+            tone
+          );
+        };
+        const shootPurple = (i, onArrive) => shoot(i, "purple", onArrive);
+        if (outcome === "energy") {
+          shoot(0, "gold", () => setEnergy((e) => e + 1));
+          const cn = coinRef.current;
+          const cp = { x: inner.left + (cn.x / 100) * inner.width, y: inner.top + (cn.y / 100) * inner.height };
+          lossTimers.current.push(
+            setTimeout(() => particlesRef.current?.flyEnergy(cx, cy, cp.x, cp.y, () => flashCoin(0.01)), 260)
+          );
+        }
+        if (outcome === "money") {
+          shootPurple(1, () => setSafes((s) => Math.min(SAFE_GOAL, s + 1)));
         }
       }
     }
     if (outcome === "energy") {
-      zoomDestroyed.current += 1;
       if (zoneKey !== "tl" && zoneKey !== "tr") {
         triggerHook();
       }
     } else if (outcome === "money") {
-      setTilePopup({ type: "money", tile: cellId });
+      const value = 50 + Math.floor(Math.random() * 450);
+      safeSum.current += value;
+      setMarks((m) => ({ ...m, [cellId]: { kind: "money", value } }));
+      purpleFound.current += 1;
+      if (purpleFound.current >= PURPLE_TOTAL) {
+        if (bankBusy.current) restartPending.current = true;
+        else bankTimers.current.push(setTimeout(restartBoard, 900));
+      }
+    } else if (outcome === "cash") {
+      const value = CASH_NOMS[Math.floor(Math.random() * CASH_NOMS.length)];
+      setMarks((m) => ({ ...m, [cellId]: { kind: "cash", value } }));
+      setTilePopup({ type: "cash", value, from: popFrom });
     } else {
       const game = MINI_GAMES[gameIdx.current % MINI_GAMES.length];
       gameIdx.current += 1;
-      setTilePopup({ type: "game", game, tile: cellId, stage: "intro" });
+      setTilePopup({ type: "game", game, tile: cellId, stage: "play", from: popFrom });
+      setMarks((m) => ({ ...m, [cellId]: { kind: "game", game: game.id } }));
     }
     setDestroyed((prev) => {
       const next = new Set(prev);
@@ -428,44 +1337,116 @@ function GridGame() {
     setLit(null);
   };
 
-  const flyEnergyOnExit = (zoneKey, isTop, destroyedNow) => {
+  const flyLoss = (from) => {
     const inner = stageRef.current;
-    if (!inner || !particlesRef.current) return;
-    const rect = inner.getBoundingClientRect();
-    const c = fields[zoneKey];
-    const fx = rect.left + (((c.tl.x + c.tr.x + c.br.x + c.bl.x) / 4 / 100) * rect.width);
-    const fy = rect.top + (((c.tl.y + c.tr.y + c.br.y + c.bl.y) / 4 / 100) * rect.height);
-
-    const send = (target, delay, onArrive) => {
-      const tx = rect.left + (target.x / 100) * rect.width;
-      const ty = rect.top + (target.y / 100) * rect.height;
-      setTimeout(() => {
-        particlesRef.current?.flyEnergy(fx, fy, tx, ty, onArrive);
-      }, delay);
-    };
-
-    const coinArrive = () => flashCoin(destroyedNow * 0.01);
-    if (isTop) {
-      send(COINCFG, 0, coinArrive);
-    } else {
-      flask.pos.forEach((_, i) => send(flaskTarget(i), i * 160, () => flashAt(flaskTarget(i))));
-      send(COINCFG, 330, coinArrive);
-    }
+    if (!inner || !particlesRef.current || !from) return;
+    const at = (t) => flyTarget(inner, t);
+    const tank = flaskTarget(0);
+    const tp = at(tank);
+    particlesRef.current.flyEnergy(
+      from.x,
+      from.y,
+      tp.x,
+      tp.y,
+      () => {
+        flashAt(tank);
+        setEnergy((e) => e + 1);
+      },
+      "gold"
+    );
+    const cp = at(coinRef.current);
+    lossTimers.current.push(
+      setTimeout(() => particlesRef.current?.flyEnergy(from.x, from.y, cp.x, cp.y, () => flashCoin(0.01)), 260)
+    );
   };
 
+  const finishGame = (res) => {
+    const pop = tilePopupRef.current;
+    if (pop?.closing) return;
+    const at = centerOf('[class*="bareBody"]') || pop?.from;
+    closePopup();
+    if (!pop || !pop.game) return;
+    const id = pop.game.id;
+    if (JOKERS.has(id)) {
+      if (res) wallet?.award("cash", JOKER_PAY, at);
+      else flyLoss(pop.from);
+      return;
+    }
+    if (id === "wheel") wallet?.award("tickets", res, at);
+    else wallet?.award("cash", res, at);
+  };
+
+  useEffect(() => {
+    particlesRef.current?.clearFlights();
+  }, [zoomZone]);
+
+  useEffect(() => {
+    setUrlSector(zoomZone);
+  }, [zoomZone]);
+
+  useEffect(() => {
+    onCoinRing?.(coinFill);
+  }, [coinFill, onCoinRing]);
+
+  const exitRef = useRef(null);
+
+  useEffect(() => {
+    exitRef.current = exitZoom;
+  });
+
+  useEffect(() => {
+    onZoomState?.({ zoomed: !!zoomZone, busy: bankFocus, exit: () => exitRef.current?.() });
+  }, [zoomZone, bankFocus, onZoomState]);
+
+  useEffect(() => {
+    const onPop = () => {
+      const key = urlSector();
+      setZoomZone(key);
+      setSelectedZone(key);
+      setLit(null);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      setUrlSector(null);
+    };
+  }, []);
+
   const exitZoom = () => {
-    const zone = zoomZone;
-    const isTop = zone === "tl" || zone === "tr";
-    const destroyedNow = zoomDestroyed.current;
     setZoomZone(null);
     setLit(null);
-    if (zone && destroyedNow > 0) {
-      setTimeout(() => flyEnergyOnExit(zone, isTop, destroyedNow), 950);
-    }
   };
 
   const zoomStyle = (() => {
-    if (!zoomZone) return undefined;
+    if (bankFocus) {
+      const pts = [flask.pos[0], flask.pos[1], { x: coin.x, y: coin.y }];
+      const xs = pts.map((p) => p.x);
+      const ys = pts.map((p) => p.y);
+      const minX = Math.min(...xs) - 12;
+      const maxX = Math.max(...xs) + 12;
+      const minY = Math.min(...ys) - 12;
+      const maxY = Math.max(...ys) + 12;
+      const cx = (minX + maxX) / 2;
+      const cy = (minY + maxY) / 2;
+      const z = Math.max(1.05, Math.min(2, Math.max(93 / (maxX - minX), 93 / (maxY - minY), 1.95)));
+      const lim = 49 * (z - 1);
+      const clamp = (v) => Math.max(-lim, Math.min(lim, v));
+      const tx = clamp(z * (50 - cx));
+      const ty = clamp(z * (50 - cy));
+      return { transform: `translate(${tx.toFixed(2)}%, ${ty.toFixed(2)}%) scale(${z.toFixed(3)})` };
+    }
+    if (!zoomZone) {
+      if (edit) {
+        return {
+          transform:
+            view.z === 1
+              ? "none"
+              : `translate(${view.z * (50 - view.x)}%, ${view.z * (50 - view.y)}%) scale(${view.z})`,
+          transition: "none",
+        };
+      }
+      return undefined;
+    }
     const c = fields[zoomZone];
     const xs = [c.tl.x, c.tr.x, c.br.x, c.bl.x];
     const ys = [c.tl.y, c.tr.y, c.br.y, c.bl.y];
@@ -480,38 +1461,70 @@ function GridGame() {
   })();
 
   return (
-    <div className={styles.grid}>
-      {zoomZone && (
-        <button className={styles.zoomBack} onClick={exitZoom}>← Fields</button>
-      )}
+    <>
+      <div className={styles.grid}>
       <Particles ref={particlesRef} />
       {hookOn && <div key={hookKey} className={styles.screenHook} />}
-      {tilePopup?.type === "money" && (
-        <LootPopup
-          tile={tilePopup.tile}
-          onClaim={() => {
-            flashCoin(0.01);
-            setTilePopup(null);
-          }}
-          onClose={() => setTilePopup(null)}
-        />
-      )}
-      {tilePopup?.type === "game" && tilePopup.stage === "intro" && (
-        <GameIntroPopup
-          name={tilePopup.game.title}
-          tile={tilePopup.tile}
-          onStart={() => setTilePopup({ ...tilePopup, stage: "play" })}
-          onClose={() => setTilePopup(null)}
-        />
-      )}
-      {tilePopup?.type === "game" && tilePopup.stage === "play" && (
-        <GamePopup title={tilePopup.game.title} onClose={() => setTilePopup(null)}>
-          <tilePopup.game.Comp />
+      {tilePopup?.type === "cash" && (
+        <GamePopup bare from={tilePopup.from} closing={!!tilePopup.closing} onClose={closeCash}>
+          <CashWin value={tilePopup.value} />
         </GamePopup>
       )}
-      <div className={styles.gridStage} style={zoomStyle}>
+            {tilePopup?.type === "game" && tilePopup.stage === "play" && (
+        <GamePopup
+          title={tilePopup.game.title}
+          bare={tilePopup.game.bare}
+          closeBottom={tilePopup.game.id === "cards"}
+          from={tilePopup.from}
+          closing={!!tilePopup.closing}
+          onClose={closePopup}
+        >
+          <tilePopup.game.Comp onFinish={finishGame} />
+        </GamePopup>
+      )}
+      <div className={styles.parkEditBar} onPointerDown={(e) => e.stopPropagation()}>
+        {edit && (
+          <>
+          <button
+            type="button"
+            className={styles.parkEditBtn}
+            onClick={() => {
+              setEdit(false);
+              setSel(null);
+              setView({ z: 1, x: 50, y: 50 });
+            }}
+          >
+            ✎ выкл
+          </button>
+          <button type="button" onClick={() => sizeSel(1 / 1.05)} disabled={!sel}>−</button>
+          <button type="button" onClick={() => sizeSel(1.05)} disabled={!sel}>+</button>
+          {[
+            ["field", "плитки"],
+            ["cover", "затемнение"],
+            ["zone", "свечение"],
+          ].map(([k, t]) => (
+            <button
+              key={k}
+              type="button"
+              className={layer === k ? styles.parkEditOn : ""}
+              onClick={() => {
+                setLayer(k);
+                setSel(null);
+              }}
+            >
+              {t}
+            </button>
+          ))}
+          <button type="button" onClick={() => setView({ z: 1, x: 50, y: 50 })}>сброс зума</button>
+          <button type="button" onClick={dumpAll}>данные</button>
+          <span className={styles.parkEditWho}>{sel ? `${sel.kind} ${sel.id}` : "ничего не выбрано"}</span>
+          </>
+        )}
+      </div>
+      <div className={styles.gridStage} style={zoomStyle} onWheel={edit ? onZoomWheel : undefined}>
         <div className={`${styles.gridInner} ${styles.rasterPinOn}`} ref={stageRef}>
-          <img className={styles.gridBg} src={`${ASSET}/Bg_Over/Down_Bg.png`} alt="Castle fields" draggable={false} />
+          <img className={styles.gridBg} src={`${ASSET}/Down_Bg_3.webp`} alt="Castle fields" draggable={false} />
+          <ParkDecor storeKey={DECO_DOWN_KEY} defaults={DEFAULT_DECO_DOWN} />
           {flags.map((f, i) => (
             <WindFlag
               key={f.id}
@@ -521,42 +1534,72 @@ function GridGame() {
               w={f.w}
               delay={`${-(i * 0.73).toFixed(2)}s`}
               dur={`${(3.4 + (i % 4) * 0.55).toFixed(2)}s`}
+              className={`${edit ? styles.editable : ""} ${
+                sel && sel.kind === "flag" && sel.id === f.id ? styles.picked : ""
+              }`}
+              onPointerDown={edit ? editStart("flag", f.id) : undefined}
+              onPointerMove={edit ? editMove : undefined}
+              onPointerUp={edit ? editEnd : undefined}
             />
           ))}
-          {flask.pos.map((p, i) => (
-            <Flask key={i} x={p.x} y={p.y} w={flask.w} fill={Math.min(1, destroyed.size / ENERGY_GOAL)} />
-          ))}
-          <CoinFlash
-            fill={coinFill}
-            pulseKey={coinPulse}
-            style={{ left: `${COINCFG.x}%`, top: `${COINCFG.y}%`, width: `${COINCFG.w}%` }}
+          <ParkFlask
+            x={flask.pos[0].x}
+            y={flask.pos[0].y}
+            w={flask.w}
+            tone="Yellow"
+            icon="Icn_Energy_Yellow.png"
+            fill={Math.min(1, energy / ENERGY_GOAL)}
+            label={energy}
+            chipDy={-6.7}
+            edit={edit}
+            picked={sel && sel.kind === "flask" && sel.id === 0}
+            onGrab={editStart("flask", 0)}
+            onMove={editMove}
+            onDrop={editEnd}
           />
-          {!zoomZone && (
-            <HumanSprite
-              className={styles.uparkWheel}
-              animate
-              from={HUMAN.from}
-              to={HUMAN.to}
-              fps={HUMAN.fps}
-              style={{
-                left: `${HUMAN.x}%`,
-                top: `${HUMAN.y}%`,
-                width: `${HUMAN.w}%`,
-                transform: "translate(-50%, -100%)",
-              }}
-            />
-          )}
+          <ParkFlask
+            x={flask.pos[1].x}
+            y={flask.pos[1].y}
+            w={flask.w}
+            tone="Purple"
+            icon="Icn_Energy_Purple.png"
+            fill={(safeFill ?? safes) / SAFE_GOAL}
+            steps={SAFE_GOAL}
+            label={`${Math.round(safeFill ?? safes)}/${SAFE_GOAL}`}
+            edit={edit}
+            picked={sel && sel.kind === "flask" && sel.id === 1}
+            onGrab={editStart("flask", 1)}
+            onMove={editMove}
+            onDrop={editEnd}
+          />
+          <CoinFlash
+            className={`${edit ? styles.editable : ""} ${
+              sel && sel.kind === "coin" ? styles.picked : ""
+            }`}
+            fill={coinFill}
+            live={coinLive}
+            drop={coinDrop}
+            pulseKey={coinPulse}
+            fullKey={coinFullKey}
+            style={{ left: `${coin.x}%`, top: `${coin.y}%`, width: `${coin.w}%` }}
+            onPointerDown={edit ? editStart("coin", 0) : undefined}
+            onPointerMove={edit ? editMove : undefined}
+            onPointerUp={edit ? editEnd : undefined}
+          />
           {tankFlashes.map((f) => (
             <span
               key={f.id}
-              className={f.coin ? styles.coinFlash : styles.tankFlash}
+              className={`${f.coin ? styles.coinFlash : styles.tankFlash} ${
+                f.tone === "purple" ? styles.tankFlashPurple : ""
+              }`}
               style={{ left: `${f.x}%`, top: `${f.y}%` }}
             />
           ))}
           {FIELDS.map((f) => {
             const active = zoomZone === f.key;
             const highlighted = !zoomZone && selectedZone === f.key;
-            const interactive = !zoomZone || active;
+            const taken = TAKEN_FIELDS.has(f.key);
+            const interactive = (!zoomZone || active) && !taken;
             return (
               <TileField
                 key={f.key}
@@ -565,15 +1608,17 @@ function GridGame() {
                 coverCorners={covers[f.key]}
                 cols={f.cols}
                 rows={f.rows}
-                seed={f.seed}
+                seed={f.seed + boardSeed * 11}
                 offset={f.offset}
                 gapX={0}
                 gapY={0}
                 scaleX={1 - gaps[f.key].w * 0.02}
                 scaleY={1 - gaps[f.key].d * 0.06}
                 destroyed={destroyed}
+                marks={marks}
                 selected={active}
-                showGlow={highlighted}
+                taken={taken}
+                showGlow={edit ? layer === "zone" && sel && sel.kind === "quad" && sel.id === f.key : highlighted}
                 litTile={active ? lit : null}
                 coverSrc={`${ASSET}/${COVER[f.key]}`}
                 onTileClick={
@@ -582,36 +1627,143 @@ function GridGame() {
               />
             );
           })}
-          {decor.map((d) =>
-            d.type === "balloon" ? (
-              <Balloons
-                key={d.id}
-                scale={0.42}
-                style={{ left: `${d.x}%`, top: `${d.y}%`, pointerEvents: "none" }}
-              />
+          {edit &&
+            FIELDS.map((f) => {
+              const q = LAYERS[layer].get()[f.key];
+              if (!q) return null;
+              const poly = `polygon(${q.tl.x}% ${q.tl.y}%, ${q.tr.x}% ${q.tr.y}%, ${q.br.x}% ${q.br.y}%, ${q.bl.x}% ${q.bl.y}%)`;
+              const on = sel && sel.kind === "quad" && sel.id === f.key;
+              return (
+                <span
+                  key={`pick-${f.key}`}
+                  className={`${styles.quadPick} ${on ? styles.quadPickOn : ""}`}
+                  style={{ clipPath: poly, WebkitClipPath: poly }}
+                  onPointerDown={editStart("quad", f.key)}
+                  onPointerMove={editMove}
+                  onPointerUp={editEnd}
+                  onPointerCancel={editEnd}
+                />
+              );
+            })}
+          {edit &&
+            sel &&
+            sel.kind === "quad" &&
+            LAYERS[layer].get()[sel.id] &&
+            ["tl", "tr", "br", "bl"].map((k) => {
+              const p = LAYERS[layer].get()[sel.id][k];
+              return (
+                <span
+                  key={`h-${k}`}
+                  className={styles.quadHandle}
+                  style={{ left: `${p.x}%`, top: `${p.y}%` }}
+                  onPointerDown={editStart("corner", sel.id, k)}
+                  onPointerMove={editMove}
+                  onPointerUp={editEnd}
+                  onPointerCancel={editEnd}
+                />
+              );
+            })}
+          {decor.map((d) => {
+            const st = {
+              left: `${d.x}%`,
+              top: `${d.y}%`,
+              pointerEvents: edit ? "auto" : "none",
+              cursor: edit ? "move" : undefined,
+              outline: edit && sel && sel.kind === "decor" && sel.id === d.id ? "1px dashed #ffd24e" : undefined,
+            };
+            const grab = edit
+              ? {
+                  onPointerDown: editStart("decor", d.id),
+                  onPointerMove: editMove,
+                  onPointerUp: editEnd,
+                  onPointerCancel: editEnd,
+                }
+              : null;
+            return d.type === "balloon" ? (
+              <Balloons key={d.id} scale={0.42 * (d.s || 1)} style={st} {...grab} />
             ) : (
-              <Flag
-                key={d.id}
-                scale={0.6}
-                rot={d.rot}
-                flip={d.flip}
-                style={{ left: `${d.x}%`, top: `${d.y}%`, pointerEvents: "none" }}
-              />
-            )
-          )}
+              <Flag key={d.id} scale={0.6 * (d.s || 1)} rot={d.rot} flip={d.flip} style={st} {...grab} />
+            );
+          })}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
-export function GamePopup({ title, onClose, children }) {
+export function GamePopup({ title, onClose, bare = false, closeBottom = false, from, closing = false, children }) {
+  const boxRef = useRef(null);
+  const fitRef = useRef(null);
+  const [popFit, setPopFit] = useState(1);
+  const [popReady, setPopReady] = useState(false);
+  usePopFrom(boxRef, from, (!bare || popReady) && !closing);
+  usePopTo(boxRef, from, closing);
+
+  useLayoutEffect(() => {
+    if (!bare || closing) return undefined;
+    const el = fitRef.current;
+    const ov = el && el.parentElement;
+    if (!el || !ov) return undefined;
+    const frames = [];
+    let lastFit = -1;
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      setPopReady(true);
+    };
+    const apply = () => {
+      const cs = getComputedStyle(ov);
+      const avail = ov.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
+      const need = el.offsetHeight;
+      const next = need > 0 ? Math.min(1, avail / need) : 1;
+      setPopFit(next);
+      if (need > 0 && Math.abs(next - lastFit) < 0.002) reveal();
+      lastFit = next;
+    };
+    apply();
+    const step = (n) => {
+      apply();
+      if (n > 0) frames.push(requestAnimationFrame(() => step(n - 1)));
+      else reveal();
+    };
+    frames.push(requestAnimationFrame(() => step(6)));
+    const guard = setTimeout(reveal, 500);
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    ro.observe(ov);
+    return () => {
+      clearTimeout(guard);
+      frames.forEach(cancelAnimationFrame);
+      ro.disconnect();
+    };
+  }, [bare, closing]);
+
+  if (bare) {
+    return (
+      <div className={`${styles.popupOverlay} ${styles.popupBare} ${closing ? styles.popupFade : ""}`}>
+        <div
+          ref={fitRef}
+          className={styles.bareFit}
+          style={{
+            transform: popFit < 1 ? `scale(${popFit.toFixed(3)})` : undefined,
+            visibility: popReady ? undefined : "hidden",
+          }}
+        >
+          <div ref={boxRef} className={styles.bareBody} onClick={(e) => e.stopPropagation()}>
+            {children}
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className={styles.popupOverlay} onClick={onClose}>
-      <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+      <div ref={boxRef} className={styles.popup} onClick={(e) => e.stopPropagation()}>
         <div className={styles.popupHead}>
           <h3>{title}</h3>
-          <button className={styles.popupClose} onClick={onClose}>✕</button>
+
         </div>
         <div className={styles.popupBody}>{children}</div>
       </div>
@@ -619,29 +1771,30 @@ export function GamePopup({ title, onClose, children }) {
   );
 }
 
-const UPARK_KEY = "bonuspark.upark3";
+const UPARK_KEY = "bonuspark.upark6";
 const DEFAULT_UPARK = {
-  wheel: { x: 6.6, y: 38.5, w: 30.5 },
-  bush: { x: -2, y: 51.5, w: 24 },
-  carousel: { x: 71, y: 43.9, w: 34 },
-  crP: { x: 48.3, y: 37.2, w: 7.5 },
-  crR: { x: 48.05, y: 42.71, w: 8 },
-  crY: { x: 47.8, y: 48.45, w: 8.5 },
-  crB: { x: 47.8, y: 54.7, w: 8.5 },
+  wheel: { x: 6.2, y: 40.61, w: 28.64 },
+  plat: { x: 7.23, y: 45.4, w: 20.91 },
+  bush: { x: -4.44, y: 52.73, w: 24.72 },
+  carousel: { x: 71.65, y: 44.42, w: 35.02 },
+  crP: { x: 47.26, y: 37.43, w: 8.414 },
+  crR: { x: 47.26, y: 43.7, w: 8.414 },
+  crY: { x: 47.26, y: 49.97, w: 8.414 },
+  crB: { x: 47.26, y: 56.24, w: 8.414 },
   coin: { x: 46.4, y: 79.5, w: 10 },
-  flask1: { x: 25.8, y: 86.7, w: 5.5 },
-  flask2: { x: 77.5, y: 86.6, w: 5.5 },
-  star1: { x: 59.95, y: 55.69, w: 7.5 },
-  star2: { x: 64.81, y: 53.75, w: 7.5 },
-  star3: { x: 62.45, y: 54.75, w: 7.5 },
-  star4: { x: 36.45, y: 55.98, w: 7.5 },
-  star5: { x: 33.25, y: 54.84, w: 7.5 },
-  star6: { x: 29.81, y: 53.37, w: 7.5 },
-  uf1: { x: 29.46, y: 71.78, w: 3.4 },
-  uf2: { x: 38.42, y: 69.37, w: 3.4 },
-  ufc: { x: 53.12, y: 68.7, w: 4 },
-  uf3: { x: 67.12, y: 69.61, w: 2.9 },
-  uf4: { x: 77.84, y: 70.78, w: 3.4 },
+  flask1: { x: 24.1, y: 89.31, w: 5.67 },
+  flask2: { x: 78.1, y: 89.11, w: 5.67 },
+  star1: { x: 60.12, y: 56.89, w: 7.5 },
+  star2: { x: 63.26, y: 55.66, w: 7.5 },
+  star3: { x: 65.15, y: 54.86, w: 7.5 },
+  star4: { x: 35.28, y: 57.1, w: 7.5 },
+  star5: { x: 31.68, y: 55.7, w: 7.5 },
+  star6: { x: 28.38, y: 54.82, w: 7.5 },
+  uf1: { x: 27.8, y: 73.6, w: 3.4 },
+  uf2: { x: 37.25, y: 71.13, w: 3.4 },
+  ufc: { x: 52.71, y: 70.54, w: 4 },
+  uf3: { x: 66.98, y: 71.47, w: 2.9 },
+  uf4: { x: 78.29, y: 72.76, w: 3.4 },
 };
 
 const UPARK_FLAGS = {
@@ -773,25 +1926,33 @@ const CRYSTAL_CFG = {
     off: "crystal/crystal_Purple_off.png",
     on: "crystal/crystal_Purple_on.png",
     ray: "crystal/rays crystal_Purple.png",
-    onBox: { left: -44.79, top: -43.75, w: 197.92, h: 143.75 },
+    onBox: { left: -43.86, top: -42.84, w: 193.82, h: 140.77 },
+    hue: 118,
+    burst: ["255, 246, 255", "226, 170, 255", "168, 78, 255", "110, 30, 220"],
   },
   crR: {
     off: "crystal/crystal_Red_off.png",
     on: "crystal/crystal_Red_on.png",
     ray: "crystal/rays crystal_Red.png",
-    onBox: { left: -52.08, top: -44.06, w: 204.17, h: 144.06 },
+    onBox: { left: -51, top: -43.15, w: 199.94, h: 141.08 },
+    hue: 188,
+    burst: ["255, 244, 238", "255, 168, 138", "255, 78, 44", "205, 30, 10"],
   },
   crY: {
     off: "crystal/crystal_Yellow_off.png",
     on: "crystal/crystal_Yellow_on.png",
     ray: "crystal/rays_crystal_Yellow.png",
-    onBox: { left: -72.04, top: -52.45, w: 250.54, h: 152.45 },
+    onBox: { left: -70.55, top: -51.36, w: 245.35, h: 149.29 },
+    hue: 258,
+    burst: ["255, 253, 226", "255, 236, 140", "255, 208, 62", "225, 150, 20"],
   },
   crB: {
     off: "crystal/crystal_Blue_off.png",
     on: "crystal/crystal_Blue_on.png",
     ray: "crystal/rays crystal_Blue.png",
-    onBox: { left: -55.91, top: -47.18, w: 202.15, h: 148.59 },
+    onBox: { left: -54.75, top: -46.2, w: 197.97, h: 145.51 },
+    hue: 0,
+    burst: ["236, 252, 255", "150, 226, 255", "48, 168, 255", "20, 96, 220"],
   },
 };
 
@@ -799,8 +1960,28 @@ const STAR_KEYS = ["star1", "star2", "star3", "star4", "star5", "star6"];
 const STAR_MIRROR = new Set(["star4", "star5", "star6"]);
 
 function CrystalSpot({ x, y, w, cfg, on }) {
+  const [flash, setFlash] = useState(0);
+  const prev = useRef(on);
+
+  useEffect(() => {
+    if (on && !prev.current) setFlash((n) => n + 1);
+    prev.current = on;
+  }, [on]);
+
   return (
     <div style={{ position: "absolute", left: `${x}%`, top: `${y}%`, width: `${w}%`, zIndex: 2, pointerEvents: "none" }}>
+      {flash > 0 && (
+        <span
+          key={flash}
+          className={styles.crystalBurst}
+          style={{
+            "--b0": cfg.burst?.[0] || "255, 253, 226",
+            "--b1": cfg.burst?.[1] || "255, 236, 140",
+            "--b2": cfg.burst?.[2] || "255, 208, 62",
+            "--b3": cfg.burst?.[3] || "225, 150, 20",
+          }}
+        />
+      )}
       <img className={styles.groundShadow} src={`${ASSET}/${cfg.off}`} alt="" draggable={false} />
       <img src={`${ASSET}/${cfg.off}`} alt="" draggable={false} style={{ width: "100%", display: "block" }} />
       <div className={styles.crystalOnWrap} style={{ opacity: on ? 1 : 0 }}>
@@ -845,6 +2026,8 @@ function StarSpot({ x, y, w, on, mirror, z }) {
   );
 }
 
+const CRYSTAL_KEYS = ["crP", "crR", "crY", "crB"];
+
 function loadUpark() {
   try {
     const raw = localStorage.getItem(UPARK_KEY);
@@ -855,21 +2038,517 @@ function loadUpark() {
   return DEFAULT_UPARK;
 }
 
-function UpperPark() {
+const SCENE_AR = 0.63981;
+
+export function UpperPark() {
+  const wallet = useWallet();
+  useEffect(() => {
+    const ph = document.querySelector("[class*='phone']");
+    if (!ph) return undefined;
+    ph.dataset.framed = "1";
+    document.body.dataset.frame = "1";
+    return () => {
+      delete ph.dataset.framed;
+      delete document.body.dataset.frame;
+    };
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const sc = document.querySelector("[class*='uparkScene']");
+      const cell = document.querySelector("[class*='cell_']");
+      const ph = document.querySelector("[class*='phone']");
+      if (!sc || !cell || !ph) return;
+      const r = sc.getBoundingClientRect();
+      const cs = getComputedStyle(ph);
+      const clip = getComputedStyle(cell).clipPath;
+      console.log(
+        "[park diag] vp=" + window.innerWidth + "x" + window.innerHeight +
+        " dpr=" + window.devicePixelRatio +
+        " scene=" + Math.round(r.width) + "x" + Math.round(r.height) +
+        " ratio=" + (r.width / r.height).toFixed(3) +
+        " clip=" + (clip || "none")
+      );
+    }, 1200);
+    return () => clearTimeout(t);
+  }, []);
+
   const [graph] = useState(loadGraph9);
-  const [upark] = useState(loadUpark);
+  const [upark, setUpark] = useState(loadUpark);
+  const [editC, setEditC] = useState(false);
+  const [decoOn, setDecoOn] = useState(false);
+
+  useEffect(() => {
+    const onDeco = (e) => {
+      setDecoOn(!!e.detail);
+      if (!e.detail) {
+        setZoom(1);
+        setZorg({ x: 50, y: 50 });
+      }
+    };
+    window.addEventListener(DECO_EDIT_EVENT, onDeco);
+    return () => window.removeEventListener(DECO_EDIT_EVENT, onDeco);
+  }, []);
+  const [zoom, setZoom] = useState(1);
+  const [zorg, setZorg] = useState({ x: 50, y: 50 });
+  const dragC = useRef(null);
+  const [selC, setSelC] = useState(null);
+
+  const sizeCrystal = (f) => {
+    const k = selC;
+    if (!k) return;
+    setUpark((prev) => {
+      const b = prev[k];
+      const nw = +(b.w * f).toFixed(2);
+      const nh = (b.w - nw) * 0.5;
+      const next = { ...prev, [k]: { ...b, w: nw, x: +(b.x + (b.w - nw) / 2).toFixed(2), y: +(b.y + nh * 0.62).toFixed(2) } };
+      try { localStorage.setItem(UPARK_KEY, JSON.stringify(next)); } catch (err) { return next; }
+      return next;
+    });
+  };
+
+  const moveCrystal = (k, dx, dy) =>
+    setUpark((prev) => {
+      const b = prev[k];
+      const next = { ...prev, [k]: { ...b, x: +(b.x + dx).toFixed(2), y: +(b.y + dy).toFixed(2) } };
+      try { localStorage.setItem(UPARK_KEY, JSON.stringify(next)); } catch (err) { return next; }
+      return next;
+    });
+
+  const crDown = (e, k) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const host = e.currentTarget.parentElement.getBoundingClientRect();
+    let lx = e.clientX;
+    let ly = e.clientY;
+    const move = (ev) => {
+      ev.preventDefault();
+      const dx = ((ev.clientX - lx) / host.width) * 100;
+      const dy = ((ev.clientY - ly) / host.height) * 100;
+      lx = ev.clientX;
+      ly = ev.clientY;
+      moveCrystal(k, dx, dy);
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+      dragC.current = null;
+    };
+    dragC.current = { k };
+    setSelC(k);
+    window.addEventListener("pointermove", move, { passive: false });
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+  };
+
+  const zoomWheel = (e) => {
+    if (!editC && !decoOn) return;
+    const host = e.currentTarget.getBoundingClientRect();
+    const px = +(((e.clientX - host.left) / host.width) * 100).toFixed(1);
+    const py = +(((e.clientY - host.top) / host.height) * 100).toFixed(1);
+    setZoom((z) => {
+      const next = Math.max(1, Math.min(6, +(z * (e.deltaY < 0 ? 1.14 : 1 / 1.14)).toFixed(3)));
+      if (z === 1 && next > 1) setZorg({ x: px, y: py });
+      if (next === 1) setZorg({ x: 50, y: 50 });
+      return next;
+    });
+  };
   const [tilePhoto] = useState(loadTilePhoto);
-  const [lit] = useState({});
+  const [keysGot, setKeysGot] = useState(0);
+  const ridesPending = useRef(false);
+  const [rides, setRides] = useState({ carousel: false, wheel: false });
+  const rideTimers = useRef([]);
+  const trainRef = useRef(null);
+  const prizeIdx = useRef(0);
+  const wheelIdx = useRef(0);
+  const carDone = useRef(null);
+  const wheelDone = useRef(null);
+  const [carStop, setCarStop] = useState(null);
+  const [wheelStop, setWheelStop] = useState(null);
+  const [carouselWin, setCarouselWin] = useState(null);
+  const [salute, setSalute] = useState(null);
+
+  const givePrize = (forced) => {
+    const fixed = typeof forced === "number" ? forced : null;
+    const prize = fixed ?? CAR_PRIZE_SEQ[prizeIdx.current % CAR_PRIZE_SEQ.length];
+    if (fixed == null) prizeIdx.current += 1;
+    const cars = CAR_CARS[prize];
+    console.log(`[train] карусель: приз ${prize} → +${cars} вагона`);
+    setCarouselWin({ v: prize, key: Date.now() });
+    rideTimers.current.push(
+      setTimeout(() => wallet?.award("coins", prize, centerOf('[class*="carouselWinNum"]')), 700)
+    );
+    rideTimers.current.push(setTimeout(() => setCarouselWin(null), 2300));
+    if (cars > 0) trainRef.current?.addCars(cars);
+  };
+
+  const runCarousel = () => {
+    const prize = CAR_PRIZE_SEQ[prizeIdx.current % CAR_PRIZE_SEQ.length];
+    prizeIdx.current += 1;
+    setCarStop(pickStop(CAR_STOP_AT[prize]));
+    console.log(`[park] карусель крутится → приз ${prize}`);
+    setRides({ carousel: true, wheel: false });
+    for (let i = 0; i < CRYSTAL_ORDER.length; i += 1) {
+      rideTimers.current.push(
+        setTimeout(() => setKeysGot((n) => Math.max(0, Math.min(n, CRYSTAL_ORDER.length - 1 - i))), 700 + i * 650)
+      );
+    }
+    rideTimers.current.push(
+      setTimeout(() => {
+        carDone.current = () => {
+          carDone.current = null;
+          rideTimers.current.push(setTimeout(() => givePrize(prize), 500));
+        };
+        setRides((r) => ({ ...r, carousel: false }));
+      }, RIDE_RUN_MS)
+    );
+  };
+
+  const onTrainDeparted = () => {
+    const prize = WHEEL_PRIZE_SEQ[wheelIdx.current % WHEEL_PRIZE_SEQ.length];
+    wheelIdx.current += 1;
+    setWheelStop(WHEEL_STOP_AT[prize]);
+    console.log(`[wheel] поезд уехал → колесо крутится → приз ${prize}`);
+    setRides((r) => ({ ...r, wheel: true }));
+    rideTimers.current.push(
+      setTimeout(() => {
+        wheelDone.current = () => {
+          wheelDone.current = null;
+          rideTimers.current.push(
+            setTimeout(() => {
+              console.log(`[wheel] приз ${prize}`);
+              setSalute(prize);
+              rideTimers.current.push(
+                setTimeout(() => wallet?.award("coins", prize, centerOf('[class*="saluteCoin"]')), 1500)
+              );
+              rideTimers.current.push(setTimeout(() => setSalute(null), 6200));
+            }, 500)
+          );
+        };
+        setRides((r) => ({ ...r, wheel: false }));
+      }, RIDE_RUN_MS)
+    );
+  };
+
+  useEffect(() => () => rideTimers.current.forEach(clearTimeout), []);
+
+  useEffect(() => {
+    window.parkSalute = (v) => {
+      setSalute(v == null ? 25 : v);
+      return "ok";
+    };
+    return () => {
+      delete window.parkSalute;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ridesPending.current) return;
+    ridesPending.current = false;
+    startRides();
+  }, [keysGot]);
+
+  const startRides = () => {
+    rideTimers.current.forEach(clearTimeout);
+    console.log("[park] 4 кристалла: карусель 3 оборота, затем колесо 3 оборота");
+    rideTimers.current = [setTimeout(runCarousel, 800)];
+  };
+  const lit = Object.fromEntries(CRYSTAL_ORDER.slice(0, keysGot).map((k) => [k, true]));
+  const [glowOn, setGlowOn] = useState(loadGlow);
+  const [ui, setUi] = useState(() => ({ ...DEFAULT_UI, ...loadJson(UI_KEY, {}) }));
+  const [path, setPath] = useState(() => loadJson(PATH_KEY, DEFAULT_PATH));
+  const [mode, setMode] = useState("off");
+
+  useEffect(() => {
+    const apply = (e) => setGlowOn(!!e.detail);
+    window.addEventListener(GLOW_EVENT, apply);
+    window.bonusParkGlow = setBonusParkGlow;
+    return () => {
+      window.removeEventListener(GLOW_EVENT, apply);
+      delete window.bonusParkGlow;
+    };
+  }, []);
+
+  useEffect(() => {
+    window.dumpPark = () => {
+      console.log(JSON.stringify({ ui, upark, path }, null, 2));
+      return "ok";
+    };
+    window.parkEdit = (m) => {
+      setMode(m === "move" || m === "path" ? m : "off");
+      return m || "off";
+    };
+    window.parkPathReset = () => {
+      setPath(DEFAULT_PATH);
+      saveJson(PATH_KEY, DEFAULT_PATH);
+      return "ok";
+    };
+    return () => {
+      delete window.dumpPark;
+      delete window.parkEdit;
+      delete window.parkPathReset;
+    };
+  }, [ui, upark, path]);
+
+  const setBox = (key) => (updater) =>
+    setUi((prev) => {
+      const next = { ...prev, [key]: updater(prev[key]) };
+      saveJson(UI_KEY, next);
+      return next;
+    });
+
+  const setPathPts = (updater) =>
+    setPath((prev) => {
+      const next = updater(prev);
+      saveJson(PATH_KEY, next);
+      return next;
+    });
+
+
+  const moving = mode === "move";
+  const pathing = mode === "path";
+
+  const demoRef = useRef(true);
+  const demoStep = useRef(0);
+
+  useEffect(() => {
+    window.slotDemo = (on = true) => {
+      demoRef.current = !!on;
+      demoStep.current = 0;
+      return on ? "демо: комбинации по очереди" : "рандом";
+    };
+    return () => {
+      delete window.slotDemo;
+    };
+  }, []);
+
+  const [spinKey, setSpinKey] = useState(0);
+  const [stopKey, setStopKey] = useState(0);
+  const winNumCache = useRef([]);
+  const [winPay, setWinPay] = useState(null);
+
+  useEffect(() => {
+    const keep = [];
+    ["+", 1, 2, 3, 5, 10, 15, 25, 50, 100, 200, 500].forEach((v) => {
+      const img = new Image();
+      img.src = `${ASSET}/Win_Num_T/Win_Number_${v}.png`;
+      img.decode?.().catch(() => {});
+      keep.push(img);
+    });
+    winNumCache.current = keep;
+  }, []);
+  const [reel, setReel] = useState(["ice", "crown", "ice"]);
+  const [shineCols, setShineCols] = useState([false, false, false]);
+  const [spinning, setSpinning] = useState(false);
+  const [spinLock, setSpinLock] = useState(false);
+  const [landed, setLanded] = useState(true);
+  const [winStage, setWinStage] = useState(0);
+  const [flash, setFlash] = useState(0);
+  const winTimers = useRef([]);
+
+  useEffect(() => () => winTimers.current.forEach(clearTimeout), []);
+
+  const rollLose = () => {
+    for (let i = 0; i < 40; i += 1) {
+      const r = [rnd(PLAIN), rnd(PLAIN), rnd(PLAIN)];
+      if (!(r[0] === r[1] && r[1] === r[2])) return r;
+    }
+    return ["ice", "hat", "ring"];
+  };
+
+  const forcedRef = useRef(null);
+
+  const rollResult = () => {
+    if (forcedRef.current) {
+      const r = forcedRef.current;
+      forcedRef.current = null;
+      console.log("[slot]", ru(r), payFor(r) > 0 ? `→ выигрыш ${payFor(r)}` : "→ проигрыш");
+      return r;
+    }
+    if (demoRef.current) {
+      const item = DEMO_SEQ[demoStep.current % DEMO_SEQ.length];
+      demoStep.current += 1;
+      if (Array.isArray(item)) {
+        const r = item.slice();
+        console.log("[slot demo]", ru(r), payFor(r) > 0 ? `→ выигрыш ${payFor(r)}` : "→ проигрыш");
+        return r;
+      }
+      if (item === "lose") {
+        const r = rollLose();
+        console.log("[slot demo]", ru(r), "→ проигрыш");
+        return r;
+      }
+      const combo = COMBOS[item];
+      const r = combo.build();
+      console.log("[slot demo]", ru(r), combo.screen ? "→ кристалл, зажигание парка" : `→ выигрыш ${combo.pay}`);
+      return r;
+    }
+    if (Math.random() < WIN_CHANCE) {
+      const combo = COMBOS[Math.floor(Math.random() * COMBOS.length)];
+      const r = combo.build();
+      console.log("[slot]", ru(r), combo.screen ? "→ кристалл, зажигание парка" : `→ выигрыш ${combo.pay}`);
+      return r;
+    }
+    const r = rollLose();
+    console.log("[slot]", ru(r), "→ проигрыш");
+    return r;
+  };
+
+  const [auto, setAuto] = useState(false);
+
+  const doSpin = () => {
+    if (spinning) {
+      setStopKey((k) => k + 1);
+      return;
+    }
+    if (wallet && !wallet.spend("coins", SPIN_COST)) return;
+    winTimers.current.forEach(clearTimeout);
+    winTimers.current = [];
+    setWinStage(0);
+    setWinPay(null);
+    setLanded(false);
+    setSpinning(true);
+    setReel(rollResult());
+    setSpinKey((k) => k + 1);
+  };
+
+  const reelRef = useRef(reel);
+  reelRef.current = reel;
+
+  const onLanded = () => {
+    setSpinning(false);
+    setLanded(true);
+    const r = reelRef.current;
+    const hasCoin = r.includes(GLOW_SYMBOL);
+    const same = lineOf(r) !== null;
+    if (r.includes("crystal")) {
+      winTimers.current.push(
+        setTimeout(() => {
+          setKeysGot((n) => {
+            const next = Math.min(CRYSTAL_ORDER.length, n + 1);
+            if (n === CRYSTAL_ORDER.length - 1 && next === CRYSTAL_ORDER.length) ridesPending.current = true;
+            return next;
+          });
+        }, CRYSTAL_GLOW_MS)
+      );
+    }
+    const pay = payFor(r);
+    if (pay > 0 && WIN_NUMS.includes(pay)) {
+      winTimers.current.push(setTimeout(() => setWinPay(pay), 200));
+      winTimers.current.push(
+        setTimeout(() => wallet?.award("coins", pay, centerOf('[class*="slotWinNum"]')), 1150)
+      );
+      winTimers.current.push(setTimeout(() => setWinPay(null), 4700));
+    }
+    if (hasCoin || same || r.includes("crystal") || r.includes("hat")) {
+      setSpinLock(true);
+      setWinStage(1);
+      winTimers.current.push(setTimeout(() => setSpinLock(false), 5450));
+      winTimers.current.push(setTimeout(() => setWinStage(0), 4700));
+    }
+  };
+
+  useEffect(() => {
+    window.parkSlot = (...keys) => {
+      if (keys.length !== 3) return "нужно 3 символа";
+      forcedRef.current = keys;
+      doSpin();
+      return keys.join(" / ");
+    };
+    return () => {
+      delete window.parkSlot;
+    };
+  });
+
+  const toggleAuto = () => setAuto((v) => !v);
+
+  useEffect(() => {
+    if (!auto) return undefined;
+    if (spinning) {
+      const t = setTimeout(() => setStopKey((k) => k + 1), AUTO_STOP_MS);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => doSpin(), AUTO_HOLD_MS);
+    return () => clearTimeout(t);
+  }, [auto, spinning, spinKey]);
+
+  const isWin = lineOf(reel) !== null;
+  const fxOn = winStage >= 1;
+  const sparksOn = pathing || (fxOn && isWin);
+  const glowCols = [0, 1, 2].map((c) => glowOn && shineCols[c] && reel[c] === GLOW_SYMBOL);
+  const winCols = [0, 1, 2].map(
+    (c) => fxOn && (isWin || reel[c] === "coin" || reel[c] === "crystal" || reel[c] === "hat")
+  );
 
   return (
     <div className={styles.upark}>
-      <div className={styles.uparkInner}>
-        <img className={styles.uparkBg} src={`${ASSET}/Bg_Over/Up_Bg.png`} alt="Park" />
-        <FerrisSprite
+      <div
+        className={styles.uparkScene}
+        onWheel={editC || decoOn ? zoomWheel : undefined}
+        style={{
+          width: "var(--scene-w)",
+          height: "var(--scene-h)",
+          "--iel": 1,
+          top: "calc(var(--crop-top, 0px) + var(--fr-v, 0px))",
+          transform: zoom !== 1 ? `translateX(-50%) scale(${zoom})` : undefined,
+          transformOrigin: zoom !== 1 ? `${zorg.x}% ${zorg.y}%` : undefined,
+        }}
+      >
+        <img className={styles.uparkBg} src={`${ASSET}/Up_Bg_3.webp`} alt="Park" draggable={false} />
+      <div className={`${styles.uparkInner} ${styles.uparkPinOn}`}>
+        <ParkDecor storeKey={DECO_UP_KEY} defaults={DEFAULT_DECO_UP} />
+        <TrainRide ref={trainRef} onDeparted={onTrainDeparted} />
+        {winPay && (
+          <span key={`wp${winPay}-${spinKey}`} className={styles.slotWinNum}>
+            <img className={styles.slotWinPlus} src={`${ASSET}/Win_Num_T/Win_Number_+.png`} alt="" draggable={false} />
+            <span className={styles.slotWinValBox}>
+              <img className={styles.slotWinVal} src={`${ASSET}/Win_Num_T/Win_Number_${winPay}.png`} alt="" draggable={false} />
+            </span>
+          </span>
+        )}
+        {carouselWin && (
+          <img
+            key={carouselWin.key}
+            className={styles.carouselWinNum}
+            src={`${ASSET}/Win_Num_T/Win_Number_${carouselWin.v}.png`}
+            alt=""
+            draggable={false}
+            style={{
+              left: `${upark.carousel.x + upark.carousel.w * 0.36}%`,
+              top: `${upark.carousel.y - 3.2}%`,
+            }}
+          />
+        )}
+        <img
           className={styles.uparkWheel}
-          style={{ left: `${upark.wheel.x}%`, top: `${upark.wheel.y}%`, width: `${upark.wheel.w}%` }}
+          src={`${ASSET}/Wheel_video/cor_01.png`}
+          alt=""
+          draggable={false}
+          style={{ left: `${upark.plat.x}%`, top: `${upark.plat.y}%`, width: `${upark.plat.w}%`, zIndex: 1 }}
+        />
+        <FerrisSprite
+          spin={rides.wheel}
+          stopAt={wheelStop}
+          onStopped={() => wheelDone.current?.()}
+          preload={keysGot > 0}
+          period={RIDE_PERIOD.wheel}
+          className={styles.uparkWheel}
+          style={{ left: `${upark.wheel.x}%`, top: `${upark.wheel.y}%`, width: `${upark.wheel.w}%`, zIndex: 2 }}
+        />
+        <img
+          className={styles.uparkWheel}
+          src={`${ASSET}/Wheel_video/cor_02.png`}
+          alt=""
+          draggable={false}
+          style={{ left: `${upark.plat.x}%`, top: `${upark.plat.y}%`, width: `${upark.plat.w}%`, zIndex: 3 }}
         />
         <CarouselSprite
+          spin={rides.carousel}
+          stopAt={carStop}
+          onStopped={() => carDone.current?.()}
+          preload={keysGot > 0}
+          period={RIDE_PERIOD.carousel}
           className={styles.uparkWheel}
           style={{ left: `${upark.carousel.x}%`, top: `${upark.carousel.y}%`, width: `${upark.carousel.w}%` }}
         />
@@ -880,18 +2559,60 @@ function UpperPark() {
           draggable={false}
           style={{ left: `${upark.bush.x}%`, top: `${upark.bush.y}%`, width: `${upark.bush.w}%` }}
         />
-        <TilesPhoto quad={tilePhoto.a} />
-        <TilesPhoto quad={tilePhoto.b} />
-        <img
-          className={styles.uparkWheel}
-          src={`${ASSET}/Flash_Coin_Lights/Coin_Spielmen_Off.png`}
-          alt=""
-          draggable={false}
-          style={{ left: `${upark.coin.x}%`, top: `${upark.coin.y}%`, width: `${upark.coin.w}%` }}
-        />
+        <ParkBox box={ui.spin} edit={moving} onChange={setBox("spin")} z={14} label="SPIN" interactive>
+          <span
+            className={`${styles.spinBtn} ${spinning ? "" : styles.spinIdle}`}
+            onClick={moving ? undefined : doSpin}
+          >
+            <img className={styles.spinBase} src={`${ASSET}/spin_button/Btn_Spin.png`} alt="" draggable={false} />
+            <img
+              className={styles.spinLabel}
+              src={`${ASSET}/spin_button/Btn_Spin_Front.png`}
+              alt=""
+              draggable={false}
+            />
+            <span className={styles.spinClip}>
+              <img
+                className={styles.spinShine}
+                src={`${ASSET}/spin_button/Btn_Spin_Light.png`}
+                alt=""
+                draggable={false}
+              />
+              <img
+                className={styles.spinStar}
+                src={`${ASSET}/spin_button/Star_hat.png`}
+                alt=""
+                draggable={false}
+              />
+            </span>
+          </span>
+        </ParkBox>
+        <button
+          type="button"
+          className={`${styles.autoRow} ${auto ? styles.autoOn : ""}`}
+          style={{ left: `${ui.spin.x}%`, top: `${ui.spin.y + 8.21}%`, width: `${ui.spin.w}%` }}
+          onClick={toggleAuto}
+        >
+          <span className={styles.autoBox}>{auto ? "✓" : ""}</span>
+          <span className={styles.autoText}>Auto Spin</span>
+        </button>
         {Object.keys(CRYSTAL_CFG).map((k) => (
           <CrystalSpot key={k} x={upark[k].x} y={upark[k].y} w={upark[k].w} cfg={CRYSTAL_CFG[k]} on={!!lit[k]} />
         ))}
+        {editC &&
+          Object.keys(CRYSTAL_CFG).map((k) => (
+            <div
+              key={`crhit-${k}`}
+              className={styles.crHit}
+              style={{
+                left: `${upark[k].x}%`,
+                top: `${upark[k].y}%`,
+                width: `${upark[k].w}%`,
+                height: `${(upark[k].w * 0.75).toFixed(2)}%`,
+              }}
+              onPointerDown={(e) => crDown(e, k)}
+            />
+          ))}
         {STAR_KEYS.map((k) => (
           <StarSpot
             key={k}
@@ -916,34 +2637,155 @@ function UpperPark() {
             dur={`${(3.4 + (i % 4) * 0.55).toFixed(2)}s`}
           />
         ))}
-        {graph.nodes.length >= 2 && graph.edges.length >= 1 && (
-          <Human9Walker nodes={graph.nodes} edges={graph.edges} stops={STOP9} w={6} speed={0.2} />
-        )}
+
+
+
+        {glowCols.map((on, c) => (
+          <ParkBox
+            key={`glow${c}`}
+            box={{
+              x: ui.monitor.x + (ui.monitor.w * (c * 2 + 1)) / 6 - ui.glow.w / 2,
+              y: ui.glow.y + (GLOW_DY[c] * ui.monitor.h) / 100,
+              w: ui.glow.w,
+              h: ui.glow.h,
+            }}
+            edit={moving && c === 1}
+           
+           
+            onChange={setBox("glow")}
+            z={11}
+            label="Огонь"
+          >
+            <CenterGlow on={on} flash={flash} tilt={GLOW_ROT[c]} />
+          </ParkBox>
+        ))}
+
+        <ParkBox box={ui.monitor} edit={moving} onChange={setBox("monitor")} z={12} label="Монитор">
+          <MonitorScreen spinKey={spinKey} stopKey={stopKey} result={reel} onLanded={onLanded} onShineChange={setShineCols} win={winCols} />
+        </ParkBox>
+
       </div>
+      </div>
+      {salute && (
+        <div className={styles.saluteWrap} onClick={() => setSalute(null)}>
+          <img className={styles.saluteConfetti} src={`${ASSET}/Win/Win_Confeti.png`} alt="" draggable={false} />
+          <span className={styles.saluteTitleBox}>
+            <img className={styles.saluteRays} src={`${ASSET}/Win/Win_Light_Fx.png`} alt="" draggable={false} />
+            <img className={styles.saluteTitle} src={`${ASSET}/Win/Win_Title.png`} alt="" draggable={false} />
+          </span>
+          <span className={styles.saluteCoinBox}>
+            <img className={styles.saluteGlow} src={`${ASSET}/Win/Win_Light_Fx_Yellow.png`} alt="" draggable={false} />
+            <img className={styles.saluteCoin} src={`${ASSET}/Win/Coin_Front_XL.png`} alt="" draggable={false} />
+          </span>
+          <img className={styles.saluteNum} src={`${ASSET}/Win_Num_T/Win_Number_${salute}.png`} alt="" draggable={false} />
+        </div>
+      )}
+      <button type="button" className={styles.trainBtn} onClick={() => givePrize()}>🚂+</button>
     </div>
   );
 }
 
+const VIEW_BY_PAGE = { parkmap: "overview", parktop: "park", parkbot: "grid" };
+const PAGE_BY_VIEW = { overview: "parkmap", park: "parktop", grid: "parkbot" };
+
+const startView = () => {
+  const p = new URLSearchParams(window.location.search).get("page");
+  return VIEW_BY_PAGE[p] || "overview";
+};
+
 export default function BonusParkPage() {
   const { navigate } = useApp();
-  const [view, setView] = useState("overview");
-  const [anim, setAnim] = useState("out");
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [zoom, setZoom] = useState({ zoomed: false, busy: false, exit: null });
+  const [coinRing, setCoinRing] = useState(0);
+  const [loadView, setLoadView] = useState(startView);
+
+  useEffect(() => {
+    const onWheel = (e) => {
+      if (e.ctrlKey) e.preventDefault();
+    };
+    const onGesture = (e) => e.preventDefault();
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("gesturestart", onGesture, { passive: false });
+    window.addEventListener("gesturechange", onGesture, { passive: false });
+    window.addEventListener("gestureend", onGesture, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("gesturestart", onGesture);
+      window.removeEventListener("gesturechange", onGesture);
+      window.removeEventListener("gestureend", onGesture);
+    };
+  }, []);
+
+  useEffect(() => {
+    const keep = GAME_PRELOAD.map((src) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+      return img;
+    });
+    if (document.fonts && document.fonts.load) GAME_FONTS.forEach((f) => document.fonts.load(f));
+    return () => {
+      keep.length = 0;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (popupOpen) document.body.dataset.pop = "1";
+    else delete document.body.dataset.pop;
+    return () => {
+      delete document.body.dataset.pop;
+    };
+  }, [popupOpen]);
+
+  const [view, setView] = useState(startView);
+  const [anim, setAnim] = useState("hold");
+  const [wheel, setWheel] = useState(null);
   const timers = useRef([]);
 
+  useEffect(() => {
+    window.openWheel = (target) => {
+      setWheel({ key: Date.now(), target: target ?? null });
+      return "ok";
+    };
+    return () => {
+      delete window.openWheel;
+    };
+  }, []);
+
   const go = (v) => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
     setAnim("in");
     const t1 = setTimeout(() => {
+      setAnim("hold");
       setView(v);
-      setAnim("out");
-      const t2 = setTimeout(() => setAnim(null), 500);
-      timers.current.push(t2);
-    }, 400);
+      setLoadView(v);
+    }, 420);
     timers.current.push(t1);
   };
 
   useEffect(() => {
-    const t = setTimeout(() => setAnim(null), 500);
+    const page = PAGE_BY_VIEW[view];
+    if (!page) return;
+    const u = new URL(window.location.href);
+    const lobbied = page === "parktop" || page === "parkbot";
+    const same = u.searchParams.get("page") === page && (!lobbied || u.searchParams.get("lobby"));
+    if (same) return;
+    u.searchParams.set("page", page);
+    if (lobbied && !u.searchParams.get("lobby")) u.searchParams.set("lobby", "1");
+    if (!lobbied) u.searchParams.delete("lobby");
+    window.history.replaceState(null, "", u.toString());
+  }, [view]);
+
+  const onLoaded = () => {
+    setLoadView(null);
+    setAnim("out");
+    const t = setTimeout(() => setAnim(null), 520);
     timers.current.push(t);
+  };
+
+  useEffect(() => {
     const list = timers.current;
     return () => list.forEach(clearTimeout);
   }, []);
@@ -951,14 +2793,42 @@ export default function BonusParkPage() {
   const pick = (v) => go(v);
 
   return (
+    <WalletProvider>
     <div className={styles.page}>
       {view === "overview" && <Overview onPick={pick} />}
-      {view === "grid" && <GridGame onBack={() => go("overview")} />}
+      {view === "grid" && (
+        <GridGame onBack={() => go("overview")} onPopup={setPopupOpen} onZoomState={setZoom} onCoinRing={setCoinRing} />
+      )}
       {view === "park" && <UpperPark />}
 
-      <button className={styles.exit} onClick={() => (view === "overview" ? navigate("home") : go("overview"))}>✕</button>
+      <ParkHud tickets={view !== "park"} coinProgress={coinRing} />
+      {!popupOpen && view !== "overview" && <PlayerRow icons={view === "grid"} />}
 
-      {anim && <div className={`${styles.cover} ${anim === "in" ? styles.coverIn : styles.coverOut}`} />}
+      {!popupOpen && !zoom.busy && (
+        <button
+          type="button"
+          className={styles.exit}
+          onClick={() => {
+            if (view === "grid" && zoom.zoomed) {
+              zoom.exit?.();
+              return;
+            }
+            if (view === "overview") navigate("home");
+            else go("overview");
+          }}
+        >
+          <img className={styles.exitBg} src={`${ASSET}/Exchange/Btn_round_Red_c.png`} alt="" draggable={false} />
+          <img className={styles.exitIcn} src={`${ASSET}/Exchange/Icn_Cress.png`} alt="" draggable={false} />
+        </button>
+      )}
+
+      {loadView && <ParkLoader view={loadView} onDone={onLoaded} />}
+      {anim && (
+        <div
+          className={`${styles.cover} ${anim === "in" ? styles.coverIn : anim === "hold" ? styles.coverHold : styles.coverOut}`}
+        />
+      )}
     </div>
+    </WalletProvider>
   );
 }

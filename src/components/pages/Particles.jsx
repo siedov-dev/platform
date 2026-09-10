@@ -10,6 +10,7 @@ const Particles = forwardRef(function Particles(_, ref) {
   const canvasRef = useRef(null);
   const itemsRef = useRef([]);
   const rafRef = useRef(0);
+  const prevTsRef = useRef(0);
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -28,18 +29,20 @@ const Particles = forwardRef(function Particles(_, ref) {
     };
   }, []);
 
-  const tick = () => {
+  const tick = (now) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const items = itemsRef.current;
+    const k = prevTsRef.current ? Math.min(10, (now - prevTsRef.current) / (1000 / 60)) : 1;
+    prevTsRef.current = now;
 
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
     for (let i = items.length - 1; i >= 0; i -= 1) {
       const p = items[i];
-      p.life -= p.decay;
-      p.t += 1;
+      p.life -= p.decay * k;
+      p.t += k;
 
       if (p.life <= 0) {
         items.splice(i, 1);
@@ -59,7 +62,8 @@ const Particles = forwardRef(function Particles(_, ref) {
       }
 
       if (p.type === "orb") {
-        p.p += p.speed;
+        if (!p.start) p.start = now;
+        p.p = (now - p.start) / p.dur;
         if (p.p >= 1) {
           if (p.onArrive) p.onArrive();
           items.splice(i, 1);
@@ -70,7 +74,7 @@ const Particles = forwardRef(function Particles(_, ref) {
         p.x = inv * inv * p.x0 + 2 * inv * u * p.cx + u * u * p.x1;
         p.y = inv * inv * p.y0 + 2 * inv * u * p.cy + u * u * p.y1;
 
-        if (p.t % 2 === 0) {
+        if ((p.t | 0) % 2 === 0) {
           items.push({
             type: "trail",
             x: p.x + rnd(-2, 2),
@@ -79,15 +83,23 @@ const Particles = forwardRef(function Particles(_, ref) {
             life: 1,
             decay: 0.07,
             t: 0,
+            tone: p.tone,
           });
         }
 
         const r = p.s * 2.4;
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-        g.addColorStop(0, "rgba(255,255,236,1)");
-        g.addColorStop(0.22, "rgba(255,233,138,0.95)");
-        g.addColorStop(0.55, "rgba(255,198,62,0.45)");
-        g.addColorStop(1, "rgba(255,190,50,0)");
+        if (p.tone === "purple") {
+          g.addColorStop(0, "rgba(255,246,255,1)");
+          g.addColorStop(0.22, "rgba(228,158,255,0.95)");
+          g.addColorStop(0.55, "rgba(182,78,242,0.45)");
+          g.addColorStop(1, "rgba(158,52,232,0)");
+        } else {
+          g.addColorStop(0, "rgba(255,255,236,1)");
+          g.addColorStop(0.22, "rgba(255,233,138,0.95)");
+          g.addColorStop(0.55, "rgba(255,198,62,0.45)");
+          g.addColorStop(1, "rgba(255,190,50,0)");
+        }
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
@@ -99,8 +111,13 @@ const Particles = forwardRef(function Particles(_, ref) {
         const r = p.s * p.life * 2;
         ctx.globalAlpha = p.life * 0.8;
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-        g.addColorStop(0, "rgba(255,242,186,0.9)");
-        g.addColorStop(1, "rgba(255,210,90,0)");
+        if (p.tone === "purple") {
+          g.addColorStop(0, "rgba(243,206,255,0.9)");
+          g.addColorStop(1, "rgba(196,96,246,0)");
+        } else {
+          g.addColorStop(0, "rgba(255,242,186,0.9)");
+          g.addColorStop(1, "rgba(255,210,90,0)");
+        }
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
@@ -109,10 +126,10 @@ const Particles = forwardRef(function Particles(_, ref) {
         continue;
       }
 
-      p.vy += p.g;
-      p.x += p.vx + Math.sin(p.t * 0.12) * 0.5;
-      p.y += p.vy;
-      p.rot += p.vr;
+      p.vy += p.g * k;
+      p.x += (p.vx + Math.sin(p.t * 0.12) * 0.5) * k;
+      p.y += p.vy * k;
+      p.rot += p.vr * k;
 
       const flip = Math.abs(Math.cos(p.t * 0.22));
       ctx.globalAlpha = Math.min(1, p.life * 1.6);
@@ -133,10 +150,23 @@ const Particles = forwardRef(function Particles(_, ref) {
   };
 
   const start = () => {
-    if (!rafRef.current) rafRef.current = requestAnimationFrame(tick);
+    if (!rafRef.current) {
+      prevTsRef.current = 0;
+      rafRef.current = requestAnimationFrame(tick);
+    }
   };
 
   useImperativeHandle(ref, () => ({
+    clearFlights() {
+      const items = itemsRef.current;
+      for (let i = items.length - 1; i >= 0; i -= 1) {
+        const p = items[i];
+        if (p.type !== "orb") continue;
+        items.splice(i, 1);
+        if (p.onArrive) p.onArrive();
+      }
+    },
+
     flash(clientX, clientY, size) {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -157,7 +187,7 @@ const Particles = forwardRef(function Particles(_, ref) {
       start();
     },
 
-    flyEnergy(fx, fy, tx, ty, onArrive) {
+    flyEnergy(fx, fy, tx, ty, onArrive, tone) {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
@@ -179,11 +209,13 @@ const Particles = forwardRef(function Particles(_, ref) {
         cx: (x0 + x1) / 2 + (y1 - y0) * 0.14,
         cy: (y0 + y1) / 2 - Math.abs(x1 - x0) * 0.28 - 25,
         p: 0,
-        speed: 0.010,
+        start: 0,
+        dur: 1500,
         s: 6,
         life: 1,
         decay: 0,
         t: 0,
+        tone,
         onArrive,
       });
 
@@ -203,7 +235,7 @@ const Particles = forwardRef(function Particles(_, ref) {
 
       items.push({ x, y, t: 0, rot: 0, vr: 0, life: 1, type: "flash", r0: s * 0.5, decay: 0.09 });
 
-      for (let i = 0; i < 44; i += 1) {
+      for (let i = 0; i < 30; i += 1) {
         const a = rnd(0, Math.PI * 2);
         const sp = rnd(1.1, 3.8);
         items.push({

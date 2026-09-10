@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import styles from "./TilePopups.module.css";
+import usePopFrom from "./usePopFrom";
 
 const CONFETTI = Array.from({ length: 26 }, (_, i) => ({
   left: (i * 37 + 11) % 100,
@@ -49,10 +51,12 @@ export function LootPopup({ tile, onClaim, onClose }) {
   );
 }
 
-export function GameIntroPopup({ name, tile, onStart, onClose }) {
+export function GameIntroPopup({ name, tile, onStart, onClose, from }) {
+  const boxRef = useRef(null);
+  usePopFrom(boxRef, from);
   return (
     <div className={styles.overlay}>
-      <div className={styles.popup}>
+      <div ref={boxRef} className={`${styles.popup} ${from ? styles.noPop : ""}`}>
         <div className={styles.head}>
           <span className={styles.title}>Мини-игра</span>
           <button className={styles.close} onClick={onClose}>✕</button>

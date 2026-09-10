@@ -1,11 +1,26 @@
+.scrollSpace {
+  height: 100vh;
+  height: 100lvh;
+  pointer-events: none;
+}
+
+.stageWrap {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  background: #0b0506;
+}
+
 .phone {
-  position: relative;
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 390px;
   height: 844px;
-  flex: 0 0 auto;
   background: #0b0506;
   overflow: hidden;
-  transform-origin: center center;
+  transform-origin: top left;
 }
 
 .screen {

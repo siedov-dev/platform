@@ -1,0 +1,10 @@
+{
+  "name": "Bonus Park",
+  "short_name": "BonusPark",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#0b0506",
+  "theme_color": "#0b0506",
+  "start_url": "/",
+  "icons": [{ "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }]
+}

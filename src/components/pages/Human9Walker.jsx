@@ -55,6 +55,8 @@ function pickNext(cur, prev, adj) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
+let sharedPromise = null;
+
 async function loadAtlas(name) {
   const res = await fetch(`${BASE}/${name}/${name}.json`);
   const json = await res.json();
@@ -74,31 +76,9 @@ async function loadImg(name) {
   return img;
 }
 
-export default function Human9Walker({ nodes, edges, stops = [], w = 6, speed = 0.2 }) {
-  const canvasRef = useRef(null);
-  const hostRef = useRef(null);
-  const dataRef = useRef({});
-  const stateRef = useRef({
-    mode: "walk",
-    cur: 0,
-    nxt: 1,
-    prev: -1,
-    t: 0,
-    frame: 0,
-    last: 0,
-    facc: 0,
-    facing: null,
-    poseName: null,
-    poseUntil: 0,
-    standName: null,
-    standFrame: 0,
-    standAcc: 0,
-  });
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
+function loadShared() {
+  if (!sharedPromise) {
+    sharedPromise = (async () => {
       const walk = {};
       const pose = {};
       const stand = {};
@@ -113,11 +93,25 @@ export default function Human9Walker({ nodes, edges, stops = [], w = 6, speed = 
           stand[name] = await loadAtlas(name);
         }),
       ]);
+      return { walk, pose, stand };
+    })();
+  }
+  return sharedPromise;
+}
+
+export default function Human9Walker({ nodes, edges, stops = [], w = 6, speed = 0.2, count = 1 }) {
+  const canvasRef = useRef(null);
+  const hostRef = useRef(null);
+  const dataRef = useRef({});
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadShared().then((map) => {
       if (cancelled) return;
-      dataRef.current = { walk, pose, stand };
+      dataRef.current = map;
       setReady(true);
-    };
-    load();
+    });
     return () => {
       cancelled = true;
     };
@@ -129,22 +123,33 @@ export default function Human9Walker({ nodes, edges, stops = [], w = 6, speed = 
     const host = hostRef.current;
     const ctx = canvas.getContext("2d");
     const map = dataRef.current;
-    const st = stateRef.current;
     const adj = buildAdj(nodes, edges);
     const stopSet = new Set(stops);
 
-    let start = 0;
-    for (let i = 0; i < adj.length; i += 1) {
-      if (adj[i].length) {
-        start = i;
-        break;
-      }
-    }
-    st.mode = "walk";
-    st.cur = start;
-    st.prev = -1;
-    st.nxt = pickNext(start, -1, adj);
-    st.t = 0;
+    const live = [];
+    for (let i = 0; i < adj.length; i += 1) if (adj[i].length) live.push(i);
+    if (!live.length) return undefined;
+
+    const crowd = Array.from({ length: Math.max(1, count) }, () => {
+      const cur = live[Math.floor(Math.random() * live.length)];
+      return {
+        mode: "walk",
+        cur,
+        prev: -1,
+        nxt: pickNext(cur, -1, adj),
+        t: Math.random(),
+        frame: Math.floor(Math.random() * 12),
+        facc: 0,
+        facing: null,
+        poseName: null,
+        poseUntil: 0,
+        standName: null,
+        standFrame: 0,
+        standAcc: 0,
+        spd: 0.82 + Math.random() * 0.42,
+        scale: 0.9 + Math.random() * 0.22,
+      };
+    });
 
     let raf = 0;
     const sizeCanvas = () => {
@@ -157,82 +162,66 @@ export default function Human9Walker({ nodes, edges, stops = [], w = 6, speed = 
     const ro = new ResizeObserver(sizeCanvas);
     ro.observe(host);
 
-    const startPose = (now) => {
+    const startPose = (st, now) => {
       st.poseName = POSES[Math.floor(Math.random() * POSES.length)];
       st.poseUntil = now + POSE_MIN + Math.random() * (POSE_MAX - POSE_MIN);
       st.mode = "pose";
     };
-    const startIdle = () => {
+    const startIdle = (st) => {
       st.standName = STANDS[Math.floor(Math.random() * STANDS.length)];
       st.standFrame = 0;
       st.standAcc = 0;
       st.mode = "idle";
     };
-    const leaveStop = () => {
+    const leaveStop = (st) => {
       st.nxt = pickNext(st.cur, st.prev, adj);
       st.t = 0;
       st.facing = null;
       st.mode = "walk";
     };
 
-    st.last = performance.now();
-    const loop = (now) => {
-      raf = requestAnimationFrame(loop);
-      const W = host.clientWidth;
-      const H = host.clientHeight;
-      const dt = Math.min(64, now - st.last);
-      st.last = now;
-      const charH = (w / 100) * W;
-      ctx.clearRect(0, 0, W, H);
+    const step = (st, now, dt, W, H, baseH) => {
+      const charH = baseH * st.scale;
 
       if (st.mode === "pose") {
         const node = nodes[st.cur];
-        const px = (node.x / 100) * W;
-        const py = (node.y / 100) * H;
         const img = map.pose[st.poseName];
-        if (img) {
-          const dh = charH;
-          const dw = dh * (img.naturalWidth / img.naturalHeight);
-          ctx.drawImage(img, px - dw / 2, py - dh, dw, dh);
-        }
-        if (now >= st.poseUntil) startIdle();
-        return;
+        if (now >= st.poseUntil) startIdle(st);
+        if (!img) return null;
+        const dh = charH;
+        const dw = dh * (img.naturalWidth / img.naturalHeight);
+        const py = (node.y / 100) * H;
+        return { img, dx: (node.x / 100) * W - dw / 2, dy: py - dh, dw, dh, py };
       }
 
       if (st.mode === "idle") {
         const anim = map.stand[st.standName];
         const node = nodes[st.cur];
-        const px = (node.x / 100) * W;
-        const py = (node.y / 100) * H;
         if (!anim) {
-          leaveStop();
-          return;
+          leaveStop(st);
+          return null;
         }
         st.standAcc += dt;
         while (st.standAcc >= MS_PER_STAND) {
           st.standAcc -= MS_PER_STAND;
           st.standFrame += 1;
         }
-        if (st.standFrame >= anim.frames.length) {
-          const f = anim.frames[anim.frames.length - 1];
-          const dh = charH;
-          const dw = dh * (f.w / f.h);
-          ctx.drawImage(anim.img, f.x, f.y, f.w, f.h, px - dw / 2, py - dh, dw, dh);
-          if (Math.random() < REPOSE_PROB) startPose(now);
-          else leaveStop();
-          return;
+        const done = st.standFrame >= anim.frames.length;
+        const f = anim.frames[done ? anim.frames.length - 1 : st.standFrame];
+        if (done) {
+          if (Math.random() < REPOSE_PROB) startPose(st, now);
+          else leaveStop(st);
         }
-        const f = anim.frames[st.standFrame];
         const dh = charH;
         const dw = dh * (f.w / f.h);
-        ctx.drawImage(anim.img, f.x, f.y, f.w, f.h, px - dw / 2, py - dh, dw, dh);
-        return;
+        const py = (node.y / 100) * H;
+        return { img: anim.img, sx: f.x, sy: f.y, sw: f.w, sh: f.h, dx: (node.x / 100) * W - dw / 2, dy: py - dh, dw, dh, py };
       }
 
       const a = nodes[st.cur];
       const b = nodes[st.nxt];
-      if (!a || !b) return;
-      const movePx = speed * (dt / 16.7);
+      if (!a || !b) return null;
+      const movePx = speed * st.spd * (dt / 16.7);
       const segLen = Math.max(0.5, Math.hypot(((b.x - a.x) / 100) * W, ((b.y - a.y) / 100) * H));
 
       st.t += movePx / segLen;
@@ -241,17 +230,8 @@ export default function Human9Walker({ nodes, edges, stops = [], w = 6, speed = 
         st.prev = st.cur;
         st.cur = st.nxt;
         if (stopSet.has(st.cur)) {
-          startPose(now);
-          const node = nodes[st.cur];
-          const px = (node.x / 100) * W;
-          const py = (node.y / 100) * H;
-          const img = map.pose[st.poseName];
-          if (img) {
-            const dh = charH;
-            const dw = dh * (img.naturalWidth / img.naturalHeight);
-            ctx.drawImage(img, px - dw / 2, py - dh, dw, dh);
-          }
-          return;
+          startPose(st, now);
+          return null;
         }
         st.nxt = pickNext(st.cur, st.prev, adj);
       }
@@ -269,7 +249,7 @@ export default function Human9Walker({ nodes, edges, stops = [], w = 6, speed = 
       st.facing = (st.facing + Math.max(-maxStep, Math.min(maxStep, diff)) + 360) % 360;
 
       const dir = map.walk[pickDir(st.facing).name];
-      if (!dir) return;
+      if (!dir) return null;
 
       const pxPerFrame = Math.max(0.5, (STRIDE * charH) / dir.frames.length);
       st.facc += movePx;
@@ -281,14 +261,39 @@ export default function Human9Walker({ nodes, edges, stops = [], w = 6, speed = 
       const f = dir.frames[st.frame % dir.frames.length];
       const dh = charH;
       const dw = dh * (f.w / f.h);
-      ctx.drawImage(dir.img, f.x, f.y, f.w, f.h, px - dw / 2, py - dh, dw, dh);
+      return { img: dir.img, sx: f.x, sy: f.y, sw: f.w, sh: f.h, dx: px - dw / 2, dy: py - dh, dw, dh, py };
+    };
+
+    let last = performance.now();
+    const queue = [];
+
+    const loop = (now) => {
+      raf = requestAnimationFrame(loop);
+      const W = host.clientWidth;
+      const H = host.clientHeight;
+      const dt = Math.min(64, now - last);
+      last = now;
+      const baseH = (w / 100) * W;
+      ctx.clearRect(0, 0, W, H);
+
+      queue.length = 0;
+      for (const st of crowd) {
+        const d = step(st, now, dt, W, H, baseH);
+        if (d) queue.push(d);
+      }
+      queue.sort((p, q) => p.py - q.py);
+
+      for (const d of queue) {
+        if (d.sw === undefined) ctx.drawImage(d.img, d.dx, d.dy, d.dw, d.dh);
+        else ctx.drawImage(d.img, d.sx, d.sy, d.sw, d.sh, d.dx, d.dy, d.dw, d.dh);
+      }
     };
     raf = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [ready, nodes, edges, stops, w, speed]);
+  }, [ready, nodes, edges, stops, w, speed, count]);
 
   return (
     <div ref={hostRef} style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 3 }}>

@@ -11,12 +11,15 @@ const ITEMS = [
   { src: "Baloon_Green.png", base: 3, len: 38, sway: 3, dur: 5.2, delay: 0 },
 ];
 
-export default function Balloons({ className, style, scale = 1, onPointerDown }) {
+export default function Balloons({ className, style, scale = 1, onPointerDown, onPointerMove, onPointerUp, onPointerCancel }) {
   return (
     <div
       className={`${styles.bunch} ${className || ""}`}
       style={{ transform: `scale(${scale})`, ...style }}
       onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
     >
       {ITEMS.map((b, i) => (
         <div key={i} className={styles.fan} style={{ transform: `rotate(${b.base}deg)` }}>

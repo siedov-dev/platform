@@ -18,34 +18,62 @@ const SPARKS = [
   { img: "Flash_Light_blue_1.png", x: 20, y: 62, w: 10, delay: 0.2 },
 ];
 
-export default function CoinFlash({ className, style, fill = 0, pulseKey = 0, onPointerDown }) {
+export default function CoinFlash({
+  className,
+  style,
+  fill = 0,
+  live = false,
+  drop = false,
+  pulseKey = 0,
+  fullKey = 0,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+}) {
   const lvl = Math.max(0, Math.min(1, fill));
   const [showLine, setShowLine] = useState(false);
   const prevFill = useRef(lvl);
+  const prevLive = useRef(live);
   const hideTimer = useRef(null);
 
   useEffect(() => {
-    if (lvl > prevFill.current + 0.0001) {
+    if (live) {
+      clearTimeout(hideTimer.current);
+      setShowLine(true);
+    } else if (prevLive.current) {
+      clearTimeout(hideTimer.current);
+      hideTimer.current = setTimeout(() => setShowLine(false), 700);
+    } else if (lvl > prevFill.current + 0.0001) {
       setShowLine(true);
       clearTimeout(hideTimer.current);
-      hideTimer.current = setTimeout(() => setShowLine(false), 1700);
+      hideTimer.current = setTimeout(() => setShowLine(false), 700);
+    } else if (lvl < prevFill.current - 0.0001) {
+      clearTimeout(hideTimer.current);
+      setShowLine(false);
     }
     prevFill.current = lvl;
+    prevLive.current = live;
     return () => clearTimeout(hideTimer.current);
-  }, [lvl]);
+  }, [lvl, live]);
 
   return (
     <div
       className={className ? `${styles.wrap} ${className}` : styles.wrap}
       style={style}
       onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
     >
+      <img className={`${styles.layer} ${styles.aura} ${styles.auraA}`} src={`${ASSET}/Flash_Light_Pink_1.png`} alt="" draggable={false} />
+      <img className={`${styles.layer} ${styles.aura} ${styles.auraB}`} src={`${ASSET}/Flash_Light_Pink_2.png`} alt="" draggable={false} />
+
       <div className={styles.coinBox}>
         {/* empty (silver) base */}
         <img className={styles.coinImg} src={`${ASSET}/Coin_Spielmen_Off.png`} alt="" draggable={false} />
         {/* gold fill grows from the bottom up to the current level */}
         <img
-          className={`${styles.coinImg} ${styles.coinFill}`}
+          className={`${styles.coinImg} ${styles.coinFill} ${live ? (drop ? styles.coinDrop : styles.coinLive) : ""}`}
           src={`${ASSET}/Coin_Spielmen_On.png`}
           alt=""
           draggable={false}
@@ -53,13 +81,20 @@ export default function CoinFlash({ className, style, fill = 0, pulseKey = 0, on
         />
         {/* light band appears only during a fill event, then fades out */}
         <img
-          className={styles.fillLine}
+          className={`${styles.fillLine} ${live ? (drop ? styles.fillLineDrop : styles.fillLineLive) : ""}`}
           src={`${ASSET}/Coin_Lights.png`}
           alt=""
           draggable={false}
           style={{ top: `${(1 - lvl) * 100}%`, opacity: showLine ? 1 : 0 }}
         />
       </div>
+
+      {fullKey > 0 && (
+        <div className={styles.fullBurst} key={`full${fullKey}`}>
+          <img className={`${styles.layer} ${styles.fullGlow}`} src={`${ASSET}/Flash_Light_blue_bg.png`} alt="" draggable={false} />
+          <img className={`${styles.layer} ${styles.fullFlare}`} src={`${ASSET}/Flash_over_light.png`} alt="" draggable={false} />
+        </div>
+      )}
 
       {/* effects only on orb impact, restart each time pulseKey changes */}
       {pulseKey > 0 && (

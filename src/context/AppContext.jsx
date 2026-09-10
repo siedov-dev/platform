@@ -19,7 +19,7 @@ const initialState = {
   betSlip: [],
   activeGame: null,
   notice: null,
-  route: "home",
+  route: new URLSearchParams(window.location.search).get("page") || "home",
   prevRoute: null,
   loading: true,
   error: null,

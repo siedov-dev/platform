@@ -10,7 +10,7 @@ export default defineConfig({
   },
   server: {
     watch: {
-      ignored: ["**/public/bonus-park/**"],
+      ignored: ["**/public/bonus-park/**", "**/*.zip"],
     },
   },
 });

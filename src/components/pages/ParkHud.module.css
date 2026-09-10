@@ -1,0 +1,275 @@
+.hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(7px + var(--safe-top, 0px) + var(--crop-top, 0px) + var(--fr-v, 0px) + var(--top-extra, 0px));
+  z-index: 560;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 calc(var(--fr-t, 0px) + 3px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hud > * {
+  pointer-events: auto;
+}
+
+:global([data-framed="grid"]) .hud {
+  transform: scale(0.96);
+  transform-origin: 50% 0;
+}
+
+.avatar {
+  position: relative;
+  flex: 0 0 auto;
+  width: 43px;
+  height: 43px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.avatarRing {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55));
+}
+
+.avatarMan {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 63%;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+.avatarBadge {
+  position: absolute;
+  right: -6px;
+  bottom: -4px;
+  width: 52%;
+  height: auto;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.chipBump {
+  animation: chipBump 0.42s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+@keyframes chipBump {
+  0% {
+    transform: scale(1);
+  }
+  38% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.chip {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.chipWide {
+  flex: 1.09 1 0;
+}
+
+.chipBg {
+  position: absolute;
+  left: 15px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(10, 5, 38, 0.92) 0%, rgba(24, 15, 76, 0.9) 100%);
+  border: 1.5px solid #6672f0;
+  box-shadow: inset 0 -5px 9px rgba(126, 226, 150, 0.16), 0 1px 3px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.chipGloss {
+  position: absolute;
+  left: 4px;
+  right: 2px;
+  bottom: 0;
+  height: 9px;
+  width: auto;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.chipIcon {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+}
+
+.chipVal {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 8px 0 2px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 0 #120a39, 0 -1px 0 #120a39, 1px 0 0 #120a39, -1px 0 0 #120a39, 0 2px 3px rgba(0, 0, 0, 0.65);
+}
+
+.chipNum {
+  display: block;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  transform-origin: 0 50%;
+}
+
+.chipValPlus {
+  padding-right: 25px;
+  padding-left: 0;
+}
+
+.plus {
+  position: absolute;
+  right: -1px;
+  top: -1px;
+  bottom: -1px;
+  z-index: 3;
+  width: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.plusBg {
+  position: absolute;
+  left: -3.33%;
+  top: -2.78%;
+  width: 110%;
+  height: 105.56%;
+  object-fit: fill;
+}
+
+.plusIcn {
+  position: absolute;
+  left: 50.7%;
+  top: 50.6%;
+  width: 60%;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+.info {
+  position: relative;
+  flex: 0 0 auto;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.info img {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+.info:active {
+  transform: scale(0.92);
+}
+
+.seal {
+  --seal: 33px;
+  --rim: 1.2px;
+  --gap: 1.8px;
+  --inset: calc(var(--gap) + var(--rim));
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  width: var(--seal);
+  height: var(--seal);
+  border-radius: 50%;
+  background: #241802;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.55);
+}
+
+.sealRing {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.sealLine {
+  stroke: #f0ccfa;
+  filter: drop-shadow(0 0 3px rgba(195, 90, 209, 1)) drop-shadow(0 0 6px rgba(195, 90, 209, 0.9));
+}
+
+.sealHalo {
+  stroke: #c35ad1;
+  filter: drop-shadow(0 0 2px rgba(240, 204, 250, 0.9)) drop-shadow(0 0 6px rgba(195, 90, 209, 0.7));
+  animation: ringPulse 2.4s ease-in-out infinite;
+}
+
+.sealFace {
+  position: absolute;
+  z-index: 1;
+  top: var(--inset);
+  left: var(--inset);
+  width: calc(100% - 2 * var(--inset));
+  height: calc(100% - 2 * var(--inset));
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sealBorder {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 50%;
+  border: var(--rim) solid #c8a95e;
+  pointer-events: none;
+}
+
+@keyframes ringPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+:global(body[data-pop="1"]) .avatar,
+:global(body[data-pop="1"]) .info {
+  filter: brightness(0.42) saturate(0.7);
+}

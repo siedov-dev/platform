@@ -1,8 +1,8 @@
 .bar {
   position: absolute;
-  top: 14px;
-  left: 0;
-  right: 0;
+  top: calc(14px + var(--crop-top, 0px) + var(--fr-v, 0px));
+  left: var(--fr-t, 0px);
+  right: var(--fr-t, 0px);
   display: flex;
   justify-content: space-between;
   align-items: center;

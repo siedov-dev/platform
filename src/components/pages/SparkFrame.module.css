@@ -1,0 +1,11 @@
+.host {
+  position: absolute;
+  z-index: 9;
+}
+
+.canvas {
+  position: absolute;
+  left: -26px;
+  top: -26px;
+  pointer-events: none;
+}

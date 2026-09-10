@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:lock": "vite build && node scripts/lock.mjs"
   },
   "dependencies": {
     "pixi.js": "^8.19.0",
@@ -16,6 +17,8 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "msw": "^2.14.6",
+    "puppeteer-core": "^25.6.0",
+    "sharp": "^0.35.3",
     "vite": "^6.3.5"
   },
   "msw": {

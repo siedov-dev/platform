@@ -1,0 +1,62 @@
+.wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 520;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #050308;
+}
+
+.pct {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffd53e;
+  -webkit-text-stroke: 0.8px #8a4a08;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
+}
+
+.bar {
+  position: relative;
+  width: 66%;
+  height: 20px;
+  border-radius: 999px;
+  padding: 3px;
+  background: linear-gradient(180deg, #f8dd80 0%, #d99a1e 55%, #f0bd4e 100%);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55);
+}
+
+.bar::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1b0d33 0%, #2a1450 100%);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.fill {
+  position: absolute;
+  z-index: 1;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe98a 0%, #ffc32e 45%, #ef8c12 100%);
+  box-shadow: 0 0 10px rgba(255, 190, 60, 0.75);
+  transition: width 0.25s ease;
+  overflow: hidden;
+}
+
+.gloss {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 12%;
+  height: 38%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.05) 100%);
+}

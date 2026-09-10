@@ -1,238 +1,204 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { gamesApi, gameField } from "@/api/gamesClient";
+import FerrisEvent, { CABIN_SLOT } from "./FerrisEvent";
+import CardsGame from "./CardsGame";
+import PyramidGame from "./PyramidGame";
+import ParkPopupFrame from "./ParkPopupFrame";
 import styles from "./MiniGames.module.css";
-
-function rand(n) {
-  return Math.floor(Math.random() * n);
-}
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const API_WAIT = 800;
+const withTimeout = (p, ms = API_WAIT) =>
+  Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
+
 async function play5050() {
-  const startRes = await gamesApi.cardsStart();
-  const gid = gameField(startRes, "game_id");
-  const playRes = await gamesApi.cardsPlay(gid);
-  return gameField(playRes, "result") === "win";
+  try {
+    const startRes = await withTimeout(gamesApi.cardsStart());
+    const gid = gameField(startRes, "game_id");
+    const playRes = await withTimeout(gamesApi.cardsPlay(gid));
+    return gameField(playRes, "result") === "win";
+  } catch {
+    return Math.random() < 0.5;
+  }
 }
 
-function CoinFlip() {
-  const [choice, setChoice] = useState(null);
+const CHOICE_SEC = 10;
+const WIN_PAY = 50;
+const MONEY_ICN = "/bonus-park/Ui_Exchange_HUD/Icn_Currency.png";
+
+function WinPay({ show, value = WIN_PAY }) {
+  if (!show) return null;
+  return (
+    <div className={styles.payFx}>
+      <img className={styles.payMoney} src={MONEY_ICN} alt="" draggable={false} />
+      <span className={styles.payNum}>+{value}</span>
+    </div>
+  );
+}
+
+function useCountdown(active, seconds, onEnd) {
+  const [left, setLeft] = useState(seconds);
+  const endRef = useRef(onEnd);
+  endRef.current = onEnd;
+  useEffect(() => {
+    if (!active) return undefined;
+    setLeft(seconds);
+    const iv = setInterval(() => {
+      setLeft((s) => {
+        if (s <= 1) {
+          clearInterval(iv);
+          endRef.current?.();
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(iv);
+  }, [active, seconds]);
+  return left;
+}
+
+function CoinFlip({ onFinish }) {
   const [landed, setLanded] = useState(null);
   const [win, setWin] = useState(null);
   const [flipping, setFlipping] = useState(false);
-  const [error, setError] = useState(null);
+  const doneRef = useRef(false);
+  const timers = useRef([]);
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   const play = async (side) => {
-    if (flipping) return;
-    setChoice(side);
+    if (doneRef.current) return;
+    doneRef.current = true;
     setLanded(null);
     setWin(null);
-    setError(null);
     setFlipping(true);
-    try {
-      const [isWin] = await Promise.all([play5050(), delay(1300)]);
-      setWin(isWin);
-      setLanded(isWin ? side : side === "heads" ? "tails" : "heads");
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setFlipping(false);
-    }
+    const [isWin] = await Promise.all([play5050(), delay(1300)]);
+    setWin(isWin);
+    setLanded(isWin ? side : side === "heads" ? "tails" : "heads");
+    setFlipping(false);
+    timers.current.push(setTimeout(() => onFinish?.(isWin ? 1 : 0), 1800));
   };
 
+  const left = useCountdown(!doneRef.current && win === null, CHOICE_SEC, () => {
+    play(Math.random() < 0.5 ? "heads" : "tails");
+  });
+
   return (
-    <div className={styles.game}>
-      <div className={`${styles.coin} ${flipping ? styles.coinFlip : ""}`}>
-        <span className={styles.coinFace}>{landed === "tails" ? "T" : "H"}</span>
-      </div>
-      {error ? (
-        <div className={styles.err}>{error}</div>
-      ) : win !== null && !flipping ? (
-        <div className={styles.resultText}>
-          {landed.toUpperCase()} — {win ? "WIN" : "LOSE"}
+    <ParkPopupFrame title="Coin Flip" timeLeft={left}>
+      <div className={styles.game}>
+        <WinPay show={win === true && !flipping} />
+        <div className={`${styles.coin} ${flipping ? styles.coinFlip : ""}`}>
+          <span className={styles.coinFace}>{landed === "tails" ? "T" : "H"}</span>
         </div>
-      ) : (
-        <div className={styles.hint}>{flipping ? "..." : "Heads or tails?"}</div>
-      )}
-      <div className={styles.controls}>
-        <button className={styles.btn} disabled={flipping} onClick={() => play("heads")}>Heads</button>
-        <button className={styles.btn} disabled={flipping} onClick={() => play("tails")}>Tails</button>
+        {win !== null && !flipping ? (
+          <div className={styles.resultText}>
+            {landed.toUpperCase()} — {win ? "WIN" : "LOSE"}
+          </div>
+        ) : (
+          <div className={styles.hint}>{flipping ? "..." : "Heads or tails?"}</div>
+        )}
+        <div className={styles.controls}>
+          <button className={styles.btn} disabled={flipping || win !== null} onClick={() => play("heads")}>Heads</button>
+          <button className={styles.btn} disabled={flipping || win !== null} onClick={() => play("tails")}>Tails</button>
+        </div>
       </div>
-    </div>
+    </ParkPopupFrame>
   );
 }
 
-function CoinHand() {
-  const [picked, setPicked] = useState(null);
+function CoinHand({ onFinish }) {
   const [coinHand, setCoinHand] = useState(null);
   const [win, setWin] = useState(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(null);
+  const doneRef = useRef(false);
+  const timers = useRef([]);
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   const play = async (hand) => {
-    if (busy || picked) return;
-    setPicked(hand);
-    setWin(null);
-    setError(null);
+    if (doneRef.current) return;
+    doneRef.current = true;
     setBusy(true);
-    try {
-      const [isWin] = await Promise.all([play5050(), delay(600)]);
-      setWin(isWin);
-      setCoinHand(isWin ? hand : hand === "left" ? "right" : "left");
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-  const reset = () => {
-    setPicked(null);
-    setCoinHand(null);
-    setWin(null);
-    setError(null);
+    const [isWin] = await Promise.all([play5050(), delay(600)]);
+    setWin(isWin);
+    setCoinHand(isWin ? hand : hand === "left" ? "right" : "left");
+    setBusy(false);
+    timers.current.push(setTimeout(() => onFinish?.(isWin ? 1 : 0), 1800));
   };
 
+  const left = useCountdown(!doneRef.current && win === null, CHOICE_SEC, () => {
+    play(Math.random() < 0.5 ? "left" : "right");
+  });
+
   return (
-    <div className={styles.game}>
-      <div className={styles.hands}>
-        {["left", "right"].map((h) => (
-          <button key={h} className={styles.hand} disabled={busy || !!picked} onClick={() => play(h)}>
-            {coinHand === h ? "🪙" : "✊"}
-          </button>
-        ))}
-      </div>
-      {error ? (
-        <div className={styles.err}>{error}</div>
-      ) : win !== null ? (
-        <>
+    <ParkPopupFrame title="Which Hand" timeLeft={left}>
+      <div className={styles.game}>
+        <WinPay show={win === true} />
+        <div className={styles.hands}>
+          {["left", "right"].map((h) => (
+            <button key={h} className={styles.hand} disabled={busy || win !== null} onClick={() => play(h)}>
+              {coinHand === h ? "🪙" : "✊"}
+            </button>
+          ))}
+        </div>
+        {win !== null ? (
           <div className={styles.resultText}>{win ? "WIN" : "LOSE"}</div>
-          <div className={styles.controls}>
-            <button className={styles.btn} onClick={reset}>Again</button>
-          </div>
-        </>
-      ) : (
-        <div className={styles.hint}>{busy ? "..." : "Which hand hides the coin?"}</div>
-      )}
-    </div>
+        ) : (
+          <div className={styles.hint}>{busy ? "..." : "Which hand hides the coin?"}</div>
+        )}
+      </div>
+    </ParkPopupFrame>
   );
 }
 
-function Matches() {
-  const [picked, setPicked] = useState(null);
+function Matches({ onFinish }) {
   const [longOne, setLongOne] = useState(null);
   const [win, setWin] = useState(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(null);
+  const doneRef = useRef(false);
+  const timers = useRef([]);
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   const play = async (i) => {
-    if (busy || picked !== null) return;
-    setPicked(i);
-    setWin(null);
-    setError(null);
+    if (doneRef.current) return;
+    doneRef.current = true;
     setBusy(true);
-    try {
-      const [isWin] = await Promise.all([play5050(), delay(500)]);
-      setWin(isWin);
-      setLongOne(isWin ? i : i === 0 ? 1 : 0);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-  const reset = () => {
-    setPicked(null);
-    setLongOne(null);
-    setWin(null);
-    setError(null);
+    const [isWin] = await Promise.all([play5050(), delay(500)]);
+    setWin(isWin);
+    setLongOne(isWin ? i : i === 0 ? 1 : 0);
+    setBusy(false);
+    timers.current.push(setTimeout(() => onFinish?.(isWin ? 1 : 0), 1800));
   };
 
+  const left = useCountdown(!doneRef.current && win === null, CHOICE_SEC, () => {
+    play(Math.random() < 0.5 ? 0 : 1);
+  });
+
   return (
-    <div className={styles.game}>
-      <div className={styles.matches}>
-        {[0, 1].map((i) => (
-          <button key={i} className={styles.matchBtn} disabled={busy || picked !== null} onClick={() => play(i)}>
-            <span
-              className={`${styles.match} ${
-                longOne !== null ? (longOne === i ? styles.matchLong : styles.matchShort) : styles.matchHidden
-              }`}
-            />
-          </button>
-        ))}
-      </div>
-      {error ? (
-        <div className={styles.err}>{error}</div>
-      ) : win !== null ? (
-        <>
+    <ParkPopupFrame title="Matches" timeLeft={left}>
+      <div className={styles.game}>
+        <WinPay show={win === true} />
+        <div className={styles.matches}>
+          {[0, 1].map((i) => (
+            <button key={i} className={styles.matchBtn} disabled={busy || win !== null} onClick={() => play(i)}>
+              <span
+                className={`${styles.match} ${
+                  longOne !== null ? (longOne === i ? styles.matchLong : styles.matchShort) : styles.matchHidden
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+        {win !== null ? (
           <div className={styles.resultText}>{win ? "LONG — WIN" : "SHORT — LOSE"}</div>
-          <div className={styles.controls}>
-            <button className={styles.btn} onClick={reset}>Again</button>
-          </div>
-        </>
-      ) : (
-        <div className={styles.hint}>{busy ? "..." : "Pick the long match"}</div>
-      )}
-    </div>
-  );
-}
-
-const SUITS = [
-  ["♠", "black"],
-  ["♥", "red"],
-  ["♦", "red"],
-  ["♣", "black"],
-];
-const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-
-function buildDeck() {
-  const deck = [];
-  for (const [suit, color] of SUITS) {
-    for (const rank of RANKS) deck.push({ label: rank + suit, color });
-  }
-  deck.push({ label: "JKR", color: "black", joker: true });
-  deck.push({ label: "JKR", color: "red", joker: true });
-  deck.push({ label: "JKR", color: "gold", joker: true, golden: true });
-  return deck;
-}
-
-function Cards() {
-  const [deck, setDeck] = useState(buildDeck);
-  const [current, setCurrent] = useState(null);
-  const [drawn, setDrawn] = useState([]);
-
-  const draw = () => {
-    if (!deck.length) return;
-    const i = rand(deck.length);
-    const card = deck[i];
-    setDeck(deck.filter((_, j) => j !== i));
-    setCurrent(card);
-    setDrawn([card, ...drawn].slice(0, 24));
-  };
-  const reset = () => {
-    setDeck(buildDeck());
-    setCurrent(null);
-    setDrawn([]);
-  };
-
-  const cardColor = (c) => (c.golden ? "gold" : c.color);
-
-  return (
-    <div className={styles.game}>
-      <div className={styles.mock}>mock — no backend yet</div>
-      <div className={`${styles.card} ${current ? styles[`card_${cardColor(current)}`] : styles.cardBack}`}>
-        <span className={styles.cardLabel}>{current ? current.label : "?"}</span>
+        ) : (
+          <div className={styles.hint}>{busy ? "..." : "Pick the long match"}</div>
+        )}
       </div>
-      <div className={styles.info}>Deck: {deck.length} / 55</div>
-      <div className={styles.controls}>
-        <button className={styles.btn} disabled={!deck.length} onClick={draw}>Draw</button>
-        <button className={styles.btn} onClick={reset}>Reset</button>
-      </div>
-      <div className={styles.drawnRow}>
-        {drawn.map((c, i) => (
-          <span key={i} className={`${styles.miniCard} ${styles[`text_${cardColor(c)}`]}`}>{c.label}</span>
-        ))}
-      </div>
-    </div>
+    </ParkPopupFrame>
   );
 }
 
@@ -335,97 +301,65 @@ const WHEEL_COLORS = [
   "#16a085",
 ];
 
-function Wheel() {
-  const [gameId, setGameId] = useState(null);
+function Wheel({ onFinish }) {
   const [angle, setAngle] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
-  const [spinsLeft, setSpinsLeft] = useState(null);
-  const [error, setError] = useState(null);
+  const timers = useRef([]);
 
-  const start = async () => {
-    setError(null);
-    setResult(null);
-    try {
-      const res = await gamesApi.wheelStart();
-      setGameId(gameField(res, "game_id"));
-      setSpinsLeft(gameField(res, "total_spins"));
-    } catch (e) {
-      setError(e.message);
-    }
-  };
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   useEffect(() => {
-    start();
+    let cancelled = false;
+    const ask = (async () => {
+      try {
+        const res = await withTimeout(gamesApi.wheelStart());
+        const gid = gameField(res, "game_id");
+        const spun = await withTimeout(gamesApi.wheelSpin(gid));
+        return gameField(spun, "sector");
+      } catch {
+        return null;
+      }
+    })();
+    const t = setTimeout(async () => {
+      if (cancelled) return;
+      setSpinning(true);
+      const sector = (await ask) || { id: 1 + Math.floor(Math.random() * 8) };
+      if (cancelled) return;
+      const slot = CABIN_SLOT.indexOf(Number(sector.id));
+      const idx = slot >= 0 ? slot : (((sector.id - 1) % 8) + 8) % 8;
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      if (cancelled) return;
+      setAngle(5 * 360 + ((((180 - idx * 45) % 360) + 360) % 360));
+      timers.current.push(
+        setTimeout(() => {
+          setSpinning(false);
+          setResult(sector);
+          timers.current.push(setTimeout(() => onFinish?.(sector.id), 1700));
+        }, 3200)
+      );
+    }, 1000);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, []);
 
-  const spin = async () => {
-    if (spinning || !gameId || spinsLeft <= 0) return;
-    setSpinning(true);
-    setResult(null);
-    setError(null);
-    try {
-      const res = await gamesApi.wheelSpin(gameId);
-      const sector = gameField(res, "sector");
-      setSpinsLeft(gameField(res, "spins_left"));
-      const idx = (((sector.id - 1) % 8) + 8) % 8;
-      const base = Math.ceil(angle / 360) * 360;
-      const target = base + 5 * 360 + (360 - (idx * 45 + 22.5));
-      setAngle(target);
-      await delay(3200);
-      setResult(sector);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setSpinning(false);
-    }
-  };
-
-  const gradient = WHEEL_COLORS.map((c, i) => `${c} ${i * 45}deg ${(i + 1) * 45}deg`).join(",");
-
   return (
-    <div className={styles.game}>
-      <div className={styles.wheelWrap}>
-        <div className={styles.wheelPointer} />
-        <div
-          className={styles.wheel}
-          style={{
-            background: `conic-gradient(${gradient})`,
-            transform: `rotate(${angle}deg)`,
-            transition: spinning ? "transform 3s cubic-bezier(.17,.67,.2,1)" : "none",
-          }}
-        >
-          {WHEEL_COLORS.map((_, i) => (
-            <span
-              key={i}
-              className={styles.wheelNum}
-              style={{ transform: `rotate(${i * 45 + 22.5}deg) translateY(-64px)` }}
-            >
-              {i + 1}
-            </span>
-          ))}
-        </div>
+    <ParkPopupFrame title="Wheel">
+      <div className={styles.wheelBox}>
+        <FerrisEvent angle={angle} spinning={spinning} prize={result ? result.id : null} />
       </div>
-      {error ? (
-        <div className={styles.err}>{error}</div>
-      ) : result ? (
-        <div className={styles.resultText}>x{result.multiplier}</div>
-      ) : (
-        <div className={styles.hint}>{spinning ? "..." : "Spin the wheel"}</div>
-      )}
-      <div className={styles.info}>Spins left: {spinsLeft ?? "-"}</div>
-      <div className={styles.controls}>
-        <button className={styles.btn} disabled={spinning || spinsLeft <= 0} onClick={spin}>Spin</button>
-      </div>
-    </div>
+      <div className={styles.hint}>{result ? `+${result.id}` : spinning ? "..." : ""}</div>
+    </ParkPopupFrame>
   );
 }
 
 export const MINI_GAMES = [
-  { id: "coinflip", title: "Coin Flip (50/50)", Comp: CoinFlip },
-  { id: "coinhand", title: "Which Hand (50/50)", Comp: CoinHand },
-  { id: "matches", title: "Matches (50/50)", Comp: Matches },
-  { id: "cards", title: "Cards", Comp: Cards },
-  { id: "figures", title: "Figures", Comp: Figures },
-  { id: "wheel", title: "Wheel", Comp: Wheel },
+  { id: "coinflip", title: "Coin Flip (50/50)", Comp: CoinFlip, bare: true },
+  { id: "coinhand", title: "Which Hand (50/50)", Comp: CoinHand, bare: true },
+  { id: "matches", title: "Matches (50/50)", Comp: Matches, bare: true },
+  { id: "cards", title: "Cards", Comp: CardsGame, bare: true },
+  { id: "pyramid", title: "Pyramid", Comp: PyramidGame, bare: true },
+  { id: "wheel", title: "Wheel", Comp: Wheel, bare: true },
 ];

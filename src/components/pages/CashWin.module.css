@@ -1,0 +1,39 @@
+.wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 8px 0;
+  animation: cashIn 0.42s cubic-bezier(0.3, 1.35, 0.5, 1) both;
+}
+
+.money {
+  width: 104px;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.45)) drop-shadow(0 3px 7px rgba(0, 0, 0, 0.5));
+}
+
+.val {
+  margin: 0 0 6px -14px;
+  font-family: "PyrSans", system-ui, sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1;
+  -webkit-text-stroke: 0.8px #f2a81d;
+  color: #ffd53e;
+  background: linear-gradient(180deg, #fff3b0 10%, #ffd53e 45%, #f5a11c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 0 rgba(122, 44, 13, 0.9)) drop-shadow(0 3px 5px rgba(0, 0, 0, 0.55));
+}
+
+@keyframes cashIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

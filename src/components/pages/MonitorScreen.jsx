@@ -48,9 +48,9 @@ export const REEL_ICONS = [
   { key: "ice", img: "Icn_IceCreame.png", h: 151, bh: 163, dy: 20.5 , wm: 1.1, winDy: 7, sdy: -7.9, wdy: -6.62 },
   { key: "hat", img: "Hat_1.webp", dir: "/bonus-park/Hat_Spin", fxImg: "Icn_Hat.png", h: 111.84, bh: 123.7, wh: 110.03, wm: 1.26, noSway: true, sdy: -0.88, lockPos: true, wfix: -1.52 },
   { key: "cocktail", img: "Icn_Cocteil.png", h: 132, bh: 146, dy: 12.4 , wm: 1.1, winDy: 5, sdy: -4.83, wdy: -9.97 },
-  { key: "key", img: "Icn_Key.png", h: 108, bh: 117 , wm: 1.27, noSway: true, sdy: 5.04, wdy: 6, wh: 102.6, rs: 0.95 },
+  { key: "key", img: "Icn_Key.png", h: 108, bh: 117 , wm: 1.27, noSway: true, sdy: 5.04, wdy: 6, wh: 102.6, rs: 0.95, lockPos: true, wfix: -4.18 },
   { key: "mask", img: "Icn_Mask.png", h: 104, bh: 104 , wm: 1.38, sdy: 2.22, wdy: -9.16, up: -1 },
-  { key: "ring", img: "castle_slot.webp", dir: "/bonus-park", h: 103, bh: 103, noFx: true, wm: 0.99, sdy: 1.48, noSway: true, wdy: -11.23, up: 0, rs: 0.95 },
+  { key: "ring", img: "castle_slot.webp", dir: "/bonus-park", h: 103, bh: 103, noFx: true, wm: 0.99, sdy: 1.48, noSway: true, wdy: -11.23, up: 0, rs: 0.95, popMs: 920 },
   { key: "crown", img: "Icn_Crown.png", h: 110, bh: 110, wm: 1.22, cdy: [2.96, 2.96, 1.49], inside: true, wdy: -11, up: -1.5 },
   { key: "coin", img: "Coin_1.webp", dir: "/bonus-park/Coin_Spin", h: 83.19, bh: 83.19, wh: 82.2, grow: 1.3, noFx: true, wm: 1.22, noSway: true, sdy: 9.87, wdy: 2.12, up: -2, lockPos: true, wfix: -9.19, iosSdy: -2.96, iosWfix: 1.82 },
   { key: "crystal", img: "ezgif-frame_Base_1.png", dir: CRYSTAL, h: 121, bh: 121, noFx: true, noSway: true, sdy: 8, cdy: [2.96, 0, 2.96], wm: 1.5, wh: 117, lockPos: true, wfix: -11.27, glowFx: "Fx_Light_5.png", glowK: 1.66 },
@@ -134,6 +134,9 @@ const SCR_D =
   "M -0.60 16.68 L 1.47 15.93 L 5.20 14.58 L 8.93 13.23 L 12.67 11.87 L 16.40 10.52 L 20.13 9.61 L 23.87 8.71 L 27.60 7.81 L 31.33 6.91 L 35.07 6.00 L 38.80 5.10 L 42.53 4.65 L 46.27 3.74 L 50 3.29 L 53.73 3.29 L 57.47 2.84 L 61.20 2.84 L 64.93 2.84 L 68.67 2.84 L 72.40 3.29 L 76.13 3.74 L 79.87 3.74 L 83.60 4.20 L 87.33 5.10 L 91.07 5.55 L 94.80 6.45 L 98.53 7.36 L 100.60 7.86 L 100.60 84.17 L 98.53 83.67 L 94.80 82.76 L 91.07 81.86 L 87.33 81.20 L 83.60 80.51 L 79.87 80.05 L 76.13 79.60 L 72.40 78.70 L 68.67 78.70 L 64.93 78.25 L 61.20 78.25 L 57.47 78.25 L 53.73 78.25 L 50 78.70 L 46.27 78.70 L 42.53 79.60 L 38.80 80.05 L 35.07 80.96 L 31.33 81.41 L 27.60 82.31 L 23.87 83.22 L 20.13 84.12 L 16.40 85.47 L 12.67 86.38 L 8.93 87.73 L 5.20 88.63 L 1.47 89.99 L -0.60 90.74 Z";
 
 const SNAP_KEYS = new Set(["coin", "key", "crystal"]);
+const NO_LEAVE = [false, false, false];
+const HOLD_KEYS = new Set(["key", "coin"]);
+const ALL_LEAVE = [true, true, true];
 
 const CR_BASE_G = { top: 0.1167, bot: 0.8833 };
 const CR_FRAME_G = { top: 0.0633, bot: 0.9467 };
@@ -141,7 +144,7 @@ const CR_FRAME_G = { top: 0.0633, bot: 0.9467 };
 const TWIST_TURN_MS = 560;
 const TWIST_TURNS = 1;
 
-function WinImg({ src, className, style, s0, dy0, dyw, inside, leaving, active, runKey }) {
+function WinImg({ src, className, style, s0, dy0, dyw, inside, leaving, active, runKey, popMs = 800 }) {
   const ref = useRef(null);
   const pdy = (style && style["--pdy"]) || "0%";
 
@@ -151,12 +154,12 @@ function WinImg({ src, className, style, s0, dy0, dyw, inside, leaving, active, 
     const from = { transform: `translateY(${dy0}) translateY(${pdy}) scale(${s0})` };
     const to = { transform: `translateY(${dyw}) scale(1.16)` };
     const anim = el.animate([from, to], {
-      duration: 800,
+      duration: popMs,
       easing: "cubic-bezier(0.34, 1.42, 0.64, 1)",
       fill: "both",
     });
     return () => anim.cancel();
-  }, [leaving, active, runKey, s0, dy0, dyw, inside, pdy]);
+  }, [leaving, active, runKey, s0, dy0, dyw, inside, pdy, popMs]);
 
   return <img ref={ref} className={className} src={src} alt="" draggable={false} style={style} />;
 }
@@ -171,6 +174,7 @@ const HAT_BACK_MS = 500;
 const HAT_GROW = 1.334;
 const HAT_LOOPS = 2;
 const HAT_TOTAL = HAT_START + HAT_MS + HAT_BACK_MS;
+const FRAME_FADE_MS = 620;
 
 const HAT_FRAMES = [];
 for (let i = 1; i <= HAT_COUNT; i += 1) HAT_FRAMES.push(`${HAT_DIR}/Hat_${i}.webp`);
@@ -476,10 +480,7 @@ function TwistIcon({ cfg, className, style, leaving, active, runKey, glow, glowH
     function onFwdEnd() {
       if (cancelled) return;
       if (cfg.endFirst) show(0);
-      if (holdRef.current) {
-        if (finalIdx >= 0) show(finalIdx);
-        return;
-      }
+      if (holdRef.current) return;
       if (!cfg.settle) return;
       timerRef.current = setTimeout(() => {
         if (cancelled) return;
@@ -531,19 +532,19 @@ function TwistIcon({ cfg, className, style, leaving, active, runKey, glow, glowH
 
   useEffect(() => {
     if (!hold || !leaving || !active) return undefined;
-    backRef.current?.();
+    if (!cfg.noBack) backRef.current?.();
     return undefined;
-  }, [hold, leaving, active]);
+  }, [hold, leaving, active, cfg.noBack]);
 
   useEffect(() => {
     const was = prevHoldRef.current;
     prevHoldRef.current = hold;
     if (!was || hold || !active || leaving || phase !== "spin") return undefined;
     setPhase("return");
-    backRef.current?.();
-    const t = setTimeout(() => setPhase("parked"), Math.max(500, spinMsRef.current));
+    if (!cfg.noBack) backRef.current?.();
+    const t = setTimeout(() => setPhase("parked"), cfg.noBack ? 520 : Math.max(500, spinMsRef.current));
     return () => clearTimeout(t);
-  }, [hold, active, leaving, phase]);
+  }, [hold, active, leaving, phase, cfg.noBack]);
 
   const poseCls =
     phase === "return"
@@ -651,8 +652,10 @@ export default function MonitorScreen({
   const [shownWin, setShownWin] = useState([false, false, false]);
   const [shownRes, setShownRes] = useState(result);
   const [showId, setShowId] = useState(0);
-  const [leaving, setLeaving] = useState(false);
+  const [leaveCols, setLeaveCols] = useState(NO_LEAVE);
+  const leaving = leaveCols[0] || leaveCols[1] || leaveCols[2];
   const [winOver, setWinOver] = useState(true);
+  const hatHoldRef = useRef(false);
   const winKey = win.map((v) => (v ? "1" : "0")).join("");
   const shownWinRef = useRef(shownWin);
   shownWinRef.current = shownWin;
@@ -662,7 +665,7 @@ export default function MonitorScreen({
 
   useEffect(() => {
     setShownWin([false, false, false]);
-    setLeaving(false);
+    setLeaveCols(NO_LEAVE);
   }, [spinKey]);
 
   useEffect(() => {
@@ -675,7 +678,7 @@ export default function MonitorScreen({
       setShownWin(want);
       setShownRes(resultRef.current);
       setShowId((x) => x + 1);
-      setLeaving(false);
+      setLeaveCols(NO_LEAVE);
       setWinOver(false);
       holdSpinRef.current = spinKey;
       return undefined;
@@ -686,18 +689,29 @@ export default function MonitorScreen({
         ? shownWinRef.current.map((v, c) => v && SNAP_KEYS.has(shownResRef.current[c]))
         : [false, false, false];
     if (keep.some(Boolean)) {
+      const drop = shownWinRef.current.map((v, c) => !!v && !keep[c]);
+      if (drop.some(Boolean)) {
+        setLeaveCols(drop);
+        const tk = setTimeout(() => {
+          setShownWin(keep);
+          setLeaveCols(NO_LEAVE);
+        }, 620);
+        return () => clearTimeout(tk);
+      }
       setShownWin(keep);
-      setLeaving(false);
+      setLeaveCols(NO_LEAVE);
       return undefined;
     }
-    setLeaving(true);
+    setLeaveCols(ALL_LEAVE);
     const t = setTimeout(() => {
       setShownWin([false, false, false]);
-      setLeaving(false);
+      setLeaveCols(NO_LEAVE);
     }, 620);
     return () => clearTimeout(t);
   }, [winKey, spinKey]);
 
+  const hatInWin = shownRes.some((k, c) => k === "hat" && shownWin[c]);
+  hatHoldRef.current = hatInWin;
   const allSame = result[0] === result[1] && result[1] === result[2];
   const wildLine =
     shownRes.includes("hat") &&
@@ -717,11 +731,11 @@ export default function MonitorScreen({
       return undefined;
     }
     setHatEnd(false);
-    const t = setTimeout(() => setHatEnd(true), HAT_TOTAL - 300);
+    const t = setTimeout(() => setHatEnd(true), HAT_TOTAL - FRAME_FADE_MS);
     return () => clearTimeout(t);
   }, [hatKey]);
 
-  const frameOn = lineWin && allSettled && shownWin.every(Boolean) && !hatEnd;
+  const frameOn = lineWin && allSettled && shownWin.every(Boolean) && !hatEnd && !winOver;
   const shineKey = !allSettled
     ? "000"
     : settled
@@ -739,10 +753,12 @@ export default function MonitorScreen({
       setShineOn([false, false, false]);
       return undefined;
     }
+    const hatHere = result.some((k) => k === "hat");
     const timers = [setTimeout(() => setShineOn(want), SHINE_DELAY)];
     want.forEach((w, i) => {
       const cfg = SHINE_MAP[result[i]];
       if (!w || !cfg || !cfg.hold) return;
+      if (hatHere && HOLD_KEYS.has(result[i])) return;
       timers.push(
         setTimeout(() => {
           setShineOn((prev) => {
@@ -753,9 +769,14 @@ export default function MonitorScreen({
         }, SHINE_DELAY + cfg.hold)
       );
     });
-    timers.push(setTimeout(() => setShineOn([false, false, false]), SHINE_HOLD));
+    if (!hatHere) timers.push(setTimeout(() => setShineOn([false, false, false]), SHINE_HOLD));
     return () => timers.forEach(clearTimeout);
   }, [shineKey]);
+
+  useEffect(() => {
+    if (!winOver) return;
+    setShineOn([false, false, false]);
+  }, [winOver]);
 
   const fadeTimers = useRef([]);
 
@@ -928,6 +949,7 @@ export default function MonitorScreen({
   const winCell = (k, c) => {
     const ic = byKey(k);
     const active = shownWin[c];
+    const leaving = leaveCols[c];
     const wm = ic.wm || 1;
     const hh = ((ic.wh || ic.h) * wm * iconScale).toFixed(1);
     const wdyEff = ic.lockPos
@@ -1007,7 +1029,7 @@ export default function MonitorScreen({
               leaving={leaving}
               active={active}
               runKey={showId}
-              hold={ic.key === "key" && wildLine && !winOver}
+              hold={HOLD_KEYS.has(ic.key) && hatInWin && !winOver}
               glow={ic.glowFx ? `${ic.dir}/${ic.glowFx}` : undefined}
               glowH={(100 * (ic.glowK || 2.1)).toFixed(0)}
               className={styles.winIcon}
@@ -1035,6 +1057,7 @@ export default function MonitorScreen({
               leaving={leaving}
               active={active}
               runKey={showId}
+              popMs={ic.popMs || 800}
             />
           )}
         </span>
@@ -1052,9 +1075,9 @@ export default function MonitorScreen({
           }}
           className={`${styles.cell} ${running[c] ? styles.moving : ""} ${starsRun[c] ? styles.starsRun : ""} ${
             shownWin[c] ? styles.won : ""
-          } ${shownWin[c] && leaving ? styles.wonBack : ""} ${
-            shownWin[c] && leaving && SNAP_KEYS.has(shownRes[c]) ? styles.wonSnap : ""
-          } ${shownRes[c] === "crystal" && !leaving ? styles.wonSoft : ""}`}
+          } ${shownWin[c] && leaveCols[c] ? styles.wonBack : ""} ${
+            shownWin[c] && leaveCols[c] && SNAP_KEYS.has(shownRes[c]) ? styles.wonSnap : ""
+          } ${shownRes[c] === "crystal" && !leaveCols[c] ? styles.wonSoft : ""}`}
           style={{
             transform: `translateY(${col.dy}%) rotate(${col.rot}deg)`,
             clipPath: `inset(${(COL_BAND[c].top - col.dy).toFixed(2)}% 0% ${(100 - COL_BAND[c].bot + col.dy).toFixed(2)}% 0%)`,

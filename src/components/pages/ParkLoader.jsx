@@ -61,6 +61,19 @@ const videoSets = () => {
 const VCACHE = new Map();
 
 const MIN_MS = 900;
+const VIDEO_CAP_MS = 22000;
+
+let vhost = null;
+const videoHost = () => {
+  if (typeof document === "undefined") return null;
+  if (vhost && vhost.isConnected) return vhost;
+  vhost = document.createElement("div");
+  vhost.setAttribute("aria-hidden", "true");
+  vhost.style.cssText =
+    "position:fixed;left:0;top:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;overflow:hidden";
+  document.body.appendChild(vhost);
+  return vhost;
+};
 
 export default function ParkLoader({ view, onDone }) {
   const [pct, setPct] = useState(0);
@@ -100,10 +113,16 @@ export default function ParkLoader({ view, onDone }) {
           }
           const v = done || document.createElement("video");
           if (!done) {
-            v.src = src;
             v.muted = true;
+            v.defaultMuted = true;
             v.playsInline = true;
+            v.setAttribute("muted", "");
+            v.setAttribute("playsinline", "");
+            v.setAttribute("webkit-playsinline", "");
             v.preload = "auto";
+            v.src = src;
+            v.style.cssText = "width:1px;height:1px;opacity:0.01";
+            videoHost()?.appendChild(v);
             VCACHE.set(src, v);
           }
           let steps = 0;
@@ -131,11 +150,11 @@ export default function ParkLoader({ view, onDone }) {
           setTimeout(() => {
             clearInterval(iv);
             while (steps < 3) step();
-          }, 9000);
+          }, VIDEO_CAP_MS);
         })
     );
 
-    const cap = vlist.length ? 10000 : 4000;
+    const cap = vlist.length ? VIDEO_CAP_MS + 500 : 4000;
     Promise.race([Promise.all([...jobs, ...vjobs]), new Promise((r) => setTimeout(r, cap))]).then(() => {
       if (cancelled) return;
       setPct(100);

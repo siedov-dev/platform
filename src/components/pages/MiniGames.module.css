@@ -38,6 +38,15 @@
   cursor: not-allowed;
 }
 
+.jokerClip {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  margin: 0 auto 2px;
+  display: block;
+  pointer-events: none;
+}
+
 .payFx {
   position: absolute;
   left: 50%;

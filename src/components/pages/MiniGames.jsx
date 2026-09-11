@@ -25,6 +25,23 @@ async function play5050() {
 
 const CHOICE_SEC = 10;
 const WIN_PAY = 50;
+const JOKER_DIR = "/bonus-park/joker";
+const JOKER_CLIPS = { coin: "102719_RGBA_00001.webm", match: "115402_RGBA_00001.webm" };
+
+function JokerClip({ clip }) {
+  return (
+    <video
+      className={styles.jokerClip}
+      src={`${JOKER_DIR}/${clip}`}
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload="auto"
+      disablePictureInPicture
+    />
+  );
+}
 const MONEY_ICN = "/bonus-park/Ui_Exchange_HUD/Icn_Currency.png";
 
 function WinPay({ show, value = WIN_PAY }) {
@@ -88,6 +105,7 @@ function CoinFlip({ onFinish }) {
   return (
     <ParkPopupFrame title="Coin Flip" timeLeft={left}>
       <div className={styles.game}>
+        <JokerClip clip={JOKER_CLIPS.coin} />
         <WinPay show={win === true && !flipping} />
         <div className={`${styles.coin} ${flipping ? styles.coinFlip : ""}`}>
           <span className={styles.coinFace}>{landed === "tails" ? "T" : "H"}</span>
@@ -180,6 +198,7 @@ function Matches({ onFinish }) {
   return (
     <ParkPopupFrame title="Matches" timeLeft={left}>
       <div className={styles.game}>
+        <JokerClip clip={JOKER_CLIPS.match} />
         <WinPay show={win === true} />
         <div className={styles.matches}>
           {[0, 1].map((i) => (

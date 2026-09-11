@@ -247,6 +247,18 @@ const COMBOS = [
 ];
 
 const DEMO_SEQ = [
+  ["coin", "coin", "hat"],
+  ["coin", "hat", "hat"],
+  ["key", "hat", "hat"],
+  ["key", "key", "hat"],
+  ["key", "key", "key"],
+  ["ring", "ring", "ring"],
+  ["ring", "ring", "hat"],
+  ["mask", "mask", "mask"],
+  ["crown", "crown", "crown"],
+  ["ice", "ice", "ice"],
+  ["cocktail", "cocktail", "cocktail"],
+  ["key", "key", "key"],
   ["crown", "hat", "ice"],
   ["crown", "hat", "crown"],
   ["mask", "mask", "hat"],
@@ -269,6 +281,13 @@ const CRYSTAL_ORDER = ["crB", "crY", "crR", "crP"];
 
 const PAY_TABLE = { ice: 3, cocktail: 5, key: 10, mask: 15, ring: 50, crown: 100, hat: 200 };
 const WIN_NUMS = [1, 2, 3, 5, 10, 15, 25, 50, 100, 200, 500];
+const WIN_SHOW_MS = 5320;
+const HAT_SHOW_MS = 3600;
+const WIN_NUM_IN = 200;
+const WIN_NUM_OUT = 500;
+const WIN_LOCK_GAP = 130;
+const WIN_OUT_MS = 620;
+const ICON_SHOW_MS = { key: 1500, coin: 1850, crystal: 1750, hat: HAT_SHOW_MS };
 
 const GAME_PRELOAD = [
   `${ASSET}/Piramid_Bg_Select/Castle.png`,
@@ -2327,6 +2346,8 @@ export function UpperPark() {
   const [stopKey, setStopKey] = useState(0);
   const winNumCache = useRef([]);
   const [winPay, setWinPay] = useState(null);
+  const [winShowMs, setWinShowMs] = useState(WIN_SHOW_MS);
+  const [winOut, setWinOut] = useState(false);
 
   useEffect(() => {
     const keep = [];
@@ -2407,6 +2428,7 @@ export function UpperPark() {
     winTimers.current = [];
     setWinStage(0);
     setWinPay(null);
+    setWinOut(false);
     setLanded(false);
     setSpinning(true);
     setReel(rollResult());
@@ -2433,19 +2455,32 @@ export function UpperPark() {
         }, CRYSTAL_GLOW_MS)
       );
     }
+    const lit = [0, 1, 2].map((c) => same || r[c] === "coin" || r[c] === "crystal" || r[c] === "hat");
+    const shownKeys = r.filter((k, i) => lit[i]);
+    const showMs = shownKeys.length
+      ? Math.max(...shownKeys.map((k) => ICON_SHOW_MS[k] ?? WIN_SHOW_MS))
+      : WIN_SHOW_MS;
+    setWinShowMs(showMs);
+    setWinOut(false);
     const pay = payFor(r);
     if (pay > 0 && WIN_NUMS.includes(pay)) {
-      winTimers.current.push(setTimeout(() => setWinPay(pay), 200));
+      winTimers.current.push(setTimeout(() => setWinPay(pay), WIN_NUM_IN));
       winTimers.current.push(
         setTimeout(() => wallet?.award("coins", pay, centerOf('[class*="slotWinNum"]')), 1150)
       );
-      winTimers.current.push(setTimeout(() => setWinPay(null), 4700));
+      winTimers.current.push(setTimeout(() => setWinOut(true), Math.max(400, showMs - WIN_NUM_OUT)));
+      winTimers.current.push(
+        setTimeout(() => {
+          setWinPay(null);
+          setWinOut(false);
+        }, showMs)
+      );
     }
     if (hasCoin || same || r.includes("crystal") || r.includes("hat")) {
       setSpinLock(true);
       setWinStage(1);
-      winTimers.current.push(setTimeout(() => setSpinLock(false), 5450));
-      winTimers.current.push(setTimeout(() => setWinStage(0), 4700));
+      winTimers.current.push(setTimeout(() => setSpinLock(false), showMs + WIN_LOCK_GAP));
+      winTimers.current.push(setTimeout(() => setWinStage(0), Math.max(250, showMs - WIN_OUT_MS)));
     }
   };
 
@@ -2500,7 +2535,10 @@ export function UpperPark() {
         <ParkDecor storeKey={DECO_UP_KEY} defaults={DEFAULT_DECO_UP} />
         <TrainRide ref={trainRef} onDeparted={onTrainDeparted} />
         {winPay && (
-          <span key={`wp${winPay}-${spinKey}`} className={styles.slotWinNum}>
+          <span
+            key={`wp${winPay}-${spinKey}`}
+            className={`${styles.slotWinNum} ${winOut ? styles.slotWinOut : ""}`}
+          >
             <img className={styles.slotWinPlus} src={`${ASSET}/Win_Num_T/Win_Number_+.png`} alt="" draggable={false} />
             <span className={styles.slotWinValBox}>
               <img className={styles.slotWinVal} src={`${ASSET}/Win_Num_T/Win_Number_${winPay}.png`} alt="" draggable={false} />

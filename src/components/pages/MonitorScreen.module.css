@@ -543,7 +543,7 @@
   overflow: visible;
   z-index: 8;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.62s ease;
   pointer-events: none;
 }
 

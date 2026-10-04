@@ -2515,7 +2515,7 @@
 .decoLayer {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 4;
   pointer-events: none;
 }
 
@@ -2576,4 +2576,97 @@
   font-weight: 700;
   white-space: nowrap;
   pointer-events: none;
+}
+
+
+
+.fountain {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.fieldHit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.leaveOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 570;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(6, 4, 16, 0.74);
+}
+
+.leaveBox {
+  width: 100%;
+  max-width: 320px;
+}
+
+.leaveText {
+  margin: 4px 0 8px;
+  text-align: center;
+  font-family: "PyrSans", system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #f6e4b8;
+  text-shadow: 0 2px 0 rgba(60, 20, 8, 0.7), 0 3px 4px rgba(0, 0, 0, 0.45);
+}
+
+.leaveRow {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.leaveBtn {
+  position: relative;
+  margin-top: 10px;
+  width: 118px;
+  height: 48px;
+  padding: 0 0 2px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #c363e8 0%, #8e21bb 46%, #5f0c84 100%);
+  box-shadow: 0 0 0 2.5px #e0b352, 0 0 0 4px #5b3d0d, 0 0 14px rgba(190, 90, 240, 0.55),
+    0 3px 8px rgba(0, 0, 0, 0.5);
+  font-family: "PyrSans", system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(74, 8, 100, 0.9), 0 3px 4px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.leaveBtn::after {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 8%;
+  height: 40%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+}
+
+.leaveBtn:active {
+  transform: scale(0.96);
+}
+
+.leaveBtnNo {
+  background: linear-gradient(180deg, #8a8a98 0%, #4f4f5e 46%, #2c2c38 100%);
+  box-shadow: 0 0 0 2.5px #e0b352, 0 0 0 4px #5b3d0d, 0 3px 8px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 0 rgba(20, 20, 30, 0.9), 0 3px 4px rgba(0, 0, 0, 0.45);
 }

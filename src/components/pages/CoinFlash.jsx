@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "./CoinFlash.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const ASSET = "/bonus-park/Flash_Coin_Lights";
+const ASSET = PARK_ASSET + "/Flash_Coin_Lights";
 
 // vertical lightning striking DOWN through the coin into the pedestal (blue top -> pink bottom hits the base)
 const BOLTS = [

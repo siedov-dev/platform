@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from "react";
 import { useApp } from "@/context/AppContext";
 import TileField from "./TileField";
 import Particles from "./Particles";
@@ -13,17 +13,20 @@ import ParkHud from "./ParkHud";
 import PlayerRow from "./PlayerRow";
 import ParkLoader from "./ParkLoader";
 import TrainRide from "./TrainRide";
+import ParkPopupFrame from "./ParkPopupFrame";
 
 import CoinFlash from "./CoinFlash";
 import usePopFrom, { usePopTo } from "./usePopFrom";
 import { MINI_GAMES } from "./MiniGames";
 import CashWin from "./CashWin";
 import { WalletProvider, useWallet, centerOf } from "./parkWallet";
+import { ParkSocket, ParkServerContext, useParkServer, parkConfig, parkMode, parkServerEnabled } from "./parkSocket";
 import styles from "./BonusParkPage.module.css";
+import { PARK_ASSET, PARK_DESK } from "./parkAssetBase";
 
-const ASSET = "/bonus-park";
+const ASSET = PARK_ASSET;
 
-const ENERGY_GOAL = 1042;
+const ENERGY_GOAL = 500;
 const SAFE_GOAL = 4;
 
 const AUTO_HOLD_MS = 1355;
@@ -31,7 +34,54 @@ const AUTO_STOP_MS = 460;
 
 const OUTCOME_SEQ = ["energy", "money", "game", "cash", "energy", "game", "money", "game", "cash", "energy", "game"];
 const CASH_NOMS = [100, 50, 25, 15, 13, 10, 8, 7, 5];
-const TAKEN_FIELDS = new Set(["mr", "bl"]);
+const DOC_POOL = { energy: 442, joker: 6, cash: 83, cards: 55, pyramid: 17, wheel: 8, money: 29 };
+const DOC_TOTAL = 640;
+const CASH_WEIGHTS = [[100, 1], [50, 1], [25, 2], [15, 3], [13, 4], [10, 20], [8, 27], [7, 11], [5, 14]];
+const WHEEL_DOC_POOL = [1, 2, 2, 2, 3, 3, 3, 5];
+const JOKER_GAMES = ["coinhand", "matches", "coinflip"];
+const SAFE_START = 5;
+const PAID_TRY_CASH = 5;
+
+const shuffleArr = (a) => {
+  for (let i = a.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+const buildLocalPool = (size) => {
+  const keys = Object.keys(DOC_POOL);
+  const raw = keys.map((k) => (DOC_POOL[k] * size) / DOC_TOTAL);
+  const base = raw.map((v) => Math.floor(v));
+  let left = size - base.reduce((s, n) => s + n, 0);
+  raw
+    .map((v, i) => [i, v - Math.floor(v)])
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([i]) => {
+      if (left > 0) {
+        base[i] += 1;
+        left -= 1;
+      }
+    });
+  const items = [];
+  keys.forEach((k, i) => {
+    for (let n = 0; n < base[i]; n += 1) items.push(k);
+  });
+  return shuffleArr(items);
+};
+
+const weightedCash = () => {
+  const total = CASH_WEIGHTS.reduce((s, [, w]) => s + w, 0);
+  let r = Math.random() * total;
+  for (const [v, w] of CASH_WEIGHTS) {
+    r -= w;
+    if (r <= 0) return v;
+  }
+  return CASH_WEIGHTS[CASH_WEIGHTS.length - 1][0];
+};
+const TEST_FIRST_GAMES = ["pyramid", "cards", "coinflip", "coinflip", "coinhand", "coinhand", "matches", "matches"];
+const TAKEN_FIELDS = new Set();
 const JOKERS = new Set(["coinflip", "coinhand", "matches"]);
 const JOKER_PAY = 50;
 const TILE_COST = 1;
@@ -186,7 +236,7 @@ const DEFAULT_UI = {
 
 const WIN_CHANCE = 0.5;
 
-const SYMS = ["ice", "hat", "cocktail", "key", "mask", "ring", "crown", "coin", "crystal"];
+const SYMS = ["ice", "hat", "cocktail", "key", "mask", "castle", "crown", "coin", "crystal"];
 const WILD = "hat";
 const PLAIN = SYMS.filter((s) => s !== "coin" && s !== "crystal");
 const NOHAT = PLAIN.filter((s) => s !== WILD);
@@ -197,7 +247,7 @@ const SYM_RU = {
   cocktail: "коктейль",
   key: "ключ",
   mask: "маска",
-  ring: "замок",
+  castle: "замок",
   crown: "корона",
   coin: "монета",
   crystal: "кристалл",
@@ -240,7 +290,7 @@ const COMBOS = [
   { pay: 5, build: () => wildMix("cocktail") },
   { pay: 10, build: () => wildMix("key") },
   { pay: 15, build: () => wildMix("mask") },
-  { pay: 50, build: () => wildMix("ring") },
+  { pay: 50, build: () => wildMix("castle") },
   { pay: 100, build: () => wildMix("crown") },
   { pay: 200, build: () => [WILD, WILD, WILD] },
   { pay: 0, screen: true, build: () => shuffle(["crystal", rnd(NOHAT), rnd(NOHAT)]) },
@@ -252,8 +302,8 @@ const DEMO_SEQ = [
   ["key", "hat", "hat"],
   ["key", "key", "hat"],
   ["key", "key", "key"],
-  ["ring", "ring", "ring"],
-  ["ring", "ring", "hat"],
+  ["castle", "castle", "castle"],
+  ["castle", "castle", "hat"],
   ["mask", "mask", "mask"],
   ["crown", "crown", "crown"],
   ["ice", "ice", "ice"],
@@ -278,18 +328,28 @@ const RIDE_LAND_MS = 2600;
 const CRYSTAL_GLOW_MS = 180;
 
 const CRYSTAL_ORDER = ["crB", "crY", "crR", "crP"];
+const TRAIN_FULL = 6;
 
-const PAY_TABLE = { ice: 3, cocktail: 5, key: 10, mask: 15, ring: 50, crown: 100, hat: 200 };
+const PAY_TABLE = { ice: 3, cocktail: 5, key: 10, mask: 15, castle: 50, crown: 100, hat: 200 };
 const WIN_NUMS = [1, 2, 3, 5, 10, 15, 25, 50, 100, 200, 500];
-const WIN_SHOW_MS = 5320;
-const HAT_SHOW_MS = 3600;
+const WIN_SHOW_MS = 3600;
+const HAT_SHOW_MS = WIN_SHOW_MS;
 const WIN_NUM_IN = 200;
 const WIN_NUM_OUT = 500;
 const WIN_LOCK_GAP = 130;
 const WIN_OUT_MS = 620;
-const ICON_SHOW_MS = { key: 1500, coin: 1850, crystal: 1750, hat: HAT_SHOW_MS };
+const ICON_SHOW_MS = { key: WIN_SHOW_MS, coin: WIN_SHOW_MS, crystal: WIN_SHOW_MS, hat: HAT_SHOW_MS };
 
 const GAME_PRELOAD = [
+  ...(PARK_DESK
+    ? [
+        ...["Castle", "Shot_1000", "Burger777_Icon", "Carousel", "Wheel", "Flash_Light_blue_2", "Crown_PopUp", "Decor_PopUp"].map(
+          (n) => `${ASSET}/Piramid_Bg_Select_hd/${n}.png`
+        ),
+        `${ASSET}/Pyramid_Game_hd/Pyramid_Line.png`,
+        `${ASSET}/Evnt_FW_hd/Arrow_Evnt_Ferris%20wheel.png`,
+      ]
+    : []),
   `${ASSET}/Piramid_Bg_Select/Castle.png`,
   `${ASSET}/Piramid_Bg_Select/Shot_1000.png`,
   `${ASSET}/Piramid_Bg_Select/Burger777_Icon.png`,
@@ -310,8 +370,9 @@ const GAME_PRELOAD = [
   `${ASSET}/Evnt_FW/Evnt_FW_Cabin_Red.png`,
   `${ASSET}/Evnt_FW/Evnt_FW_Cabin__Green.png`,
   `${ASSET}/Cards_Game/Card_all_0000_Layer-287-copy-14.webp`,
-  `${ASSET}/Cards_Game/Shine_Card-Win.webp`,
-  `${ASSET}/Cards_Game/Light_Fx_Card.webp`,
+  `${ASSET}/Cards_Game${PARK_DESK ? "_hd" : ""}/Card_all_0000_Layer-287-copy-14.webp`,
+  `${ASSET}/Cards_Game${PARK_DESK ? "_hd" : ""}/Shine_Card-Win.webp`,
+  `${ASSET}/Cards_Game${PARK_DESK ? "_hd" : ""}/Light_Fx_Card.webp`,
 ];
 
 const GAME_FONTS = ['16px "PyrUncial"', '700 16px "PyrSans"', '900 16px "PyrSans"'];
@@ -326,17 +387,11 @@ const lineOf = (r) => {
 };
 
 const payFor = (r) => {
-  if (r.includes("crystal")) return 0;
   const hats = r.filter((s) => s === WILD).length;
   if (hats === 3) return PAY_TABLE[WILD];
   const coins = r.filter((s) => s === "coin").length;
   const rest = r.filter((s) => s !== WILD && s !== "coin");
-  if (coins > 0) {
-    if (coins === 1 && hats === 2) return 3;
-    if (coins === 2 && hats === 0) return 2;
-    if (coins === 1 && hats === 1) return 2;
-    return 1;
-  }
+  if (coins > 0) return coins + hats;
   const uniq = [...new Set(rest)];
   if (uniq.length === 1) return PAY_TABLE[uniq[0]] || 0;
   if (hats === 1 && uniq.length === 2) return 1;
@@ -402,7 +457,7 @@ function saveJson(key, value) {
   }
 }
 
-const PBS = "/bonus-park/Piramid_Bg_Select";
+const PBS = PARK_ASSET + "/Piramid_Bg_Select";
 const YF = `${PBS}/Yacht_Fountain`;
 const DECO_EDIT_EVENT = "bonuspark-deco-edit";
 const DECO_DUMP_EVENT = "bonuspark-deco-dump";
@@ -410,7 +465,7 @@ const DECO_DUMP_EVENT = "bonuspark-deco-dump";
 const DECO_UP_KEY = "bonuspark.decoUp3";
 const DEFAULT_DECO_UP = [
   { id: "hat", src: `${PBS}/Gold_Hat_map.png`, x: 39.94, y: 62.16, w: 22.78 },
-  { id: "people", src: `${PBS}/People_Up.png`, x: -5.7, y: 34.71, w: 116.26 },
+  { id: "people", src: `${PBS}/People_Up.png`, x: -6.11, y: 34.61, w: 116.26 },
   { id: "fountain1", src: `${YF}/fountain_1.png`, x: 25.77, y: 34.6, w: 5.95 },
   { id: "fountain2a", src: `${YF}/fountain_2.png`, x: 29.34, y: 42.49, w: 4.41 },
   { id: "fountain2b", src: `${YF}/fountain_2.png`, x: 83.49, y: 33.3, w: 6.49 },
@@ -451,23 +506,12 @@ function ParkDecor({ storeKey, defaults }) {
     };
   }, [items, storeKey]);
 
-  useEffect(() => {
-    window.decoEdit = (on) => {
-      const next = on === undefined ? !document.body.dataset.deco : !!on;
-      if (next) document.body.dataset.deco = "1";
-      else delete document.body.dataset.deco;
-      window.dispatchEvent(new CustomEvent(DECO_EDIT_EVENT, { detail: next }));
-      return next ? "редактор декора включён" : "редактор декора выключен";
-    };
-    window.dumpDeco = () => {
-      window.dispatchEvent(new CustomEvent(DECO_DUMP_EVENT));
-      return "данные в консоли";
-    };
-    return () => {
-      delete window.decoEdit;
-      delete window.dumpDeco;
-    };
-  }, []);
+  useEffect(
+    () => () => {
+      delete document.body.dataset.deco;
+    },
+    []
+  );
 
   const patch = (id, next) =>
     setItems((prev) => {
@@ -836,8 +880,13 @@ function Overview({ onPick }) {
   );
 }
 
+const IDLE_LEAVE_MS = 5 * 60 * 1000;
+const REMOTE_DRAIN_MS = 1200;
+
 function GridGame({ onPopup, onZoomState, onCoinRing }) {
   const wallet = useWallet();
+  const park = useParkServer();
+  const client = park?.client || null;
   const stageRef = useRef(null);
 
   useEffect(() => {
@@ -852,8 +901,8 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
   }, []);
   const [fields, setFields] = useState(loadFields);
   const [decor, setDecor] = useState(loadDecor);
-  const [selectedZone, setSelectedZone] = useState(urlSector);
-  const [zoomZone, setZoomZone] = useState(urlSector);
+  const [selectedZone, setSelectedZone] = useState(() => (client ? null : urlSector()));
+  const [zoomZone, setZoomZone] = useState(() => (client ? null : urlSector()));
   const [lit, setLit] = useState(null);
   const [destroyed, setDestroyed] = useState(() => new Set());
   const [zones, setZones] = useState(loadZones);
@@ -873,6 +922,13 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
   const [coinFullKey, setCoinFullKey] = useState(0);
   const [energy, setEnergy] = useState(0);
   const [safes, setSafes] = useState(0);
+  const [bank, setBank] = useState(SAFE_START);
+  const [bankBase, setBankBase] = useState(SAFE_START);
+  const bankRef = useRef(bank);
+  bankRef.current = bank;
+  const poolRef = useRef({});
+  const wheelPoolRef = useRef({ list: shuffleArr(WHEEL_DOC_POOL.slice()), i: 0 });
+  const jokerRef = useRef({ i: 0, next: {} });
   const [coin, setCoin] = useState(loadCoin);
   const [edit, setEdit] = useState(false);
   const [sel, setSel] = useState(null);
@@ -897,6 +953,44 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
 
   const coinRef = useRef(coin);
   coinRef.current = coin;
+
+  const bankMineRef = useRef(true);
+  useEffect(() => {
+    if (!client || !park?.balance) return;
+    const b = park.balance;
+    setEnergy(Math.max(0, b.energy || 0));
+    setSafes(Math.max(0, Math.min(SAFE_GOAL - 1, b.safe || 0)));
+    setCoinFill(Math.max(0, Math.min(1, b.coin_fill || 0)));
+    if (typeof b.safe_bank === "number" && typeof b.energy === "number") setBankBase(b.safe_bank - b.energy);
+  }, [client, park?.balance]);
+
+  useEffect(() => {
+    if (!client || !park?.sector) return;
+    const key = KEY_OF_SECTOR[String(park.sector)];
+    if (!key) return;
+    setSelectedZone(key);
+    setZoomZone(key);
+  }, [client, park?.sector]);
+
+  useEffect(() => {
+    if (!client || park?.sector) return;
+    setZoomZone(null);
+    setLit(null);
+  }, [client, park?.sector]);
+
+  const lastOpenRef = useRef(Date.now());
+  useEffect(() => {
+    if (!client || !park?.sector) return undefined;
+    lastOpenRef.current = Date.now();
+    const iv = setInterval(() => {
+      if (Date.now() - lastOpenRef.current < IDLE_LEAVE_MS) return;
+      console.info("[park] 5 минут без плиток, выхожу с поля");
+      setZoomZone(null);
+      setLit(null);
+      park.leaveSector?.();
+    }, 15000);
+    return () => clearInterval(iv);
+  }, [client, park?.sector]);
 
   const saveJson = (key, val) => {
     try {
@@ -1129,6 +1223,142 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
     setBoardSeed((n) => n + 1);
   };
 
+  const restartRef = useRef(restartBoard);
+  restartRef.current = restartBoard;
+
+  useEffect(() => {
+    if (!client || park?.status !== "open") return undefined;
+    let dead = false;
+    client
+      .request({ action: "get_field" })
+      .then((r) => {
+        if (dead) return;
+        if (typeof r.energy === "number") setEnergy(Math.max(0, r.energy));
+        if (typeof r.safe === "number") setSafes(Math.max(0, Math.min(SAFE_GOAL - 1, r.safe)));
+        if (typeof r.safe_bank === "number" && typeof r.energy === "number") setBankBase(r.safe_bank - r.energy);
+        if (!Array.isArray(r.cells)) return;
+        const ids = new Set();
+        const mk = {};
+        r.cells.forEach((c) => {
+          ids.add(c.cell_id);
+          if (c.outcome === "money") mk[c.cell_id] = { kind: "money", value: c.value };
+          else if (c.outcome === "cash") mk[c.cell_id] = { kind: "cash", value: c.value };
+          else if (c.outcome === "game" && c.game) mk[c.cell_id] = { kind: "game", game: c.game };
+        });
+        purpleFound.current = r.cells.filter((c) => c.outcome === "money").length;
+        setDestroyed(ids);
+        setMarks(mk);
+      })
+      .catch(() => {});
+    const offReset = client.on("field_reset", () => {
+      console.info("[park] field_reset");
+      restartRef.current();
+      client
+        .request({ action: "get_field" })
+        .then((r) => {
+          if (dead || !Array.isArray(r.cells) || !r.cells.length) return;
+          const ids = new Set();
+          const mk = {};
+          r.cells.forEach((c) => {
+            ids.add(c.cell_id);
+            if (c.outcome === "money") mk[c.cell_id] = { kind: "money", value: c.value };
+            else if (c.outcome === "cash") mk[c.cell_id] = { kind: "cash", value: c.value };
+            else if (c.outcome === "game" && c.game) mk[c.cell_id] = { kind: "game", game: c.game };
+          });
+          setDestroyed(ids);
+          setMarks(mk);
+        })
+        .catch(() => {});
+    });
+    const offState = client.on("field_state", (m) => remoteRef.current(m));
+    const offBal = client.on("balance", (b) => {
+      if (b && typeof b.safe_bank === "number" && typeof b.energy === "number") setBankBase(b.safe_bank - b.energy);
+    });
+    const offBank = client.on("bank", (m) => {
+      console.info("[park] bank пакет", JSON.stringify(m));
+      const mine = m && m.user_id != null ? String(m.user_id) === String(park?.userId) : true;
+      bankMineRef.current = mine;
+      if (!mine) return;
+      if (!m || !(m.coins_added > 0)) return;
+      if (typeof m.coins === "number") {
+        wallet?.applyTruth({ coins: m.coins });
+        wallet?.hold("coins", m.coins_added);
+      } else {
+        wallet?.credit("coins", m.coins_added);
+      }
+    });
+    return () => {
+      dead = true;
+      offReset();
+      offState();
+      offBal();
+      offBank();
+    };
+  }, [client, park?.status, park?.sector]);
+
+  const applyRemote = (m) => {
+    if (!m || !client) return;
+    if (m.user_id != null && String(m.user_id) === String(park?.userId)) return;
+    console.info("[park] field_state", JSON.stringify(m));
+    const remoteBank = typeof m.safe === "number" && m.safe >= SAFE_GOAL;
+    if (remoteBank) drainRemote();
+    else {
+      if (typeof m.energy === "number") setEnergy(Math.max(0, m.energy));
+      if (typeof m.safe === "number") setSafes(Math.max(0, Math.min(SAFE_GOAL - 1, m.safe)));
+      if (typeof m.safe_bank === "number" && typeof m.energy === "number") setBankBase(m.safe_bank - m.energy);
+    }
+    const cellId = Number(m.cell_id);
+    if (!Number.isInteger(cellId) || cellId < 0) return;
+    const field = FIELDS.find((f) => cellId >= f.offset && cellId < f.offset + f.cols * f.rows);
+    if (!field) return;
+    setDestroyed((prev) => {
+      if (prev.has(cellId)) return prev;
+      const next = new Set(prev);
+      next.add(cellId);
+      return next;
+    });
+    if (m.outcome === "money") setMarks((mk) => ({ ...mk, [cellId]: { kind: "money", value: m.value || 0 } }));
+    else if (m.outcome === "cash") setMarks((mk) => ({ ...mk, [cellId]: { kind: "cash", value: m.value || 0 } }));
+    else if (m.outcome === "game" && m.game) setMarks((mk) => ({ ...mk, [cellId]: { kind: "game", game: m.game } }));
+    const cells = document.querySelectorAll("[class*='cell_']");
+    const el = cells[cellId];
+    if (el && particlesRef.current) {
+      const r = el.getBoundingClientRect();
+      if (r.width) particlesRef.current.burst(r.left + r.width / 2, r.top + r.height / 2, r.width);
+    }
+  };
+  const remoteRef = useRef(applyRemote);
+  remoteRef.current = applyRemote;
+
+  const drainRef = useRef(false);
+  const drainRemote = () => {
+    if (drainRef.current) return;
+    drainRef.current = true;
+    console.info("[park] чужой банк: сливаю колбы без анимации");
+    setSafes(SAFE_GOAL - 1);
+    setSafeFill(SAFE_GOAL);
+    const total = energyRef.current;
+    bankTimers.current.push(
+      setTimeout(() => {
+        const t0 = performance.now();
+        const step = () => {
+          const k = Math.min(1, (performance.now() - t0) / REMOTE_DRAIN_MS);
+          setEnergy(Math.max(0, Math.round(total * (1 - k))));
+          setSafeFill(SAFE_GOAL * (1 - k));
+          if (k < 1) {
+            bankTimers.current.push(setTimeout(step, 16));
+            return;
+          }
+          setEnergy(0);
+          setSafes(0);
+          setSafeFill(null);
+          drainRef.current = false;
+        };
+        step();
+      }, BANK_HOLD_MS)
+    );
+  };
+
   const runBank = () => {
     const inner = stageRef.current;
     const at = inner ? flyTarget(inner, coinRef.current) : null;
@@ -1142,6 +1372,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
       setSafeFill(null);
       setCoinLive(false);
       setCoinDrop(false);
+      if (client) wallet?.settle("coins");
       bankTimers.current.push(
         setTimeout(() => {
           setBankFocus(false);
@@ -1179,7 +1410,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
           return;
         }
         setCoinFullKey((x) => x + 1);
-        wallet?.award("coins", COIN_FULL_PAY, at);
+        if (!client || bankMineRef.current) wallet?.award("coins", COIN_FULL_PAY, at);
         bankTimers.current.push(
           setTimeout(() => {
             coin = 0;
@@ -1215,21 +1446,6 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
     []
   );
 
-  useEffect(() => {
-    window.parkSafe = () => setSafes((s) => Math.min(SAFE_GOAL, s + 1));
-    window.parkCoin = (v) => setCoinFill((f) => Math.max(0, Math.min(1, v == null ? 1 : v)));
-    window.parkEnergy = (v) => setEnergy(Math.max(0, Math.min(ENERGY_GOAL, v == null ? 100 : v)));
-    window.parkPurple = (n) => { purpleFound.current = n == null ? PURPLE_TOTAL - 1 : n; return purpleFound.current; };
-    window.parkEdit = (on) => setEdit((v) => (on === undefined ? !v : !!on));
-    return () => {
-      delete window.parkSafe;
-      delete window.parkCoin;
-      delete window.parkEnergy;
-      delete window.parkPurple;
-      delete window.parkEdit;
-    };
-  }, []);
-
   const triggerHook = () => {
     setHookKey((k) => k + 1);
     setHookOn(true);
@@ -1247,6 +1463,11 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
   const flashCoin = (amount) => {
     setCoinPulse((p) => p + 1);
     setCoinFill((f) => Math.min(1, f + amount));
+  };
+
+  const flashCoinTo = (v) => {
+    setCoinPulse((p) => p + 1);
+    setCoinFill(Math.max(0, Math.min(1, v)));
   };
 
   const coinFullRef = useRef(false);
@@ -1269,7 +1490,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
     };
   }, [coinFill]);
 
-  const handleTileClick = (zoneKey, index, cellId, rect) => {
+  const handleTileClick = (zoneKey, index, cellId, rect, gone = false) => {
     if (bankFocus) return;
     const popFrom = rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, w: rect.width } : null;
     if (zoomZone !== zoneKey) {
@@ -1277,21 +1498,99 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
         setSelectedZone(zoneKey);
         return;
       }
+      if (client && !park?.sector) {
+        park?.joinSector?.(SECTOR_OF[zoneKey]);
+        return;
+      }
       setZoomZone(zoneKey);
       setLit(null);
       return;
     }
+    if (gone) return;
     if (lit !== index) {
       setLit(index);
       return;
     }
-    if (wallet && !wallet.spend("tickets", TILE_COST)) return;
-    const outcome = OUTCOME_SEQ[outcomeIdx.current % OUTCOME_SEQ.length];
+    if (client && park?.sector && SECTOR_OF[zoneKey] !== Number(park.sector)) return;
+    let spentTicket = true;
+    if (wallet && !wallet.spend("tickets", TILE_COST)) {
+      if (client || wallet.cash < PAID_TRY_CASH) return;
+      spentTicket = false;
+    }
+    if (client) {
+      if (rect) particlesRef.current?.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width);
+      setDestroyed((prev) => {
+        const next = new Set(prev);
+        next.add(cellId);
+        return next;
+      });
+      setLit(null);
+      lastOpenRef.current = Date.now();
+      client
+        .request({ action: "open_cell", cell_id: cellId })
+        .then((r) => {
+          wallet?.applyTruth({ tickets: r.tickets });
+          applyOutcome(zoneKey, cellId, rect, popFrom, r.outcome, r.value, r.game, r, false);
+        })
+        .catch((e) => {
+          console.warn("[park] open_cell", cellId, e && e.code, e && e.message);
+          wallet?.unspend("tickets", TILE_COST);
+          if (e && e.code === "cell_already_open") return;
+          setDestroyed((prev) => {
+            const next = new Set(prev);
+            next.delete(cellId);
+            return next;
+          });
+        });
+      return;
+    }
+    const testGame = TEST_FIRST_GAMES[outcomeIdx.current] || null;
     outcomeIdx.current += 1;
+    let outcome = "game";
+    let gameId = testGame;
+    let value = 0;
+    let forced;
+    if (!testGame) {
+      const field = FIELDS.find((f) => f.key === zoneKey);
+      const size = field ? field.cols * field.rows : 100;
+      if (!poolRef.current[zoneKey] || !poolRef.current[zoneKey].length) poolRef.current[zoneKey] = buildLocalPool(size);
+      const item = poolRef.current[zoneKey].shift();
+      if (item === "joker") {
+        gameId = JOKER_GAMES[jokerRef.current.i % JOKER_GAMES.length];
+        jokerRef.current.i += 1;
+        const nx = jokerRef.current.next;
+        if (typeof nx[gameId] !== "boolean") nx[gameId] = Math.random() < 0.5;
+        forced = nx[gameId];
+        nx[gameId] = !nx[gameId];
+      } else if (item === "cards" || item === "pyramid") {
+        gameId = item;
+      } else if (item === "wheel") {
+        gameId = "wheel";
+        const wp = wheelPoolRef.current;
+        if (wp.i >= wp.list.length) {
+          wp.list = shuffleArr(WHEEL_DOC_POOL.slice());
+          wp.i = 0;
+        }
+        forced = wp.list[wp.i];
+        wp.i += 1;
+      } else {
+        outcome = item;
+        if (item === "cash") value = weightedCash();
+      }
+    }
+    if (outcome === "money" && safes + 1 < SAFE_GOAL) {
+      if (wallet && spentTicket) wallet.unspend("tickets", TILE_COST);
+    } else if (wallet && !spentTicket) {
+      wallet.spend("cash", PAID_TRY_CASH);
+    }
+    applyOutcome(zoneKey, cellId, rect, popFrom, outcome, value, gameId, null, true, forced);
+  };
+
+  const applyOutcome = (zoneKey, cellId, rect, popFrom, outcome, value, gameId, reply, burst, forced) => {
     if (rect) {
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
-      particlesRef.current?.burst(cx, cy, rect.width);
+      if (burst) particlesRef.current?.burst(cx, cy, rect.width);
 
       if (stageRef.current) {
         const inner = stageRef.current.getBoundingClientRect();
@@ -1313,15 +1612,47 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
         };
         const shootPurple = (i, onArrive) => shoot(i, "purple", onArrive);
         if (outcome === "energy") {
-          shoot(0, "gold", () => setEnergy((e) => e + 1));
+          shoot(0, "gold", () => {
+            setEnergy((e) => (reply ? Math.max(e, reply.energy || 0) : e + 1));
+            if (!reply) setBank((b) => b + 1);
+          });
           const cn = coinRef.current;
           const cp = { x: inner.left + (cn.x / 100) * inner.width, y: inner.top + (cn.y / 100) * inner.height };
+          const wrapped = reply && typeof reply.coin_fill === "number" && reply.coin_fill < coinFillRef.current - 0.5;
+          if (wrapped) wallet?.hold("coins", 1);
           lossTimers.current.push(
-            setTimeout(() => particlesRef.current?.flyEnergy(cx, cy, cp.x, cp.y, () => flashCoin(0.01)), 260)
+            setTimeout(
+              () =>
+                particlesRef.current?.flyEnergy(cx, cy, cp.x, cp.y, () => {
+                  if (!reply || typeof reply.coin_fill !== "number") {
+                    flashCoin(0.01);
+                    return;
+                  }
+                  if (!wrapped) {
+                    flashCoinTo(reply.coin_fill);
+                    return;
+                  }
+                  flashCoinTo(1);
+                  lossTimers.current.push(setTimeout(() => setCoinFill(reply.coin_fill), 900));
+                }),
+              260
+            )
           );
         }
         if (outcome === "money") {
-          shootPurple(1, () => setSafes((s) => Math.min(SAFE_GOAL, s + 1)));
+          shootPurple(1, () => {
+            setSafes((sv) => {
+              const next = Math.min(SAFE_GOAL, reply ? Math.max(sv, reply.safe || 0) : sv + 1);
+              if (!reply && next >= SAFE_GOAL && sv < SAFE_GOAL) {
+                const paid = bankRef.current;
+                const tank = flaskTarget(1);
+                const at = stageRef.current ? flyTarget(stageRef.current, tank) : null;
+                bankTimers.current.push(setTimeout(() => wallet?.award("cash", paid, at), 350));
+                setBank(SAFE_START);
+              }
+              return next;
+            });
+          });
         }
       }
     }
@@ -1330,22 +1661,33 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
         triggerHook();
       }
     } else if (outcome === "money") {
-      const value = 50 + Math.floor(Math.random() * 450);
-      safeSum.current += value;
-      setMarks((m) => ({ ...m, [cellId]: { kind: "money", value } }));
+      const v = reply ? value || 0 : 50 + Math.floor(Math.random() * 450);
+      safeSum.current += v;
+      setMarks((m) => ({ ...m, [cellId]: { kind: "money", value: v } }));
       purpleFound.current += 1;
-      if (purpleFound.current >= PURPLE_TOTAL) {
+      if (purpleFound.current >= PURPLE_TOTAL && !client) {
         if (bankBusy.current) restartPending.current = true;
         else bankTimers.current.push(setTimeout(restartBoard, 900));
       }
     } else if (outcome === "cash") {
-      const value = CASH_NOMS[Math.floor(Math.random() * CASH_NOMS.length)];
-      setMarks((m) => ({ ...m, [cellId]: { kind: "cash", value } }));
-      setTilePopup({ type: "cash", value, from: popFrom });
+      const v = reply ? value || 0 : value || CASH_NOMS[Math.floor(Math.random() * CASH_NOMS.length)];
+      if (reply && v > 0) {
+        if (typeof reply.cash === "number") {
+          wallet?.applyTruth({ cash: reply.cash });
+          wallet?.hold("cash", v);
+        } else {
+          wallet?.credit("cash", v);
+        }
+      }
+      setMarks((m) => ({ ...m, [cellId]: { kind: "cash", value: v } }));
+      setTilePopup({ type: "cash", value: v, from: popFrom });
     } else {
-      const game = MINI_GAMES[gameIdx.current % MINI_GAMES.length];
-      gameIdx.current += 1;
-      setTilePopup({ type: "game", game, tile: cellId, stage: "play", from: popFrom });
+      let game = gameId ? MINI_GAMES.find((g) => g.id === gameId) : null;
+      if (!game) {
+        game = MINI_GAMES[gameIdx.current % MINI_GAMES.length];
+        gameIdx.current += 1;
+      }
+      setTilePopup({ type: "game", game, tile: cellId, stage: "play", from: popFrom, forced });
       setMarks((m) => ({ ...m, [cellId]: { kind: "game", game: game.id } }));
     }
     setDestroyed((prev) => {
@@ -1370,6 +1712,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
       () => {
         flashAt(tank);
         setEnergy((e) => e + 1);
+        if (!client) setBank((b) => b + 1);
       },
       "gold"
     );
@@ -1419,6 +1762,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
 
   useEffect(() => {
     const onPop = () => {
+      if (client) return;
       const key = urlSector();
       setZoomZone(key);
       setSelectedZone(key);
@@ -1498,7 +1842,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
           closing={!!tilePopup.closing}
           onClose={closePopup}
         >
-          <tilePopup.game.Comp onFinish={finishGame} />
+          <tilePopup.game.Comp onFinish={finishGame} forced={tilePopup.forced} />
         </GamePopup>
       )}
       <div className={styles.parkEditBar} onPointerDown={(e) => e.stopPropagation()}>
@@ -1568,7 +1912,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
             tone="Yellow"
             icon="Icn_Energy_Yellow.png"
             fill={Math.min(1, energy / ENERGY_GOAL)}
-            label={energy}
+            label={client ? bankBase + energy : energy}
             chipDy={-6.7}
             edit={edit}
             picked={sel && sel.kind === "flask" && sel.id === 0}
@@ -1584,7 +1928,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
             icon="Icn_Energy_Purple.png"
             fill={(safeFill ?? safes) / SAFE_GOAL}
             steps={SAFE_GOAL}
-            label={`${Math.round(safeFill ?? safes)}/${SAFE_GOAL}`}
+            label={client ? `${Math.round(safeFill ?? safes)}/${SAFE_GOAL}` : `${bank}`}
             edit={edit}
             picked={sel && sel.kind === "flask" && sel.id === 1}
             onGrab={editStart("flask", 1)}
@@ -1617,7 +1961,9 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
           {FIELDS.map((f) => {
             const active = zoomZone === f.key;
             const highlighted = !zoomZone && selectedZone === f.key;
-            const taken = TAKEN_FIELDS.has(f.key);
+            const foreign = !!client && !!park?.sector && SECTOR_OF[f.key] !== Number(park.sector);
+            const busyFree = !!client && !park?.sector && !!park?.sectors && (Number(park.sectors[String(SECTOR_OF[f.key])]) || 0) > 0;
+            const taken = TAKEN_FIELDS.has(f.key) || foreign || busyFree;
             const interactive = (!zoomZone || active) && !taken;
             return (
               <TileField
@@ -1641,7 +1987,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
                 litTile={active ? lit : null}
                 coverSrc={`${ASSET}/${COVER[f.key]}`}
                 onTileClick={
-                  interactive ? (i, cellId, rect) => handleTileClick(f.key, i, cellId, rect) : undefined
+                  interactive ? (i, cellId, rect, gone) => handleTileClick(f.key, i, cellId, rect, gone) : undefined
                 }
               />
             );
@@ -1737,7 +2083,7 @@ export function GamePopup({ title, onClose, bare = false, closeBottom = false, f
       const avail = ov.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
       const need = el.offsetHeight;
       const next = need > 0 ? Math.min(1, avail / need) : 1;
-      setPopFit(next);
+      setPopFit((prev) => Math.min(prev, next));
       if (need > 0 && Math.abs(next - lastFit) < 0.002) reveal();
       lastFit = next;
     };
@@ -1796,10 +2142,10 @@ const DEFAULT_UPARK = {
   plat: { x: 7.23, y: 45.4, w: 20.91 },
   bush: { x: -4.44, y: 52.73, w: 24.72 },
   carousel: { x: 71.65, y: 44.42, w: 35.02 },
-  crP: { x: 47.26, y: 37.43, w: 8.414 },
-  crR: { x: 47.26, y: 43.7, w: 8.414 },
-  crY: { x: 47.26, y: 49.97, w: 8.414 },
-  crB: { x: 47.26, y: 56.24, w: 8.414 },
+  crP: { x: 47.45, y: 37.59, w: 7.54 },
+  crR: { x: 47.27, y: 43.41, w: 8 },
+  crY: { x: 47.03, y: 49.66, w: 8.24 },
+  crB: { x: 47.08, y: 56.32, w: 8.24 },
   coin: { x: 46.4, y: 79.5, w: 10 },
   flask1: { x: 24.1, y: 89.31, w: 5.67 },
   flask2: { x: 78.1, y: 89.11, w: 5.67 },
@@ -2059,8 +2405,27 @@ function loadUpark() {
 
 const SCENE_AR = 0.63981;
 
-export function UpperPark() {
+function Fountain({ x, y, w }) {
+  return (
+    <img
+      className={styles.fountain}
+      src={`${ASSET}/Fountain.png`}
+      alt=""
+      draggable={false}
+      style={{ left: `${x}%`, top: `${y}%`, width: `${w}%` }}
+    />
+  );
+}
+
+export function UpperPark({ provider = false }) {
   const wallet = useWallet();
+  const park = useParkServer();
+  const client = park?.client || null;
+  const bonusRef = useRef(null);
+  const spinBusy = useRef(false);
+  const spinPayRef = useRef(null);
+  const spinCrystalsRef = useRef(null);
+  const unpaidRef = useRef(0);
   useEffect(() => {
     const ph = document.querySelector("[class*='phone']");
     if (!ph) return undefined;
@@ -2070,26 +2435,6 @@ export function UpperPark() {
       delete ph.dataset.framed;
       delete document.body.dataset.frame;
     };
-  }, []);
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      const sc = document.querySelector("[class*='uparkScene']");
-      const cell = document.querySelector("[class*='cell_']");
-      const ph = document.querySelector("[class*='phone']");
-      if (!sc || !cell || !ph) return;
-      const r = sc.getBoundingClientRect();
-      const cs = getComputedStyle(ph);
-      const clip = getComputedStyle(cell).clipPath;
-      console.log(
-        "[park diag] vp=" + window.innerWidth + "x" + window.innerHeight +
-        " dpr=" + window.devicePixelRatio +
-        " scene=" + Math.round(r.width) + "x" + Math.round(r.height) +
-        " ratio=" + (r.width / r.height).toFixed(3) +
-        " clip=" + (clip || "none")
-      );
-    }, 1200);
-    return () => clearTimeout(t);
   }, []);
 
   const [graph] = useState(loadGraph9);
@@ -2188,25 +2533,117 @@ export function UpperPark() {
   const [carouselWin, setCarouselWin] = useState(null);
   const [salute, setSalute] = useState(null);
 
+  const foreignRef = useRef(false);
+  const prizeGivenRef = useRef(false);
+  const carsRef = useRef(0);
+  const stateRef = useRef(null);
+  const rideBusyRef = useRef(false);
+
+  const applyParkState = () => {
+    const s = stateRef.current;
+    if (!s || rideBusyRef.current) return;
+    const mine = s.user_id != null && String(s.user_id) === String(park?.userId);
+    if (mine) {
+      console.info("[park] park_state мой, кристаллы и вагоны уже учтены локально");
+      return;
+    }
+    if (typeof s.crystals === "number") setKeysGot(Math.max(0, Math.min(CRYSTAL_ORDER.length - 1, s.crystals)));
+    if (typeof s.cars_total === "number") {
+      const want = Math.max(0, Math.min(TRAIN_FULL - 1, Math.floor(s.cars_total)));
+      const delta = want - carsRef.current;
+      if (delta > 0) {
+        console.info("[park] вагоны из park_state", carsRef.current, "->", want);
+        carsRef.current = want;
+        trainRef.current?.addCars(delta);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!client) return undefined;
+    return client.on("park_state", (m) => {
+      console.info("[park] park_state", JSON.stringify(m));
+      stateRef.current = m;
+      applyParkState();
+    });
+  }, [client]);
+
+  const crSynced = useRef(false);
+  useEffect(() => {
+    if (!client || !park?.balance || crSynced.current) return;
+    crSynced.current = true;
+    setKeysGot(Math.max(0, Math.min(CRYSTAL_ORDER.length - 1, park.balance.crystals || 0)));
+    const cars = Math.max(0, Math.min(TRAIN_FULL - 1, Math.floor(park.balance.cars_total || 0)));
+    if (cars > 0) {
+      console.info("[park] вагоны с сервера", cars);
+      carsRef.current = cars;
+      rideTimers.current.push(setTimeout(() => trainRef.current?.addCars(cars), 600));
+    }
+  }, [client, park?.balance]);
+
+  useEffect(() => {
+    if (!client) return undefined;
+    return client.on("bonus", (m) => {
+      console.info("[park] bonus пакет", JSON.stringify(m));
+      const foreign = m && m.user_id != null && String(m.user_id) !== String(park?.userId);
+      if (foreign) {
+        if (rideBusyRef.current) {
+          console.info("[park] чужая карусель пришла во время своей, пропускаю анимацию");
+          return;
+        }
+        console.info("[park] чужая карусель/колесо: только анимация, без приза");
+        foreignRef.current = true;
+        bonusRef.current = m;
+        startRides();
+        return;
+      }
+      foreignRef.current = false;
+      bonusRef.current = m;
+      if (typeof m.coins === "number") wallet?.applyTruth({ coins: m.coins });
+      else wallet?.credit("coins", (m.carousel || 0) + (m.wheel || 0));
+      if (typeof m.coins === "number") wallet?.hold("coins", (m.carousel || 0) + (m.wheel || 0));
+    });
+  }, [client]);
+
   const givePrize = (forced) => {
+    if (client && prizeGivenRef.current) {
+      console.warn("[park] карусель: повторный приз в том же заезде, пропускаю");
+      return;
+    }
+    prizeGivenRef.current = true;
     const fixed = typeof forced === "number" ? forced : null;
     const prize = fixed ?? CAR_PRIZE_SEQ[prizeIdx.current % CAR_PRIZE_SEQ.length];
     if (fixed == null) prizeIdx.current += 1;
-    const cars = CAR_CARS[prize];
-    console.log(`[train] карусель: приз ${prize} → +${cars} вагона`);
-    setCarouselWin({ v: prize, key: Date.now() });
-    rideTimers.current.push(
-      setTimeout(() => wallet?.award("coins", prize, centerOf('[class*="carouselWinNum"]')), 700)
-    );
-    rideTimers.current.push(setTimeout(() => setCarouselWin(null), 2300));
-    if (cars > 0) trainRef.current?.addCars(cars);
+    const bonus = client ? bonusRef.current : null;
+    const cars = bonus && typeof bonus.cars === "number" ? bonus.cars : CAR_CARS[prize];
+    console.info("[park] карусель приз", prize, "вагонов", cars, bonus ? "с сервера" : "локально", foreignRef.current ? "(чужая)" : "");
+    if (!foreignRef.current) {
+      setCarouselWin({ v: prize, key: Date.now() });
+      rideTimers.current.push(
+        setTimeout(() => wallet?.award("coins", prize, centerOf('[class*="carouselWinNum"]')), 700)
+      );
+      rideTimers.current.push(setTimeout(() => setCarouselWin(null), 2300));
+    }
+    if (cars > 0) {
+      carsRef.current += cars;
+      trainRef.current?.addCars(cars);
+    }
+    if (carsRef.current < TRAIN_FULL) {
+      rideBusyRef.current = false;
+      if (client) {
+        bonusRef.current = null;
+        foreignRef.current = false;
+      }
+      applyParkState();
+    }
   };
 
   const runCarousel = () => {
-    const prize = CAR_PRIZE_SEQ[prizeIdx.current % CAR_PRIZE_SEQ.length];
-    prizeIdx.current += 1;
+    const bonus = client ? bonusRef.current : null;
+    const fromServer = !!bonus && CAR_STOP_AT[bonus.carousel] !== undefined;
+    const prize = fromServer ? bonus.carousel : CAR_PRIZE_SEQ[prizeIdx.current % CAR_PRIZE_SEQ.length];
+    if (!fromServer) prizeIdx.current += 1;
     setCarStop(pickStop(CAR_STOP_AT[prize]));
-    console.log(`[park] карусель крутится → приз ${prize}`);
     setRides({ carousel: true, wheel: false });
     for (let i = 0; i < CRYSTAL_ORDER.length; i += 1) {
       rideTimers.current.push(
@@ -2225,23 +2662,43 @@ export function UpperPark() {
   };
 
   const onTrainDeparted = () => {
-    const prize = WHEEL_PRIZE_SEQ[wheelIdx.current % WHEEL_PRIZE_SEQ.length];
-    wheelIdx.current += 1;
+    const bonus = client ? bonusRef.current : null;
+    const fromServer = !!bonus && WHEEL_STOP_AT[bonus.wheel] !== undefined;
+    const prize = fromServer ? bonus.wheel : WHEEL_PRIZE_SEQ[wheelIdx.current % WHEEL_PRIZE_SEQ.length];
+    if (!fromServer) wheelIdx.current += 1;
+    const foreign = foreignRef.current;
+    console.info("[park] колесо приз", prize, fromServer ? "с сервера" : "локально", foreign ? "(чужое)" : "");
+    rideBusyRef.current = true;
+    carsRef.current = 0;
     setWheelStop(WHEEL_STOP_AT[prize]);
-    console.log(`[wheel] поезд уехал → колесо крутится → приз ${prize}`);
     setRides((r) => ({ ...r, wheel: true }));
+    const finishRide = () => {
+      if (client) bonusRef.current = null;
+      foreignRef.current = false;
+      rideBusyRef.current = false;
+      applyParkState();
+    };
     rideTimers.current.push(
       setTimeout(() => {
         wheelDone.current = () => {
           wheelDone.current = null;
+          if (foreign) {
+            finishRide();
+            return;
+          }
           rideTimers.current.push(
             setTimeout(() => {
-              console.log(`[wheel] приз ${prize}`);
               setSalute(prize);
               rideTimers.current.push(
                 setTimeout(() => wallet?.award("coins", prize, centerOf('[class*="saluteCoin"]')), 1500)
               );
-              rideTimers.current.push(setTimeout(() => setSalute(null), 6200));
+              rideTimers.current.push(
+                setTimeout(() => {
+                  setSalute(null);
+                  if (client) wallet?.settle("coins");
+                  finishRide();
+                }, 6200)
+              );
             }, 500)
           );
         };
@@ -2253,24 +2710,15 @@ export function UpperPark() {
   useEffect(() => () => rideTimers.current.forEach(clearTimeout), []);
 
   useEffect(() => {
-    window.parkSalute = (v) => {
-      setSalute(v == null ? 25 : v);
-      return "ok";
-    };
-    return () => {
-      delete window.parkSalute;
-    };
-  }, []);
-
-  useEffect(() => {
     if (!ridesPending.current) return;
     ridesPending.current = false;
     startRides();
   }, [keysGot]);
 
   const startRides = () => {
+    rideBusyRef.current = true;
+    prizeGivenRef.current = false;
     rideTimers.current.forEach(clearTimeout);
-    console.log("[park] 4 кристалла: карусель 3 оборота, затем колесо 3 оборота");
     rideTimers.current = [setTimeout(runCarousel, 800)];
   };
   const lit = Object.fromEntries(CRYSTAL_ORDER.slice(0, keysGot).map((k) => [k, true]));
@@ -2282,33 +2730,10 @@ export function UpperPark() {
   useEffect(() => {
     const apply = (e) => setGlowOn(!!e.detail);
     window.addEventListener(GLOW_EVENT, apply);
-    window.bonusParkGlow = setBonusParkGlow;
     return () => {
       window.removeEventListener(GLOW_EVENT, apply);
-      delete window.bonusParkGlow;
     };
   }, []);
-
-  useEffect(() => {
-    window.dumpPark = () => {
-      console.log(JSON.stringify({ ui, upark, path }, null, 2));
-      return "ok";
-    };
-    window.parkEdit = (m) => {
-      setMode(m === "move" || m === "path" ? m : "off");
-      return m || "off";
-    };
-    window.parkPathReset = () => {
-      setPath(DEFAULT_PATH);
-      saveJson(PATH_KEY, DEFAULT_PATH);
-      return "ok";
-    };
-    return () => {
-      delete window.dumpPark;
-      delete window.parkEdit;
-      delete window.parkPathReset;
-    };
-  }, [ui, upark, path]);
 
   const setBox = (key) => (updater) =>
     setUi((prev) => {
@@ -2375,45 +2800,22 @@ export function UpperPark() {
       const r = [rnd(PLAIN), rnd(PLAIN), rnd(PLAIN)];
       if (!(r[0] === r[1] && r[1] === r[2])) return r;
     }
-    return ["ice", "hat", "ring"];
+    return ["ice", "hat", "castle"];
   };
 
-  const forcedRef = useRef(null);
-
   const rollResult = () => {
-    if (forcedRef.current) {
-      const r = forcedRef.current;
-      forcedRef.current = null;
-      console.log("[slot]", ru(r), payFor(r) > 0 ? `→ выигрыш ${payFor(r)}` : "→ проигрыш");
-      return r;
-    }
     if (demoRef.current) {
       const item = DEMO_SEQ[demoStep.current % DEMO_SEQ.length];
       demoStep.current += 1;
-      if (Array.isArray(item)) {
-        const r = item.slice();
-        console.log("[slot demo]", ru(r), payFor(r) > 0 ? `→ выигрыш ${payFor(r)}` : "→ проигрыш");
-        return r;
-      }
-      if (item === "lose") {
-        const r = rollLose();
-        console.log("[slot demo]", ru(r), "→ проигрыш");
-        return r;
-      }
-      const combo = COMBOS[item];
-      const r = combo.build();
-      console.log("[slot demo]", ru(r), combo.screen ? "→ кристалл, зажигание парка" : `→ выигрыш ${combo.pay}`);
-      return r;
+      if (Array.isArray(item)) return item.slice();
+      if (item === "lose") return rollLose();
+      return COMBOS[item].build();
     }
     if (Math.random() < WIN_CHANCE) {
       const combo = COMBOS[Math.floor(Math.random() * COMBOS.length)];
-      const r = combo.build();
-      console.log("[slot]", ru(r), combo.screen ? "→ кристалл, зажигание парка" : `→ выигрыш ${combo.pay}`);
-      return r;
+      return combo.build();
     }
-    const r = rollLose();
-    console.log("[slot]", ru(r), "→ проигрыш");
-    return r;
+    return rollLose();
   };
 
   const [auto, setAuto] = useState(false);
@@ -2423,15 +2825,45 @@ export function UpperPark() {
       setStopKey((k) => k + 1);
       return;
     }
+    if (client && spinBusy.current) return;
     if (wallet && !wallet.spend("coins", SPIN_COST)) return;
+    if (client) {
+      spinBusy.current = true;
+      client
+        .request({ action: "spin" })
+        .then((r) => {
+          spinBusy.current = false;
+          console.info("[park] spin ответ", JSON.stringify(r));
+          wallet?.applyTruth({ coins: r.coins });
+          if (r.pay > 0) wallet?.hold("coins", r.pay);
+          spinPayRef.current = typeof r.pay === "number" ? r.pay : null;
+          spinCrystalsRef.current = typeof r.crystals === "number" ? r.crystals : null;
+          startSpin(Array.isArray(r.reels) && r.reels.length === 3 ? r.reels.slice() : rollResult());
+        })
+        .catch((e) => {
+          console.warn("[park] spin", e && e.code, e && e.message);
+          spinBusy.current = false;
+          wallet?.unspend("coins", SPIN_COST);
+        });
+      return;
+    }
+    startSpin(rollResult());
+  };
+
+  const startSpin = (res) => {
     winTimers.current.forEach(clearTimeout);
     winTimers.current = [];
+    if (unpaidRef.current > 0) {
+      console.info("[park] спин во время анимации, выигрыш", unpaidRef.current, "начисляю сразу");
+      wallet?.award("coins", unpaidRef.current, null);
+      unpaidRef.current = 0;
+    }
     setWinStage(0);
     setWinPay(null);
     setWinOut(false);
     setLanded(false);
     setSpinning(true);
-    setReel(rollResult());
+    setReel(res);
     setSpinKey((k) => k + 1);
   };
 
@@ -2442,13 +2874,17 @@ export function UpperPark() {
     setSpinning(false);
     setLanded(true);
     const r = reelRef.current;
+    if (client) console.info("[park] барабаны встали", r.join(","), "выплата по таблице", payFor(r), "сервер", spinPayRef.current);
     const hasCoin = r.includes(GLOW_SYMBOL);
     const same = lineOf(r) !== null;
     if (r.includes("crystal")) {
       winTimers.current.push(
         setTimeout(() => {
           setKeysGot((n) => {
-            const next = Math.min(CRYSTAL_ORDER.length, n + 1);
+            const srv = client ? spinCrystalsRef.current : null;
+            let next = Math.min(CRYSTAL_ORDER.length, n + 1);
+            if (srv != null) next = srv >= CRYSTAL_ORDER.length || (srv === 0 && n >= CRYSTAL_ORDER.length - 1) ? CRYSTAL_ORDER.length : Math.min(CRYSTAL_ORDER.length - 1, srv);
+            if (client) console.info("[park] кристаллы: было", n, "сервер", srv, "ставлю", next);
             if (n === CRYSTAL_ORDER.length - 1 && next === CRYSTAL_ORDER.length) ridesPending.current = true;
             return next;
           });
@@ -2462,19 +2898,26 @@ export function UpperPark() {
       : WIN_SHOW_MS;
     setWinShowMs(showMs);
     setWinOut(false);
-    const pay = payFor(r);
-    if (pay > 0 && WIN_NUMS.includes(pay)) {
-      winTimers.current.push(setTimeout(() => setWinPay(pay), WIN_NUM_IN));
-      winTimers.current.push(
-        setTimeout(() => wallet?.award("coins", pay, centerOf('[class*="slotWinNum"]')), 1150)
-      );
-      winTimers.current.push(setTimeout(() => setWinOut(true), Math.max(400, showMs - WIN_NUM_OUT)));
+    const pay = client && spinPayRef.current != null ? spinPayRef.current : payFor(r);
+    if (pay > 0) {
+      unpaidRef.current = pay;
+      const shown = WIN_NUMS.includes(pay);
+      if (shown) winTimers.current.push(setTimeout(() => setWinPay(pay), WIN_NUM_IN));
       winTimers.current.push(
         setTimeout(() => {
-          setWinPay(null);
-          setWinOut(false);
-        }, showMs)
+          unpaidRef.current = 0;
+          wallet?.award("coins", pay, centerOf('[class*="slotWinNum"]'));
+        }, 1150)
       );
+      if (shown) {
+        winTimers.current.push(setTimeout(() => setWinOut(true), Math.max(400, showMs - WIN_NUM_OUT)));
+        winTimers.current.push(
+          setTimeout(() => {
+            setWinPay(null);
+            setWinOut(false);
+          }, showMs)
+        );
+      }
     }
     if (hasCoin || same || r.includes("crystal") || r.includes("hat")) {
       setSpinLock(true);
@@ -2483,18 +2926,6 @@ export function UpperPark() {
       winTimers.current.push(setTimeout(() => setWinStage(0), Math.max(250, showMs - WIN_OUT_MS)));
     }
   };
-
-  useEffect(() => {
-    window.parkSlot = (...keys) => {
-      if (keys.length !== 3) return "нужно 3 символа";
-      forcedRef.current = keys;
-      doSpin();
-      return keys.join(" / ");
-    };
-    return () => {
-      delete window.parkSlot;
-    };
-  });
 
   const toggleAuto = () => setAuto((v) => !v);
 
@@ -2662,8 +3093,17 @@ export function UpperPark() {
             z={UPARK_Z[k]}
           />
         ))}
-        <Flask x={upark.flask1.x} y={upark.flask1.y} w={upark.flask1.w} fill={0} />
-        <Flask x={upark.flask2.x} y={upark.flask2.y} w={upark.flask2.w} fill={0} />
+        {provider ? (
+          <>
+            <Fountain x={upark.flask1.x} y={upark.flask1.y} w={upark.flask1.w * FOUNTAIN_K} />
+            <Fountain x={upark.flask2.x} y={upark.flask2.y} w={upark.flask2.w * FOUNTAIN_K} />
+          </>
+        ) : (
+          <>
+            <Flask x={upark.flask1.x} y={upark.flask1.y} w={upark.flask1.w} fill={0} />
+            <Flask x={upark.flask2.x} y={upark.flask2.y} w={upark.flask2.w} fill={0} />
+          </>
+        )}
         {Object.keys(UPARK_FLAGS).map((k, i) => (
           <WindFlag
             key={k}
@@ -2718,10 +3158,14 @@ export function UpperPark() {
           <img className={styles.saluteNum} src={`${ASSET}/Win_Num_T/Win_Number_${salute}.png`} alt="" draggable={false} />
         </div>
       )}
-      <button type="button" className={styles.trainBtn} onClick={() => givePrize()}>🚂+</button>
     </div>
   );
 }
+
+const FOUNTAIN_K = 2.2;
+
+const OPEN_KIND = { coinhand: "joker", coinflip: "joker", matches: "joker", cards: "cards", pyramid: "pyramid", wheel: "wheel" };
+const PARKS_BUILD = "2026-10-04b";
 
 const VIEW_BY_PAGE = { parkmap: "overview", parktop: "park", parkbot: "grid" };
 const PAGE_BY_VIEW = { overview: "parkmap", park: "parktop", grid: "parkbot" };
@@ -2734,10 +3178,223 @@ const startView = () => {
 export default function BonusParkPage() {
   const { navigate } = useApp();
   const [popupOpen, setPopupOpen] = useState(false);
+  const [client] = useState(() => (parkServerEnabled() ? new ParkSocket(parkConfig()) : null));
+  const [srv, setSrv] = useState({ status: "idle", balance: null, sector: null, players: [], sectors: null });
+
+  useEffect(() => {
+    console.info("[park] parks build", PARKS_BUILD);
+  }, []);
+
+  useEffect(() => {
+    if (!client) return undefined;
+    const offS = client.on("status", (st) => {
+      setSrv((v) => ({ ...v, status: st }));
+      if (st !== "open") {
+        if (st === "closed" || st === "retry" || st === "unauthorized") {
+          setSrv((v) => {
+            if (v.sector) console.info("[park] связь потеряна, отвязываюсь от поля", v.sector);
+            return v.sector ? { ...v, sector: null } : v;
+          });
+        }
+        return;
+      }
+      client
+        .request({ action: "lobby" })
+        .then((r) =>
+          setSrv((v) => ({
+            ...v,
+            sector: r.sector !== undefined ? r.sector : v.sector,
+            sectors: r.sectors && typeof r.sectors === "object" ? r.sectors : v.sectors,
+            players: Array.isArray(r.players)
+              ? r.players.map((pl) => ({ id: `u${pl.user_id}`, name: pl.name, avatar: pl.avatar || "" }))
+              : v.players,
+          }))
+        )
+        .catch(() => {});
+      client
+        .request({ action: "get_balance" })
+        .then((b) => setSrv((v) => ({ ...v, balance: b })))
+        .catch(() => {});
+    });
+    const offB = client.on("balance", (b) => setSrv((v) => (v.balance ? v : { ...v, balance: b })));
+    const onSectors = (m) => {
+      if (!m || typeof m !== "object") return;
+      const hasSectors = !!m.sectors && typeof m.sectors === "object";
+      const hasPlayers = Array.isArray(m.players);
+      if (!hasSectors && !hasPlayers) return;
+      if (hasSectors) console.info("[park] sectors", JSON.stringify(m.sectors));
+      if (hasPlayers) console.info("[park] players", JSON.stringify(m.players));
+      setSrv((v) => ({
+        ...v,
+        sectors: hasSectors ? m.sectors : v.sectors,
+        players: hasPlayers ? m.players.map((pl) => ({ id: `u${pl.user_id}`, name: pl.name, avatar: pl.avatar || "" })) : v.players,
+      }));
+    };
+    const offL = client.on("lobby", onSectors);
+    const offX = client.on("sectors", onSectors);
+    const onSeen = (m) => {
+      if (!m || m.user_id == null) return;
+      if (String(m.user_id) === String(parkConfig().userId)) return;
+      const id = `u${m.user_id}`;
+      setSrv((v) => {
+        if (v.players.some((p) => p.id === id)) return v;
+        console.info("[park] игрок из field_state, в lobby его не было:", m.user_id);
+        return { ...v, players: [...v.players, { id, name: m.name || `Player_${m.user_id}`, avatar: m.avatar || "" }] };
+      });
+    };
+    const offSeen = client.on("field_state", onSeen);
+    client.connect();
+    window.parkWs = client;
+    return () => {
+      offS();
+      offB();
+      offL();
+      offX();
+      offSeen();
+      client.close();
+      if (window.parkWs === client) delete window.parkWs;
+    };
+  }, [client]);
+
+  const joinSector = useCallback(
+    (sector) => {
+      if (!client) return Promise.resolve(null);
+      console.info("[park] join_sector", sector);
+      return client
+        .request({ action: "join_sector", sector })
+        .then((r) => {
+          setSrv((v) => ({
+            ...v,
+            sector: r.sector ?? sector,
+            sectors: r.sectors && typeof r.sectors === "object" ? r.sectors : v.sectors,
+            players: Array.isArray(r.players)
+              ? r.players.map((pl) => ({ id: `u${pl.user_id}`, name: pl.name, avatar: pl.avatar || "" }))
+              : v.players,
+          }));
+          return r;
+        })
+        .catch((e) => {
+          console.warn("[park] join_sector", sector, e && e.code);
+          client
+            .request({ action: "lobby" })
+            .then((r) => setSrv((v) => ({ ...v, sector: r.sector ?? v.sector, sectors: r.sectors || v.sectors })))
+            .catch(() => {});
+          return null;
+        });
+    },
+    [client]
+  );
+
+  const leaveSector = useCallback(() => {
+    if (!client) return Promise.resolve(null);
+    console.info("[park] leave_sector");
+    return client
+      .request({ action: "leave_sector" })
+      .then((r) => {
+        setSrv((v) => ({ ...v, sector: null, sectors: r.sectors && typeof r.sectors === "object" ? r.sectors : v.sectors }));
+        client
+          .request({ action: "lobby" })
+          .then((l) => setSrv((v) => ({ ...v, sector: l.sector ?? null, sectors: l.sectors || v.sectors })))
+          .catch(() => {});
+        return r;
+      })
+      .catch((e) => {
+        console.warn("[park] leave_sector", e && e.code, "переподключаюсь, сервер освободит поле по разрыву");
+        setSrv((v) => ({ ...v, sector: null }));
+        client.close();
+        client.connect();
+        return null;
+      });
+  }, [client]);
+
+  const [leaveAsk, setLeaveAsk] = useState(false);
+
+  const serverCtx = useMemo(
+    () =>
+      client
+        ? {
+            client,
+            status: srv.status,
+            balance: srv.balance,
+            sector: srv.sector,
+            players: srv.players,
+            sectors: srv.sectors,
+            userId: parkConfig().userId,
+            joinSector,
+            leaveSector,
+          }
+        : null,
+    [client, srv, joinSector, leaveSector]
+  );
+  const subscribeWins = useCallback(
+    (push) =>
+      client
+        ? client.on("player_win", (m) => {
+            if (m && m.user_id != null && String(m.user_id) === String(parkConfig().userId)) return;
+            push({ id: `u${m.user_id}`, name: m.name, avatar: m.avatar, amount: m.prize ?? m.amount ?? m.win });
+          })
+        : undefined,
+    [client]
+  );
+  const [openEvent, setOpenEvent] = useState(null);
+  const openShown = useCallback((key) => setOpenEvent((cur) => (cur && cur.key === key ? null : cur)), []);
+
+  useEffect(() => {
+    if (!client) return undefined;
+    let dead = false;
+    const emit = (m, game, value) => {
+      let kind = null;
+      if (m.outcome === "game") kind = OPEN_KIND[game] || null;
+      else if (m.outcome === "money") kind = "safe";
+      else if (m.outcome === "cash") kind = "cash";
+      console.info("[park] иконка игрока", m.user_id, m.outcome, game || "", value ?? "", "->", kind || "ничего");
+      if (!kind || dead) return;
+      setOpenEvent({
+        key: `${m.user_id}-${m.cell_id}-${Date.now()}`,
+        id: `u${m.user_id}`,
+        name: m.name || `Player_${m.user_id}`,
+        avatar: m.avatar || "",
+        game: kind,
+        value: kind === "cash" ? Number(value) || 0 : undefined,
+      });
+    };
+    const off = client.on("field_state", (m) => {
+      if (!m || m.user_id == null) return;
+      if (String(m.user_id) === String(parkConfig().userId)) return;
+      const cellId = Number(m.cell_id);
+      if (!Number.isInteger(cellId) || cellId < 0) return;
+      if (m.outcome !== "game" && m.outcome !== "cash") {
+        emit(m, m.game, m.value);
+        return;
+      }
+      const hasGame = m.outcome === "game" && typeof m.game === "string" && m.game;
+      const hasValue = m.outcome === "cash" && typeof m.value === "number";
+      if (hasGame || hasValue) {
+        emit(m, m.game, m.value);
+        return;
+      }
+      client
+        .request({ action: "get_field" })
+        .then((r) => {
+          const cell = Array.isArray(r.cells) ? r.cells.find((c) => Number(c.cell_id) === cellId) : null;
+          console.info("[park] в field_state нет game/value, взял из get_field:", JSON.stringify(cell));
+          emit(m, cell ? cell.game : m.game, cell ? cell.value : m.value);
+        })
+        .catch(() => emit(m, m.game, m.value));
+    });
+    return () => {
+      dead = true;
+      off();
+    };
+  }, [client]);
   const [zoom, setZoom] = useState({ zoomed: false, busy: false, exit: null });
   const [coinRing, setCoinRing] = useState(0);
   const [loadView, setLoadView] = useState(startView);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    window.dispatchEvent(new Event("bonuspark-refit"));
+  }, []);
   useEffect(() => {
     const onWheel = (e) => {
       if (e.ctrlKey) e.preventDefault();
@@ -2831,16 +3488,28 @@ export default function BonusParkPage() {
   const pick = (v) => go(v);
 
   return (
-    <WalletProvider>
+    <ParkServerContext.Provider value={serverCtx}>
+    <WalletProvider server={client}>
     <div className={styles.page}>
       {view === "overview" && <Overview onPick={pick} />}
       {view === "grid" && (
         <GridGame onBack={() => go("overview")} onPopup={setPopupOpen} onZoomState={setZoom} onCoinRing={setCoinRing} />
       )}
-      {view === "park" && <UpperPark />}
+      {view === "park" && <UpperPark provider={parkMode() === "provider"} />}
 
       <ParkHud tickets={view !== "park"} coinProgress={coinRing} />
-      {!popupOpen && view !== "overview" && <PlayerRow icons={view === "grid"} />}
+      {!popupOpen && view !== "overview" && (
+        <PlayerRow
+          icons={view === "grid"}
+          players={client ? srv.players.filter((p) => p.id !== `u${parkConfig().userId}`) : []}
+          subscribe={client ? subscribeWins : undefined}
+          openEvent={client ? openEvent : null}
+          onOpenShown={client ? openShown : undefined}
+          demo={client ? false : undefined}
+          placeholders
+          ghostEmpty={!!client}
+        />
+      )}
 
       {!popupOpen && !zoom.busy && (
         <button
@@ -2848,6 +3517,10 @@ export default function BonusParkPage() {
           className={styles.exit}
           onClick={() => {
             if (view === "grid" && zoom.zoomed) {
+              if (client && srv.sector) {
+                setLeaveAsk(true);
+                return;
+              }
               zoom.exit?.();
               return;
             }
@@ -2856,8 +3529,34 @@ export default function BonusParkPage() {
           }}
         >
           <img className={styles.exitBg} src={`${ASSET}/Exchange/Btn_round_Red_c.png`} alt="" draggable={false} />
-          <img className={styles.exitIcn} src={`${ASSET}/Exchange/Icn_Cress.png`} alt="" draggable={false} />
+          <img className={styles.exitIcn} src={`${ASSET}/Exchange/Icn_Arrow_Back.png`} alt="" draggable={false} />
         </button>
+      )}
+
+      {leaveAsk && (
+        <div className={styles.leaveOverlay} onClick={() => setLeaveAsk(false)}>
+          <div className={styles.leaveBox} onClick={(e) => e.stopPropagation()}>
+            <ParkPopupFrame title="Leave field">
+              <div className={styles.leaveText}>Do you really want to leave the field?</div>
+              <div className={styles.leaveRow}>
+                <button
+                  type="button"
+                  className={styles.leaveBtn}
+                  onClick={() => {
+                    setLeaveAsk(false);
+                    zoom.exit?.();
+                    leaveSector();
+                  }}
+                >
+                  Yes
+                </button>
+                <button type="button" className={`${styles.leaveBtn} ${styles.leaveBtnNo}`} onClick={() => setLeaveAsk(false)}>
+                  No
+                </button>
+              </div>
+            </ParkPopupFrame>
+          </div>
+        </div>
       )}
 
       {loadView && <ParkLoader view={loadView} onDone={onLoaded} />}
@@ -2868,5 +3567,6 @@ export default function BonusParkPage() {
       )}
     </div>
     </WalletProvider>
+    </ParkServerContext.Provider>
   );
 }

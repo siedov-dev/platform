@@ -1,8 +1,17 @@
 import { useEffect, useRef, useState } from "react";
+import { MATCH_FILES, COIN_FILES, FLIP_FILES } from "./MiniGames";
+import { jokerVideo } from "./jokerVideos";
 import styles from "./ParkLoader.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const A = "/bonus-park";
+const A = PARK_ASSET;
 const UI = `${A}/Ui_Icon_Bg_Up`;
+
+const isSafari = () => {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  return /^((?!chrome|android|crios|fxios).)*safari/i.test(ua) || /iPad|iPhone|iPod/.test(ua);
+};
 
 const SETS = {
   overview: [`${A}/main_vertical.webp`],
@@ -12,12 +21,13 @@ const SETS = {
     `${UI}/Btn_SPIN.png`,
     `${UI}/Monitor_Line.png`,
     `${UI}/Icn_IceCreame.png`,
-    `${A}/Hat_Spin/Hat_1.webp`,
+    `${A}/Hat_Spin/Hat_1.png`,
+    `${A}/Coin_Spin/Coin_1.png`,
+    ...(isSafari() ? [`${A}/Hat_Spin/hat_sheet.png`, `${A}/Hat_Spin/hat_sheet2.png`, `${A}/Coin_Spin/coin_sheet.png`] : []),
     `${UI}/Icn_Cocteil.png`,
     `${UI}/Icn_Key.png`,
     `${UI}/Icn_Mask.png`,
     `${UI}/Icn_Crown.png`,
-    `${A}/Coin_Spin/Coin_1.webp`,
     `${A}/castle_slot.webp`,
     `${A}/crystal/crystal_Blue_off.png`,
     `${A}/crystal/crystal_Yellow_off.png`,
@@ -35,6 +45,7 @@ const SETS = {
     `${A}/opt/Light.webp`,
     `${A}/Tiles/field_cut.webp`,
     `${A}/Ui_Exchange_HUD/Icn_Energy_Purple.png`,
+    `${A}/Ui_Exchange_HUD/Icn_Currency.png`,
     `${A}/Icn_Field/Icn_Card_S.png`,
     `${A}/Icn_Field/Icn_Joker_S.png`,
     `${A}/Icn_Field/Icn_Pyramid_S.png`,
@@ -43,22 +54,18 @@ const SETS = {
   ],
 };
 
-const isSafari = () => {
-  if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent;
-  return /^((?!chrome|android|crios|fxios).)*safari/i.test(ua) || /iPad|iPhone|iPod/.test(ua);
-};
-
 const videoSets = () => {
   const safari = isSafari();
   const ext = safari ? "mov" : "webm";
   const carousel = safari ? "carousel_250_new.mov" : "0000-0250.webm";
   return {
-    park: [`${A}/Wheel_video/wheel.${ext}`, `${A}/Carousel_video/${carousel}`],
+    park: [`/bonus-park/Wheel_video/wheel.${ext}`, `/bonus-park/Carousel_video/${carousel}`],
+    grid: [...MATCH_FILES(), ...COIN_FILES(), ...FLIP_FILES()],
   };
 };
 
-const VCACHE = new Map();
+const VCACHE = new Set();
+const KEEP = new Map();
 
 const MIN_MS = 900;
 const VIDEO_CAP_MS = 22000;
@@ -73,6 +80,22 @@ const videoHost = () => {
     "position:fixed;left:0;top:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;overflow:hidden";
   document.body.appendChild(vhost);
   return vhost;
+};
+
+const freeVideo = (v) => {
+  if (!v) return;
+  try {
+    v.pause();
+    v.removeAttribute("src");
+    v.load();
+  } catch (e) {
+    /* noop */
+  }
+  v.remove();
+  if (vhost && !vhost.childElementCount) {
+    vhost.remove();
+    vhost = null;
+  }
 };
 
 export default function ParkLoader({ view, onDone }) {
@@ -100,19 +123,20 @@ export default function ParkLoader({ view, onDone }) {
       return done.then(bump, bump);
     });
 
+    const live = [];
     const vjobs = vlist.map(
       (src) =>
         new Promise((res) => {
-          const done = VCACHE.get(src);
-          if (done && done.readyState >= 3) {
+          if (VCACHE.has(src) && KEEP.has(src)) {
             bump();
             bump();
             bump();
             res();
             return;
           }
-          const v = done || document.createElement("video");
-          if (!done) {
+          const joker = src.includes("/joker");
+          const v = joker ? jokerVideo(src) : document.createElement("video");
+          if (!joker) {
             v.muted = true;
             v.defaultMuted = true;
             v.playsInline = true;
@@ -121,15 +145,32 @@ export default function ParkLoader({ view, onDone }) {
             v.setAttribute("webkit-playsinline", "");
             v.preload = "auto";
             v.src = src;
-            v.style.cssText = "width:1px;height:1px;opacity:0.01";
-            videoHost()?.appendChild(v);
-            VCACHE.set(src, v);
           }
+          KEEP.set(src, v);
+          live.push(v);
           let steps = 0;
+          let iv = 0;
+          const finish = () => {
+            clearInterval(iv);
+            VCACHE.add(src);
+            if (joker) {
+              const done = () => res();
+              v.play().then(
+                () => {
+                  v.pause();
+                  v.currentTime = 0;
+                  done();
+                },
+                done
+              );
+              return;
+            }
+            res();
+          };
           const step = () => {
             steps += 1;
             bump();
-            if (steps >= 3) res();
+            if (steps >= 3) finish();
           };
           const check = () => {
             if (v.readyState >= 3 && steps < 3) {
@@ -142,13 +183,9 @@ export default function ParkLoader({ view, onDone }) {
           v.addEventListener("error", () => {
             while (steps < 3) step();
           });
-          if (!done) v.load();
-          const iv = setInterval(() => {
-            check();
-            if (steps >= 3) clearInterval(iv);
-          }, 200);
+          if (!joker) v.load();
+          iv = setInterval(check, 200);
           setTimeout(() => {
-            clearInterval(iv);
             while (steps < 3) step();
           }, VIDEO_CAP_MS);
         })

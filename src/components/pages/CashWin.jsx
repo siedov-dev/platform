@@ -1,7 +1,8 @@
 import ParkPopupFrame from "./ParkPopupFrame";
 import styles from "./CashWin.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const MONEY = "/bonus-park/Ui_Exchange_HUD/Icn_Currency.png";
+const MONEY = PARK_ASSET + "/Ui_Exchange_HUD/Icn_Currency.png";
 
 export default function CashWin({ value = 0 }) {
   return (

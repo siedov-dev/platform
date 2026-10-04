@@ -171,6 +171,8 @@ function useFitScale() {
       apply();
       wake.push(setTimeout(apply, 180));
       wake.push(setTimeout(apply, 600));
+      wake.push(setTimeout(apply, 1200));
+      wake.push(setTimeout(apply, 2400));
     };
     apply();
     window.addEventListener("resize", onResize);
@@ -180,7 +182,9 @@ function useFitScale() {
     document.addEventListener("visibilitychange", onWake);
     window.addEventListener("pageshow", onWake);
     window.addEventListener("focus", onWake);
+    window.addEventListener("bonuspark-refit", onWake);
     return () => {
+      window.removeEventListener("bonuspark-refit", onWake);
       clearTimeout(timer);
       clearWake();
       window.removeEventListener("resize", onResize);

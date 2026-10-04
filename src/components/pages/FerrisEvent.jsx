@@ -1,19 +1,21 @@
 import styles from "./FerrisEvent.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const A = "/bonus-park/Evnt_FW";
+const A = PARK_ASSET + "/Evnt_FW";
 
 const CABINS = [
-  { img: "Evnt_FW_Cabin_Red.png", n: 1 },
-  { img: "Evnt_FW_Cabin__Green.png", n: 6 },
-  { img: "Evnt_FW_Cabin_Blue.png", n: 7 },
-  { img: "Evnt_FW_Cabin_Purple.png", n: 3 },
-  { img: "Evnt_FW_Cabin_Red.png", n: 2 },
-  { img: "Evnt_FW_Cabin__Green.png", n: 5 },
-  { img: "Evnt_FW_Cabin_Blue.png", n: 8 },
-  { img: "Evnt_FW_Cabin_Purple.png", n: 4 },
+  { img: "Evnt_FW_Cabin_Purple.png", n: 1, t: 5 },
+  { img: "Evnt_FW_Cabin_Blue.png", n: 2, t: 3 },
+  { img: "Evnt_FW_Cabin_Red.png", n: 3, t: 2 },
+  { img: "Evnt_FW_Cabin_Blue.png", n: 4, t: 3 },
+  { img: "Evnt_FW_Cabin__Green.png", n: 5, t: 1 },
+  { img: "Evnt_FW_Cabin_Red.png", n: 6, t: 2 },
+  { img: "Evnt_FW_Cabin_Blue.png", n: 7, t: 3 },
+  { img: "Evnt_FW_Cabin_Red.png", n: 8, t: 2 },
 ];
 
 export const CABIN_SLOT = CABINS.map((c) => c.n);
+export const CABIN_TICKETS = Object.fromEntries(CABINS.map((c) => [c.n, c.t]));
 
 export default function FerrisEvent({ angle = 0, spinning = false, prize = null }) {
   const ease = spinning ? "transform 3s cubic-bezier(.17,.67,.2,1)" : "none";
@@ -32,7 +34,7 @@ export default function FerrisEvent({ angle = 0, spinning = false, prize = null 
               style={{ transform: `translate(-50%, -46%) rotate(${-(angle + i * 45)}deg)`, transition: ease }}
             >
               <img src={`${A}/${c.img}`} alt="" draggable={false} />
-              <span className={styles.num}>{c.n}</span>
+              <span className={styles.num}>{c.t}</span>
             </div>
           </div>
         ))}
@@ -55,9 +57,9 @@ export default function FerrisEvent({ angle = 0, spinning = false, prize = null 
           <span className={styles.ticketBob}>
             <span className={styles.ticketBox}>
               <img className={styles.ticketGlow} src={`${A}/Evnt_FW_Light_ticket.png`} alt="" draggable={false} />
-              <img className={styles.ticketIcn} src="/bonus-park/Ui_Icon_Bg_Up/Icn_Tiket.png" alt="" draggable={false} />
+              <img className={styles.ticketIcn} src={PARK_ASSET + "/Ui_Icon_Bg_Up/Icn_Tiket.png"} alt="" draggable={false} />
             </span>
-            <span className={styles.ticketNum}>+{prize}</span>
+            <span className={styles.ticketNum}>+{CABIN_TICKETS[prize] ?? prize}</span>
           </span>
         </div>
       )}

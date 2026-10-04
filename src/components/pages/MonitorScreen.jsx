@@ -1,8 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import styles from "./MonitorScreen.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const UI = "/bonus-park/Ui_Icon_Bg_Up";
-const FX = "/bonus-park/Icn_Fx";
+const UI = PARK_ASSET + "/Ui_Icon_Bg_Up";
+const FX = PARK_ASSET + "/Icn_Fx";
 const SHINE_DELAY = 260;
 const SHINE_HOLD = 4700;
 
@@ -10,7 +11,7 @@ const TONE_CLS = { gold: "shineGold", navy: "shineNavy" };
 
 const SHINE_MAP = {
   hat: { tone: "blue", fade: 700, triple: true, hold: 2640 },
-  ring: { tone: "blue", fade: 700, triple: true },
+  castle: { tone: "blue", fade: 700, triple: true },
   coin: { tone: "navy", fade: 700, hold: 1090 },
 };
 
@@ -39,20 +40,20 @@ const SHINE_SPARKS = [
   { x: 44, y: 68, s: 2.4, rise: 54, d: 2, dl: 0.72 },
 ];
 
-const CRYSTAL = "/bonus-park/Crystal_Fx";
+const CRYSTAL = PARK_ASSET + "/Crystal_Fx";
 
 const CRYSTAL_FRAMES = [];
 for (let i = 1; i <= 25; i += 2) CRYSTAL_FRAMES.push(`${CRYSTAL}/ezgif-frame-${String(i).padStart(3, "0")}.png`);
 
 export const REEL_ICONS = [
   { key: "ice", img: "Icn_IceCreame.png", h: 151, bh: 163, dy: 20.5 , wm: 1.1, winDy: 7, sdy: -7.9, wdy: -6.62 },
-  { key: "hat", img: "Hat_1.webp", dir: "/bonus-park/Hat_Spin", fxImg: "Icn_Hat.png", h: 111.84, bh: 123.7, wh: 110.03, wm: 1.26, noSway: true, sdy: -0.88, lockPos: true, wfix: -1.52 },
+  { key: "hat", img: "Hat_1.png", dir: PARK_ASSET + "/Hat_Spin", fxImg: "Icn_Hat.png", h: 111.84, bh: 123.7, wh: 110.03, wm: 1.26, noSway: true, sdy: -0.88, lockPos: true, wfix: -1.52 },
   { key: "cocktail", img: "Icn_Cocteil.png", h: 132, bh: 146, dy: 12.4 , wm: 1.1, winDy: 5, sdy: -4.83, wdy: -9.97 },
   { key: "key", img: "Icn_Key.png", h: 108, bh: 117 , wm: 1.27, noSway: true, sdy: 5.04, wdy: 6, wh: 102.6, rs: 0.95, lockPos: true, wfix: -4.18 },
   { key: "mask", img: "Icn_Mask.png", h: 104, bh: 104 , wm: 1.38, sdy: 2.22, wdy: -9.16, up: -1 },
-  { key: "ring", img: "castle_slot.webp", dir: "/bonus-park", h: 103, bh: 103, noFx: true, wm: 0.99, sdy: 1.48, noSway: true, wdy: -11.23, up: 0, rs: 0.95, popMs: 920 },
+  { key: "castle", img: "castle_slot.webp", dir: PARK_ASSET, h: 103, bh: 103, noFx: true, wm: 0.99, sdy: 1.48, noSway: true, wdy: -11.23, up: 0, rs: 0.95, popMs: 920 },
   { key: "crown", img: "Icn_Crown.png", h: 110, bh: 110, wm: 1.22, cdy: [2.96, 2.96, 1.49], inside: true, wdy: -11, up: -1.5 },
-  { key: "coin", img: "Coin_1.webp", dir: "/bonus-park/Coin_Spin", h: 83.19, bh: 83.19, wh: 82.2, grow: 1.3, noFx: true, wm: 1.22, noSway: true, sdy: 9.87, wdy: 2.12, up: -2, lockPos: true, wfix: -9.19, iosSdy: -2.96, iosWfix: 1.82 },
+  { key: "coin", img: "Coin_1.png", dir: PARK_ASSET + "/Coin_Spin", h: 83.19, bh: 83.19, wh: 82.2, grow: 1.3, noFx: true, wm: 1.22, noSway: true, sdy: 9.87, wdy: 2.12, up: -2, lockPos: true, wfix: -9.19, iosSdy: -2.96, iosWfix: 1.82 },
   { key: "crystal", img: "ezgif-frame_Base_1.png", dir: CRYSTAL, h: 121, bh: 121, noFx: true, noSway: true, sdy: 8, cdy: [2.96, 0, 2.96], wm: 1.5, wh: 117, lockPos: true, wfix: -11.27, glowFx: "Fx_Light_5.png", glowK: 1.66 },
 ];
 
@@ -98,11 +99,11 @@ const PLAT_LIFT = {
   hat: -1.5,
   crown: [0.5, -1.5, 0.5],
   mask: 0.5,
-  ring: 1.5,
+  castle: 1.5,
   crystal: 0.94,
 };
 
-const IOS_LIFT = { ring: 1.5 };
+const IOS_LIFT = { castle: 1.5 };
 
 const liftOf = (ic, c = 1) => {
   if (IS_IOS) return IOS_LIFT[ic.key] ?? 0;
@@ -127,6 +128,121 @@ const STARS = [
   { x: 68, y: 95, s: 11, dx: -3, dy: -6, r: -18, d: 0.88, dl: 0.33 },
 ];
 
+const IS_MOBILE = IS_IOS || (typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent));
+
+const STAR_KF = [
+  [0, 0, 0, 0.08, 0],
+  [0.14, 1, 0.2, 1.3, 1],
+  [0.34, 0.4, 0.45, 0.62, 1.8],
+  [0.56, 1, 0.68, 1.08, 2.4],
+  [0.78, 0.5, 0.86, 0.7, 3],
+  [1, 0, 1, 0.08, 3.6],
+];
+const STAR_PAD = 12;
+const STAR_SPRITES = new Map();
+let starImgEl = null;
+
+const starImg = () => {
+  if (!starImgEl) {
+    starImgEl = new Image();
+    starImgEl.src = `${FX}/Star_Fx.png`;
+  }
+  return starImgEl;
+};
+
+const starSprite = (size, k) => {
+  const key = `${size}@${k}`;
+  const hit = STAR_SPRITES.get(key);
+  if (hit) return hit;
+  const img = starImg();
+  const w = size * k;
+  const h = (size * img.naturalHeight) / img.naturalWidth * k;
+  const pad = STAR_PAD * k;
+  const cv = document.createElement("canvas");
+  cv.width = Math.ceil(w + pad * 2);
+  cv.height = Math.ceil(h + pad * 2);
+  const ctx = cv.getContext("2d");
+  if (!ctx) return cv;
+  ctx.shadowColor = "rgba(255, 150, 240, 0.55)";
+  ctx.shadowBlur = 9 * k;
+  ctx.drawImage(img, pad, pad, w, h);
+  ctx.shadowColor = "rgba(255, 214, 255, 0.9)";
+  ctx.shadowBlur = 4 * k;
+  ctx.drawImage(img, pad, pad, w, h);
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.drawImage(img, pad, pad, w, h);
+  STAR_SPRITES.set(key, cv);
+  return cv;
+};
+
+const starPose = (p) => {
+  let a = STAR_KF[0];
+  let b = STAR_KF[STAR_KF.length - 1];
+  for (let i = 1; i < STAR_KF.length; i += 1) {
+    if (p <= STAR_KF[i][0]) {
+      a = STAR_KF[i - 1];
+      b = STAR_KF[i];
+      break;
+    }
+  }
+  const span = b[0] - a[0] || 1;
+  const t = Math.min(1, Math.max(0, (p - a[0]) / span));
+  return [a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t, a[3] + (b[3] - a[3]) * t, a[4] + (b[4] - a[4]) * t];
+};
+
+function StarsCanvas({ run, shift }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const cv = ref.current;
+    if (!cv || !run) return undefined;
+    const host = cv.parentElement;
+    if (!host) return undefined;
+    const k = Math.min(9, (window.devicePixelRatio || 1) * 3);
+    const w = host.clientWidth || 1;
+    const h = host.clientHeight || 1;
+    cv.width = Math.max(1, Math.round(w * k));
+    cv.height = Math.max(1, Math.round(h * k));
+    const ctx = cv.getContext("2d");
+    if (!ctx) return undefined;
+    const img = starImg();
+    const t0 = performance.now();
+    let raf = 0;
+    const frame = (now) => {
+      raf = requestAnimationFrame(frame);
+      if (!img.complete || !img.naturalWidth) return;
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      const el = (now - t0) / 1000;
+      for (let i = 0; i < STARS.length; i += 1) {
+        const s = STARS[i];
+        const e = el - (s.dl + shift);
+        if (e < 0) continue;
+        const p = (e % s.d) / s.d;
+        const [op, kk, sc, kr] = starPose(p);
+        if (op <= 0.001) continue;
+        const sp = starSprite(s.s, k);
+        const cx = ((s.x / 100) * w + s.dx * kk) * k;
+        const cy = ((s.y / 100) * h + s.dy * kk) * k;
+        ctx.save();
+        ctx.globalAlpha = op;
+        ctx.translate(cx, cy);
+        ctx.rotate((s.r * kr * Math.PI) / 180);
+        ctx.scale(sc, sc);
+        ctx.drawImage(sp, -sp.width / 2, -sp.height / 2);
+        ctx.restore();
+      }
+    };
+    raf = requestAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(raf);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+    };
+  }, [run, shift]);
+
+  return <canvas ref={ref} className={styles.starsCanvas} />;
+}
+
 const byKey = (k) => REEL_ICONS.find((i) => i.key === k) || REEL_ICONS[0];
 
 
@@ -135,7 +251,7 @@ const SCR_D =
 
 const SNAP_KEYS = new Set(["coin", "key", "crystal"]);
 const NO_LEAVE = [false, false, false];
-const HOLD_KEYS = new Set(["key", "coin"]);
+const HOLD_KEYS = new Set(["key", "coin", "crystal"]);
 const ALL_LEAVE = [true, true, true];
 
 const CR_BASE_G = { top: 0.1167, bot: 0.8833 };
@@ -164,7 +280,7 @@ function WinImg({ src, className, style, s0, dy0, dyw, inside, leaving, active, 
   return <img ref={ref} className={className} src={src} alt="" draggable={false} style={style} />;
 }
 
-const HAT_DIR = "/bonus-park/Hat_Spin";
+const HAT_DIR = PARK_ASSET + "/Hat_Spin";
 const HAT_COUNT = 40;
 const HAT_MS = 2400;
 const HAT_POP_DELAY = 230;
@@ -176,14 +292,50 @@ const HAT_LOOPS = 2;
 const HAT_TOTAL = HAT_START + HAT_MS + HAT_BACK_MS;
 const FRAME_FADE_MS = 620;
 
+const HAT_SHEET = { cols: 5, rows: 4, count: 20, fw: 366, fh: 375, url: "/bonus-park/Hat_Spin/hat_sheet.png" };
+const HAT_SHEET_B = { ...HAT_SHEET, url: "/bonus-park/Hat_Spin/hat_sheet2.png" };
+const hatSheetOf = (i) => (i < HAT_SHEET.count ? HAT_SHEET : HAT_SHEET_B);
+const COIN_SHEET_URL = "/bonus-park/Coin_Spin/coin_sheet.png";
+const COIN_SHEET = { cols: 6, rows: 5, count: 30, fw: 191, fh: 190, url: COIN_SHEET_URL, cls: "coinSheet" };
+
+const SHEET_IMGS = {};
+const sheetImg = (url) => {
+  if (SHEET_IMGS[url]) return SHEET_IMGS[url];
+  const im = new Image();
+  im.src = url;
+  im.decode?.().catch(() => {});
+  SHEET_IMGS[url] = im;
+  return im;
+};
+
+const useCanvasFrames = () => IS_IOS;
+
+const drawSheetFrame = (canvas, sheet, i) => {
+  if (!canvas) return false;
+  const im = sheetImg(sheet.url);
+  if (!im.complete || !im.naturalWidth) {
+    im.addEventListener("load", () => drawSheetFrame(canvas, sheet, i), { once: true });
+    return false;
+  }
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return false;
+  const k = Math.min(sheet.count - 1, Math.max(0, i));
+  ctx.clearRect(0, 0, sheet.fw, sheet.fh);
+  ctx.drawImage(im, (k % sheet.cols) * sheet.fw, Math.floor(k / sheet.cols) * sheet.fh, sheet.fw, sheet.fh, 0, 0, sheet.fw, sheet.fh);
+  return true;
+};
+
 const HAT_FRAMES = [];
-for (let i = 1; i <= HAT_COUNT; i += 1) HAT_FRAMES.push(`${HAT_DIR}/Hat_${i}.webp`);
+for (let i = 1; i <= HAT_COUNT; i += 1) HAT_FRAMES.push(`${HAT_DIR}/Hat_${i}.png`);
 
 function HatIcon({ className, style, leaving, active, runKey, hold, sync }) {
   const rootRef = useRef(null);
   const imgRef = useRef(null);
   const rafRef = useRef(0);
   const timerRef = useRef(0);
+  const anchorRef = useRef({ key: null, t0: 0 });
+  const leavingRef = useRef(leaving);
+  leavingRef.current = leaving;
   const [phase, setPhase] = useState("grow");
 
   useLayoutEffect(() => {
@@ -212,8 +364,18 @@ function HatIcon({ className, style, leaving, active, runKey, hold, sync }) {
     let cancelled = false;
     const show = (idx) => {
       const el = imgRef.current;
-      if (el) el.src = HAT_FRAMES[idx];
+      if (!el) return;
+      if (IS_IOS) {
+        const i = Math.min(HAT_COUNT - 1, Math.max(0, idx));
+        drawSheetFrame(el, hatSheetOf(i), i % HAT_SHEET.count);
+        return;
+      }
+      el.src = HAT_FRAMES[idx];
     };
+    if (IS_IOS) {
+      sheetImg(HAT_SHEET.url);
+      sheetImg(HAT_SHEET_B.url);
+    }
     show(0);
     setPhase("grow");
     if (!active) {
@@ -241,6 +403,7 @@ function HatIcon({ className, style, leaving, active, runKey, hold, sync }) {
           runFrames();
           return;
         }
+        if (leavingRef.current) return;
         show(0);
         setPhase("return");
         timerRef.current = setTimeout(() => {
@@ -249,10 +412,12 @@ function HatIcon({ className, style, leaving, active, runKey, hold, sync }) {
       };
       rafRef.current = requestAnimationFrame(tick);
     };
+    if (anchorRef.current.key !== runKey) anchorRef.current = { key: runKey, t0: performance.now() };
+    const wait = Math.max(0, anchorRef.current.t0 + HAT_START - performance.now());
     timerRef.current = setTimeout(() => {
       if (cancelled) return;
       runFrames();
-    }, HAT_START);
+    }, wait);
     return () => {
       cancelled = true;
       cancelAnimationFrame(rafRef.current);
@@ -265,7 +430,10 @@ function HatIcon({ className, style, leaving, active, runKey, hold, sync }) {
     cancelAnimationFrame(rafRef.current);
     clearTimeout(timerRef.current);
     const el = imgRef.current;
-    if (el) el.src = HAT_FRAMES[0];
+    if (el) {
+      if (IS_IOS) drawSheetFrame(el, HAT_SHEET, 0);
+      else el.src = HAT_FRAMES[0];
+    }
     setPhase("return");
     const t = setTimeout(() => setPhase("parked"), HAT_BACK_MS);
     return () => clearTimeout(t);
@@ -286,7 +454,11 @@ function HatIcon({ className, style, leaving, active, runKey, hold, sync }) {
       className={`${className} ${poseCls} ${styles.hatStack}`}
       style={{ ...style, "--hsg": HAT_GROW }}
     >
-      <img ref={imgRef} className={styles.hatFrame} src={HAT_FRAMES[0]} alt="" draggable={false} />
+      {IS_IOS ? (
+        <canvas ref={imgRef} width={HAT_SHEET.fw} height={HAT_SHEET.fh} className={styles.hatFrame} />
+      ) : (
+        <img ref={imgRef} className={styles.hatFrame} src={HAT_FRAMES[0]} alt="" draggable={false} />
+      )}
     </span>
   );
 }
@@ -299,10 +471,15 @@ function TwistIcon({ cfg, className, style, leaving, active, runKey, glow, glowH
   const rootRef = useRef(null);
   const holdRef = useRef(hold);
   holdRef.current = hold;
+  const anchorRef = useRef({ key: null, t0: 0 });
   const backRef = useRef(null);
+  const finalRef = useRef(null);
   const spinMsRef = useRef(0);
   const prevHoldRef = useRef(hold);
+  const releaseRef = useRef(0);
   const [phase, setPhase] = useState("spin");
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
 
 
   useEffect(() => {
@@ -368,6 +545,7 @@ function TwistIcon({ cfg, className, style, leaving, active, runKey, glow, glowH
     return () => anim.cancel();
   }, [active, leaving, runKey, phase]);
 
+  const sheet = IS_IOS && cfg.sheet ? cfg.sheet : null;
   const frames = [];
   if (cfg.list) {
     frames.push(...cfg.list);
@@ -382,6 +560,17 @@ function TwistIcon({ cfg, className, style, leaving, active, runKey, glow, glowH
     let cancelled = false;
     const els = imgsRef.current;
     const show = (idx) => {
+      if (sheet) {
+        const el = els[0];
+        if (!el) return;
+        const i = Math.min(sheet.count - 1, Math.max(0, idx));
+        if (useCanvasFrames()) {
+          drawSheetFrame(el, sheet, i);
+          return;
+        }
+        el.style.backgroundPosition = `${((i % sheet.cols) * 100) / (sheet.cols - 1)}% ${(Math.floor(i / sheet.cols) * 100) / (sheet.rows - 1)}%`;
+        return;
+      }
       for (let i = 0; i < els.length; i += 1) {
         if (!els[i]) continue;
         els[i].style.visibility = i === idx ? "visible" : "hidden";
@@ -504,10 +693,12 @@ function TwistIcon({ cfg, className, style, leaving, active, runKey, glow, glowH
       }, cfg.settleGap ?? 360);
     }
 
+    if (anchorRef.current.key !== runKey) anchorRef.current = { key: runKey, t0: performance.now() };
+    const since = performance.now() - anchorRef.current.t0;
     if (cfg.still) {
-      timerRef.current = setTimeout(onFwdEnd, (cfg.delay || 0) + 900);
+      timerRef.current = setTimeout(onFwdEnd, Math.max(0, (cfg.delay || 0) + 900 - since));
     } else if (cfg.delay) {
-      timerRef.current = setTimeout(runFwd, cfg.delay);
+      timerRef.current = setTimeout(runFwd, Math.max(0, cfg.delay - since));
     } else {
       runFwd();
     }
@@ -521,12 +712,20 @@ function TwistIcon({ cfg, className, style, leaving, active, runKey, glow, glowH
       });
     };
 
+    finalRef.current = () => {
+      if (cancelled || finalIdx < 0) return;
+      if (cfg.cross) cross(0, finalIdx, cfg.crossMs || 420);
+      else show(finalIdx);
+    };
+
     return () => {
       cancelled = true;
       backRef.current = null;
+      finalRef.current = null;
       cancelAnimationFrame(rafRef.current);
       clearTimeout(timerRef.current);
       clearTimeout(crossRef.current);
+      clearTimeout(releaseRef.current);
     };
   }, [active, runKey]);
 
@@ -539,12 +738,18 @@ function TwistIcon({ cfg, className, style, leaving, active, runKey, glow, glowH
   useEffect(() => {
     const was = prevHoldRef.current;
     prevHoldRef.current = hold;
-    if (!was || hold || !active || leaving || phase !== "spin") return undefined;
+    if (!was || hold || !active || leaving || phaseRef.current !== "spin") return undefined;
     setPhase("return");
     if (!cfg.noBack) backRef.current?.();
-    const t = setTimeout(() => setPhase("parked"), cfg.noBack ? 520 : Math.max(500, spinMsRef.current));
-    return () => clearTimeout(t);
-  }, [hold, active, leaving, phase, cfg.noBack]);
+    clearTimeout(releaseRef.current);
+    releaseRef.current = setTimeout(() => {
+      setPhase("parked");
+      if (cfg.noBack) finalRef.current?.();
+    }, cfg.noBack ? 520 : Math.max(500, spinMsRef.current));
+    return undefined;
+  }, [hold, active, leaving, cfg.noBack]);
+
+  useEffect(() => () => clearTimeout(releaseRef.current), []);
 
   const poseCls =
     phase === "return"
@@ -568,7 +773,28 @@ function TwistIcon({ cfg, className, style, leaving, active, runKey, glow, glowH
           style={{ height: `${glowH}%` }}
         />
       )}
-      {frames.map((src, i) => (
+      {sheet && useCanvasFrames() ? (
+        <canvas
+          ref={(el) => {
+            imgsRef.current[0] = el;
+            if (el && !el.dataset.drawn) {
+              el.dataset.drawn = "1";
+              drawSheetFrame(el, sheet, 0);
+            }
+          }}
+          width={sheet.fw}
+          height={sheet.fh}
+          className={styles.twistFrame}
+        />
+      ) : sheet ? (
+        <span
+          ref={(el) => {
+            imgsRef.current[0] = el;
+          }}
+          className={`${styles.twistFrame} ${styles[sheet.cls]}`}
+        />
+      ) : null}
+      {(sheet ? [] : frames).map((src, i) => (
         <img
           key={src}
           ref={(el) => {
@@ -627,26 +853,23 @@ export default function MonitorScreen({
   const preloadRef = useRef([]);
 
   useEffect(() => {
-    const keep = [];
-    for (let f = 1; f <= 30; f += 1) {
-      const img = new Image();
-      img.src = `/bonus-park/Coin_Spin/Coin_${f}.webp`;
-      img.decode?.().catch(() => {});
-      keep.push(img);
+    const list = [];
+    for (let f = 1; f <= 9; f += 1) list.push(`${PARK_ASSET}/Key_twist/Key_${f}.png`);
+    for (let i = 0; i < CRYSTAL_FRAMES.length; i += 1) list.push(CRYSTAL_FRAMES[i]);
+    if (!IS_IOS) {
+      for (let f = 1; f <= 30; f += 1) list.push(`${PARK_ASSET}/Coin_Spin/Coin_${f}.png`);
+      for (let f = 1; f <= HAT_COUNT; f += 1) list.push(`${HAT_DIR}/Hat_${f}.png`);
     }
-    for (let f = 1; f <= 9; f += 1) {
+    const keep = list.map((src) => {
       const img = new Image();
-      img.src = `/bonus-park/Key_twist/Key_${f}.png`;
+      img.src = src;
       img.decode?.().catch(() => {});
-      keep.push(img);
-    }
-    for (let f = 1; f <= HAT_COUNT; f += 1) {
-      const img = new Image();
-      img.src = `${HAT_DIR}/Hat_${f}.webp`;
-      img.decode?.().catch(() => {});
-      keep.push(img);
-    }
+      return img;
+    });
     preloadRef.current = keep;
+    return () => {
+      preloadRef.current = [];
+    };
   }, []);
 
   const [shownWin, setShownWin] = useState([false, false, false]);
@@ -718,9 +941,6 @@ export default function MonitorScreen({
     !shownRes.every((k) => k === "hat") &&
     !shownRes.some((k) => k === "coin" || k === "crystal") &&
     new Set(shownRes.filter((k) => k !== "hat")).size === 1;
-  const lineWin =
-    !result.some((k) => k === "coin" || k === "crystal") &&
-    new Set(result.filter((k) => k !== "hat")).size <= 1;
   const allSettled = settled[0] && settled[1] && settled[2];
   const hatKey = `${showId}:${shownRes.join(",")}:${shownWin.map((v) => (v ? 1 : 0)).join("")}`;
 
@@ -735,7 +955,7 @@ export default function MonitorScreen({
     return () => clearTimeout(t);
   }, [hatKey]);
 
-  const frameOn = lineWin && allSettled && shownWin.every(Boolean) && !hatEnd && !winOver;
+  const frameOn = allSettled && shownWin.some(Boolean) && !hatEnd && !winOver;
   const shineKey = !allSettled
     ? "000"
     : settled
@@ -758,7 +978,7 @@ export default function MonitorScreen({
     want.forEach((w, i) => {
       const cfg = SHINE_MAP[result[i]];
       if (!w || !cfg || !cfg.hold) return;
-      if (hatHere && HOLD_KEYS.has(result[i])) return;
+      if (HOLD_KEYS.has(result[i])) return;
       timers.push(
         setTimeout(() => {
           setShineOn((prev) => {
@@ -983,10 +1203,10 @@ export default function MonitorScreen({
               cfg={
                 ic.key === "coin"
                   ? {
-                      dir: "/bonus-park/Coin_Spin",
+                      dir: PARK_ASSET + "/Coin_Spin",
                       base: "Coin",
-                      ext: "webp",
                       count: 30,
+                      sheet: COIN_SHEET,
                       turnMs: 696,
                       pop: true,
                       popMs: 520,
@@ -1016,7 +1236,7 @@ export default function MonitorScreen({
                         final: `${CRYSTAL}/ezgif-frame_Base_1.png`,
                       }
                     : {
-                        dir: "/bonus-park/Key_twist",
+                        dir: PARK_ASSET + "/Key_twist",
                         base: "Key",
                         count: 9,
                         settle: true,
@@ -1029,7 +1249,7 @@ export default function MonitorScreen({
               leaving={leaving}
               active={active}
               runKey={showId}
-              hold={HOLD_KEYS.has(ic.key) && hatInWin && !winOver}
+              hold={HOLD_KEYS.has(ic.key) && !winOver}
               glow={ic.glowFx ? `${ic.dir}/${ic.glowFx}` : undefined}
               glowH={(100 * (ic.glowK || 2.1)).toFixed(0)}
               className={styles.winIcon}
@@ -1093,7 +1313,7 @@ export default function MonitorScreen({
           >
             <img
               className={styles.shineBaked}
-              src={`/bonus-park/Icn_Fx/shine_${SHINE_MAP[result[c]]?.tone || "blue"}_a.webp`}
+              src={`${PARK_ASSET}/Icn_Fx/shine_${SHINE_MAP[result[c]]?.tone || "blue"}_a.webp`}
               alt=""
               draggable={false}
             />
@@ -1149,7 +1369,10 @@ export default function MonitorScreen({
 
 
           <div className={styles.stars}>
-            {STARS.map((s) => (
+            {IS_MOBILE ? (
+              <StarsCanvas run={starsRun[c]} shift={c * 0.11} />
+            ) : null}
+            {(IS_MOBILE ? [] : STARS).map((s) => (
               <img
                 key={`${c}-${s.x}-${s.y}`}
                 className={styles.star}

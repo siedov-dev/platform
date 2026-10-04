@@ -138,12 +138,12 @@
 .winTag {
   position: absolute;
   left: 50%;
-  bottom: 96%;
-  z-index: 3;
+  top: 50%;
+  z-index: 5;
   display: flex;
   align-items: baseline;
   gap: 0.5px;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   font-weight: 900;
   color: #ffd53e;
   text-shadow: 0 0 2px #b02a08, 1.2px 0 0 #b02a08, -1.2px 0 0 #b02a08, 0 1.2px 0 #b02a08, 0 -1.2px 0 #b02a08,
@@ -163,10 +163,10 @@
 }
 
 @keyframes winTagPop {
-  0% { opacity: 0; transform: translateX(-50%) translateY(4px) scale(0.6); }
-  12% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-  80% { opacity: 1; transform: translateX(-50%) translateY(-2px) scale(1); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(0.95); }
+  0% { opacity: 0; transform: translate(-50%, -50%) translateY(4px) scale(0.6); }
+  12% { opacity: 1; transform: translate(-50%, -50%) translateY(0) scale(1); }
+  80% { opacity: 1; transform: translate(-50%, -50%) translateY(-2px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateY(-6px) scale(0.95); }
 }
 
 .openTag {
@@ -201,4 +201,9 @@
   12% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
   80% { opacity: 1; transform: translateX(-50%) translateY(1px) scale(1); }
   100% { opacity: 0; transform: translateX(-50%) translateY(3px) scale(0.95); }
+}
+
+.slotGhost {
+  opacity: 0.42;
+  filter: saturate(0.6);
 }

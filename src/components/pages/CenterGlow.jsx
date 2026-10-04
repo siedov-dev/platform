@@ -1,6 +1,7 @@
 import styles from "./CenterGlow.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const ASSET = "/bonus-park/Flash_Coin_Lights";
+const ASSET = PARK_ASSET + "/Flash_Coin_Lights";
 
 const LMAX = 100;
 const ANGLES = [
@@ -46,55 +47,10 @@ export default function CenterGlow({ on = true, flash = 0, tilt = 0 }) {
       className={`${styles.layer} ${on ? styles.on : ""}`}
       style={tilt ? { transform: `rotate(${tilt}deg)` } : undefined}
     >
-      {on && flash > 0 && <span key={flash} className={styles.ignite} />}
-
       <div className={styles.mound} />
-
-      <div className={styles.fan}>
-        {RAYS.map((r, i) => (
-          <span
-            key={`r${r.a}`}
-            className={styles.rayWrap}
-            style={{
-              width: `${r.w}%`,
-              height: `${r.len.toFixed(1)}%`,
-              opacity: r.o.toFixed(2),
-              transform: `translateX(-50%) rotate(${r.a}deg)`,
-            }}
-          >
-            <span
-              className={styles.ray}
-              style={{ animationDuration: `${r.d}s`, animationDelay: `-${(i * 0.47).toFixed(2)}s` }}
-            />
-          </span>
-        ))}
-      </div>
-
-      <div className={styles.core} />
-      <div className={styles.bloom} />
-
-      {MOTES.map((m, i) => (
-        <span
-          key={`${m.x}-${m.y}`}
-          className={styles.mote}
-          style={{
-            left: `${m.x}%`,
-            top: `${m.y}%`,
-            width: `${m.s}px`,
-            height: `${m.s}px`,
-            animationDuration: `${m.d}s`,
-            animationDelay: `-${(i * 0.43).toFixed(2)}s`,
-            "--rise": `${-m.rise}px`,
-          }}
-        />
-      ))}
 
       <div className={styles.strip}>
         <img className={styles.stripImg} src={`${ASSET}/Coin_Lights.png`} alt="" draggable={false} />
-        <span className={styles.arcRim} />
-        <span className={styles.arcLine} />
-        <span className={styles.arcCore} />
-        <span className={styles.arcSheen} />
       </div>
     </div>
   );

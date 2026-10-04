@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from "react";
+import { useServerGame } from "./parkSocket";
+import { useWallet } from "./parkWallet";
 import styles from "./PyramidGame.module.css";
+import { PARK_ASSET, PARK_DESK } from "./parkAssetBase";
 
-const P = "/bonus-park/Piramid_Bg_Select";
-const UI = "/bonus-park/Ui_Exchange_HUD";
+const HD = PARK_DESK ? "_hd" : "";
+const P = PARK_ASSET + "/Piramid_Bg_Select" + HD;
+const UI = PARK_ASSET + "/Ui_Exchange_HUD";
 const MONEY = `${UI}/Icn_Currency.png`;
-const LINE = "/bonus-park/Pyramid_Game/Pyramid_Line.png";
-const ARROW = "/bonus-park/Evnt_FW/Arrow_Evnt_Ferris%20wheel.png";
+const LINE = PARK_ASSET + "/Pyramid_Game" + HD + "/Pyramid_Line.png";
+const ARROW = PARK_ASSET + "/Evnt_FW" + HD + "/Arrow_Evnt_Ferris%20wheel.png";
 const PCROWN = `${P}/Crown_PopUp.png`;
 const PDECOR = `${P}/Decor_PopUp.png`;
 
@@ -17,7 +21,7 @@ const PRIZES = [
   { id: "carousel", img: "Carousel.png", value: 10 },
 ];
 
-const POOL = [0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4];
+const POOL = [0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4];
 const PICKS = 3;
 const TIMER_SEC = 60;
 const SPIN_BASE = 21;
@@ -34,18 +38,53 @@ export default function PyramidGame({ onFinish }) {
   const timers = useRef([]);
   const takenRef = useRef(false);
   const activeRef = useRef(null);
+  const sg = useServerGame();
+  const wallet = useWallet();
+  const startRef = useRef(null);
+  const busyRef = useRef(false);
+
+  useEffect(() => {
+    if (!sg || startRef.current) return;
+    startRef.current = sg
+      .start("pyramid")
+      .then((r) => r.game_id || null)
+      .catch(() => null);
+  }, [sg]);
+
+  const serverStep = async (step) => {
+    if (!sg) return null;
+    const gid = startRef.current ? await startRef.current : null;
+    if (!gid) return null;
+    try {
+      const r = await sg.play(gid, { step });
+      if (r && typeof r.cash === "number") wallet?.applyTruth({ cash: r.cash });
+      if (r && r.done && r.prize > 0) wallet?.hold("cash", r.prize);
+      return r;
+    } catch (e) {
+      return null;
+    }
+  };
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
-  const finish = (idx) => {
-    if (takenRef.current || idx == null) return;
+  const finish = (idx, value) => {
+    if (takenRef.current || (idx == null && value == null)) return;
     takenRef.current = true;
     setTaken(true);
-    timers.current.push(setTimeout(() => onFinish?.(PRIZES[idx].value), 1100));
+    const v = typeof value === "number" ? value : PRIZES[idx].value;
+    timers.current.push(setTimeout(() => onFinish?.(v), 1100));
   };
 
   const take = () => {
-    if (takenRef.current || rolling || activeRef.current == null) return;
+    if (takenRef.current || rolling || activeRef.current == null || busyRef.current) return;
+    if (sg) {
+      busyRef.current = true;
+      serverStep("take").then((r) => {
+        busyRef.current = false;
+        finish(activeRef.current, r && typeof r.prize === "number" ? r.prize : undefined);
+      });
+      return;
+    }
     finish(activeRef.current);
   };
 
@@ -60,6 +99,16 @@ export default function PyramidGame({ onFinish }) {
           if (takenRef.current) return 0;
           setPicks(0);
           if (activeRef.current == null) {
+            if (sg) {
+              serverStep("roll").then((r) => {
+                const at = r && r.item ? PRIZES.findIndex((pz) => pz.id === r.item) : -1;
+                const idx = at >= 0 ? at : rollIndex();
+                activeRef.current = idx;
+                setActive(idx);
+                finish(idx, r && typeof r.prize === "number" ? r.prize : undefined);
+              });
+              return 0;
+            }
             const idx = rollIndex();
             activeRef.current = idx;
             setActive(idx);
@@ -76,11 +125,27 @@ export default function PyramidGame({ onFinish }) {
   }, []);
 
   const spin = () => {
-    if (rolling || takenRef.current || picks <= 0) return;
+    if (rolling || takenRef.current || picks <= 0 || busyRef.current) return;
+    if (sg) {
+      busyRef.current = true;
+      setRolling(true);
+      serverStep("roll").then((r) => {
+        busyRef.current = false;
+        const idx = r && r.item ? PRIZES.findIndex((p) => p.id === r.item) : -1;
+        const prize = r && r.done && typeof r.prize === "number" ? r.prize : null;
+        if (r && typeof r.rolls_left === "number") setPicks(r.rolls_left);
+        else setPicks((n) => n - 1);
+        runSpin(idx >= 0 ? idx : rollIndex(), !!(r && r.done), prize);
+      });
+      return;
+    }
     const lastPick = picks <= 1;
     setPicks((n) => n - 1);
     setRolling(true);
-    const target = rollIndex();
+    runSpin(rollIndex(), lastPick, null);
+  };
+
+  const runSpin = (target, lastPick, prize) => {
     const start = activeRef.current == null ? 0 : (activeRef.current + 1) % PRIZES.length;
     const extra = (((target - (start + SPIN_BASE - 1)) % PRIZES.length) + PRIZES.length) % PRIZES.length;
     const total = SPIN_BASE + extra;
@@ -95,7 +160,7 @@ export default function PyramidGame({ onFinish }) {
           setActive(idx);
           if (last) {
             setRolling(false);
-            if (lastPick) timers.current.push(setTimeout(() => finish(idx), 650));
+            if (lastPick) timers.current.push(setTimeout(() => finish(idx, prize == null ? undefined : prize), 650));
           }
         }, acc)
       );

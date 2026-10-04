@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { Application, Assets, PerspectiveMesh } from "pixi.js";
 import styles from "./BonusParkPage.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const ASSET = "/bonus-park";
+const ASSET = PARK_ASSET;
 const COLS = 10;
 const ROWS = 10;
 

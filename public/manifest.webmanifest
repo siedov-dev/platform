@@ -1,7 +1,7 @@
 {
   "name": "Bonus Park",
   "short_name": "BonusPark",
-  "display": "fullscreen",
+  "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0b0506",
   "theme_color": "#0b0506",

@@ -1,6 +1,7 @@
 import styles from "./Flag.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const ASSET = "/bonus-park";
+const ASSET = PARK_ASSET;
 
 export default function Flag({ style, scale = 1, rot = 0, flip = false, onPointerDown, onPointerMove, onPointerUp, onPointerCancel, dur = 5.5, delay = 0 }) {
   return (

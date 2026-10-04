@@ -1,11 +1,19 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import ParkPopupFrame from "./ParkPopupFrame";
+import { useServerGame, useParkServer } from "./parkSocket";
+import { useWallet } from "./parkWallet";
 import styles from "./CardsGame.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const A = "/bonus-park/Cards_Game";
+const DESK =
+  typeof window !== "undefined" && typeof window.matchMedia === "function"
+    ? window.matchMedia("(hover: hover) and (pointer: fine)").matches
+    : false;
+const A = DESK ? PARK_ASSET + "/Cards_Game_hd" : PARK_ASSET + "/Cards_Game";
+const A_GRID = A;
 const BACK = "Card_all_0000_Layer-287-copy-14.webp";
-const MONEY = "/bonus-park/Ui_Exchange_HUD/Icn_Currency.png";
+const MONEY = PARK_ASSET + "/Ui_Exchange_HUD/Icn_Currency.png";
 
 const SUITS = ["Clubs", "Diamonds", "Hearts", "Spades"];
 
@@ -134,6 +142,15 @@ function buildDeck() {
 
 const PICK_SEC = 15;
 
+const KNOWN_CARDS = new Set(buildDeck().map((c) => c.img));
+
+const serverCardImg = (name) => {
+  if (typeof name !== "string") return null;
+  const m = /^(\d+)_(Clubs|Diamonds|Hearts|Spades)$/.exec(name);
+  const img = m ? `${m[2]}_${m[1]}.webp` : `${name}.webp`;
+  return KNOWN_CARDS.has(img) ? img : null;
+};
+
 export default function CardsGame({ onFinish }) {
   const [deck] = useState(buildDeck);
   const [opened, setOpened] = useState(() => new Set());
@@ -141,6 +158,63 @@ export default function CardsGame({ onFinish }) {
   const boardRef = useRef(null);
   const flyerRef = useRef(null);
   const timers = useRef([]);
+  const sg = useServerGame();
+  const park = useParkServer();
+  const wallet = useWallet();
+  const startRef = useRef(null);
+  const [remote, setRemote] = useState({});
+
+  const remoteCard = (name, prize) => ({ img: serverCardImg(name) || deck.find((c) => c.pts === prize)?.img || BACK, pts: typeof prize === "number" ? prize : 0 });
+
+  const addRemote = (list) => {
+    const items = (Array.isArray(list) ? list : [list]).filter((o) => o && Number.isInteger(Number(o.choice)));
+    if (!items.length) return;
+    setRemote((cur) => {
+      const next = { ...cur };
+      items.forEach((o) => {
+        next[Number(o.choice)] = remoteCard(o.card, o.prize);
+      });
+      return next;
+    });
+    setOpened((p) => {
+      const n = new Set(p);
+      items.forEach((o) => n.add(Number(o.choice)));
+      return n;
+    });
+  };
+
+  useEffect(() => {
+    if (!sg || startRef.current) return;
+    startRef.current = sg
+      .start("cards")
+      .then((r) => {
+        if (Array.isArray(r.opened)) {
+          console.info("[park] карты: уже открыто", r.opened.length);
+          addRemote(r.opened);
+        }
+        return r.game_id || null;
+      })
+      .catch(() => null);
+  }, [sg]);
+
+  useEffect(() => {
+    if (!sg) return undefined;
+    const offOpen = sg.client.on("card_opened", (m) => {
+      if (!m) return;
+      if (m.user_id != null && park && String(m.user_id) === String(park.userId)) return;
+      console.info("[park] карты: открыл другой игрок", JSON.stringify(m));
+      addRemote(m);
+    });
+    const offReset = sg.client.on("cards_reset", () => {
+      console.info("[park] карты: колода перемешана");
+      setRemote({});
+      setOpened(new Set());
+    });
+    return () => {
+      offOpen();
+      offReset();
+    };
+  }, [sg]);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
@@ -171,6 +245,7 @@ export default function CardsGame({ onFinish }) {
     setBig((cur) => {
       if (!cur) return cur;
       const pts = cur.card ? cur.card.pts : 0;
+      if (sg && cur.card) setRemote((rm) => ({ ...rm, [cur.idx]: cur.card }));
       setOpened((p) => {
         const n = new Set(p);
         n.add(cur.idx);
@@ -249,20 +324,49 @@ export default function CardsGame({ onFinish }) {
     const dy = (hb.top + hb.height / 2 - b.top) / f - (from.top + from.h / 2);
     const payload = { idx, card: deck[idx], from, to: { dx, dy, s }, phase: "start", landed: false };
 
-    const face = new Image();
-    face.src = `${A}/${payload.card.img}`;
-    const start = () => setBig((cur) => (cur ? cur : payload));
-    if (face.decode) {
-      Promise.race([face.decode(), new Promise((res) => setTimeout(res, 300))])
-        .catch(() => {})
-        .then(start);
-    } else {
-      start();
+    const show = () => {
+      const face = new Image();
+      face.src = `${A}/${payload.card.img}`;
+      const start = () => setBig((cur) => (cur ? cur : payload));
+      if (face.decode) {
+        Promise.race([face.decode(), new Promise((res) => setTimeout(res, 300))])
+          .catch(() => {})
+          .then(start);
+      } else {
+        start();
+      }
+    };
+
+    if (!sg) {
+      show();
+      return;
     }
+    (async () => {
+      const gid = startRef.current ? await startRef.current : null;
+      if (gid) {
+        try {
+          const r = await sg.play(gid, { choice: idx });
+          if (r && typeof r.cash === "number") wallet?.applyTruth({ cash: r.cash });
+          if (r && typeof r.prize === "number") {
+            const img = serverCardImg(r.card) || deck.find((c) => c.pts === r.prize)?.img || payload.card.img;
+            payload.card = { img, pts: r.prize };
+            if (r.prize > 0) wallet?.hold("cash", r.prize);
+          }
+        } catch (e) {
+          if (e && e.code === "card_opened") {
+            console.warn("[park] карты: позиция уже открыта", idx);
+            pickedRef.current = false;
+            return;
+          }
+          payload.card = deck[idx];
+        }
+      }
+      show();
+    })();
   };
 
   const renderCard = (idx) => {
-    const card = deck[idx];
+    const card = remote[idx] || deck[idx];
     const isOpen = opened.has(idx);
     const flying = big && big.idx === idx;
     return (
@@ -274,7 +378,7 @@ export default function CardsGame({ onFinish }) {
       >
         <img
           className={styles.cardImg}
-          src={`${A}/${isOpen ? card.img : BACK}`}
+          src={`${A_GRID}/${isOpen ? card.img : BACK}`}
           alt=""
           draggable={false}
         />

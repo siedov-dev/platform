@@ -157,3 +157,187 @@
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
 }
+
+.growBoard {
+  transition: transform 0.85s cubic-bezier(0.37, 0, 0.16, 1) 0.45s;
+  will-change: transform;
+}
+
+.growPanel > .inner {
+  will-change: transform;
+}
+
+.growCompact {
+  transform: translateY(calc(var(--grow, 0px) / 2));
+  transition-delay: 0.78s;
+}
+
+.growPanel {
+  background: none;
+  box-shadow: none;
+}
+
+.growInner {
+  background: none;
+  box-shadow: none;
+}
+
+.skin {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.growPanel > .crown,
+.growPanel > .inner,
+.growPanel > .decor {
+  position: relative;
+  z-index: 1;
+}
+
+.growPanel > .crown,
+.growPanel > .decor {
+  position: absolute;
+}
+
+.skinShadow,
+.skinMid,
+.skinBot,
+.growBoard .decor,
+.growBoard .timer {
+  transition: transform 0.85s cubic-bezier(0.37, 0, 0.16, 1) 0.45s;
+}
+
+.growCompact .skinShadow,
+.growCompact .skinMid,
+.growCompact .skinBot,
+.growCompact .decor,
+.growCompact .timer {
+  transition-delay: 0.78s;
+}
+
+.skin:not([data-ready]) .skinShadow,
+.skin:not([data-ready]) .skinMid,
+.skin:not([data-ready]) .skinBot {
+  transition: none;
+}
+
+.skinShadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 26px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  transform-origin: 50% 0;
+}
+
+.growCompact .skinShadow {
+  transform: scaleY(var(--sh-k, 1));
+}
+
+.skinPiece {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.skinTop {
+  top: 0;
+  height: calc(var(--ph, 0px) - var(--cap) - var(--grow, 0px) + 2px);
+  z-index: 2;
+  border-radius: 26px 26px 0 0;
+}
+
+.skinMid {
+  top: calc(var(--ph, 0px) - var(--cap) - var(--grow, 0px));
+  height: var(--grow, 0px);
+  z-index: 1;
+}
+
+.growCompact .skinMid {
+  transform: translateY(calc(var(--grow, 0px) * -1));
+}
+
+.skinBot {
+  top: calc(var(--ph, 0px) - var(--cap) - 2px);
+  height: calc(var(--cap) + 2px);
+  z-index: 2;
+  border-radius: 0 0 26px 26px;
+}
+
+.growCompact .skinBot {
+  transform: translateY(calc(var(--grow, 0px) * -1));
+}
+
+.skinFull {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--ph, 0px);
+  box-sizing: border-box;
+  padding: 3px;
+  border-radius: 26px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  background: linear-gradient(
+    180deg,
+    #f6d98c 0%,
+    #dfae4a 22%,
+    #c8912e 48%,
+    #dfae4a calc(100% - var(--cap) - var(--grow, 0px)),
+    #dfae4a calc(100% - var(--cap)),
+    #f4d585 100%
+  );
+}
+
+.skinTop .skinFull {
+  top: 0;
+}
+
+.skinTop .skinFill {
+  top: 3px;
+}
+
+.skinMid .skinFull {
+  top: calc((var(--ph, 0px) - var(--cap) - var(--grow, 0px)) * -1);
+}
+
+.skinMid .skinFill {
+  top: calc((var(--ph, 0px) - var(--cap) - var(--grow, 0px)) * -1 + 3px);
+}
+
+.skinBot .skinFull {
+  top: calc((var(--ph, 0px) - var(--cap) - 2px) * -1);
+}
+
+.skinBot .skinFill {
+  top: calc((var(--ph, 0px) - var(--cap) - 2px) * -1 + 3px);
+}
+
+.skinFill {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  height: calc(var(--ph, 0px) - 6px);
+  border-radius: 23px;
+  background: radial-gradient(56% 27% at 50% 10%, #6b2daa 0%, #4a1a78 46%, rgba(40, 12, 64, 0) 100%),
+    linear-gradient(
+      180deg,
+      #200936 0%,
+      #180626 calc(100% - var(--cap) - var(--grow, 0px)),
+      #180626 calc(100% - var(--cap)),
+      #110419 100%
+    );
+  box-shadow: inset 0 0 0 1.5px rgba(255, 214, 120, 0.42), inset 0 0 34px rgba(0, 0, 0, 0.5);
+}
+
+.growCompact .decor {
+  transform: translateX(-50%) translateY(calc(var(--grow, 0px) * -1));
+}
+
+.growCompact .timer {
+  transform: translateY(calc(var(--grow, 0px) * -1));
+}

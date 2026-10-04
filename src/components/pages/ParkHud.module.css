@@ -250,6 +250,25 @@
   object-fit: cover;
 }
 
+.sealClip {
+  position: absolute;
+  z-index: 1;
+  top: var(--inset);
+  left: var(--inset);
+  width: calc(100% - 2 * var(--inset));
+  height: calc(100% - 2 * var(--inset));
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.sealCoinImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translateY(4.1%) scale(1.06);
+}
+
 .sealBorder {
   position: absolute;
   inset: 0;
@@ -257,6 +276,15 @@
   border-radius: 50%;
   border: var(--rim) solid #c8a95e;
   pointer-events: none;
+}
+
+.cashSeal {
+  --gap: 3px;
+}
+
+.cashSeal .sealFace {
+  object-fit: contain;
+  background: radial-gradient(circle at 50% 40%, #2a1f5c 0%, #14103a 100%);
 }
 
 @keyframes ringPulse {

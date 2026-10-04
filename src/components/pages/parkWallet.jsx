@@ -1,17 +1,20 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./parkWallet.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
 const KEY = "bonuspark.wallet1";
 const START = { coins: 100, tickets: 999, cash: 999 };
+const KINDS = ["coins", "tickets", "cash"];
 const FLY_MS = 700;
 const STEP_MS = 52;
 const CURVE_PTS = 16;
+const TRUTH_DELAY_MS = 60;
 
 const ICON = {
-  coins: "/bonus-park/Ui_Icon_Bg_Up/Icn_Coin_Front.png",
-  tickets: "/bonus-park/Ui_Icon_Bg_Up/Icn_Tiket.png",
-  cash: "/bonus-park/Ui_Exchange_HUD/Icn_Currency.png",
+  coins: PARK_ASSET + "/Ui_Icon_Bg_Up/Icn_Coin_Front.png",
+  tickets: PARK_ASSET + "/Ui_Icon_Bg_Up/Icn_Tiket.png",
+  cash: PARK_ASSET + "/Ui_Exchange_HUD/Icn_Currency.png",
 };
 
 const load = () => {
@@ -85,42 +88,168 @@ function HitPulse({ item }) {
   return <span className={styles.hit} style={{ left: `${item.to.x}px`, top: `${item.to.y}px` }} />;
 }
 
-export function WalletProvider({ children }) {
-  const [val, setVal] = useState(load);
-  const valRef = useRef(val);
+const zeros = () => ({ coins: 0, tickets: 0, cash: 0 });
+
+const wlog = (what, kind, n, truthRef, holdRef, pendRef) => {
+  const t = truthRef.current || zeros();
+  console.info(
+    `[wallet] ${what} ${kind}${n != null ? " " + n : ""} | truth ${t.coins}/${t.tickets}/${t.cash} hold ${holdRef.current.coins}/${holdRef.current.tickets}/${holdRef.current.cash} pend ${pendRef.current.coins}/${pendRef.current.tickets}/${pendRef.current.cash}`
+  );
+};
+
+export function WalletProvider({ server = null, children }) {
+  const [local, setLocal] = useState(load);
+  const [truth, setTruth] = useState(null);
+  const [tick, setTick] = useState(0);
+  const holdRef = useRef(zeros());
+  const pendRef = useRef(zeros());
+  const truthRef = useRef(null);
+  const truthTimer = useRef(0);
+  const valRef = useRef(local);
   const targets = useRef({});
   const seq = useRef(0);
   const timers = useRef([]);
   const [flights, setFlights] = useState([]);
   const [pulses, setPulses] = useState([]);
 
+  const val = useMemo(() => {
+    if (!server) return local;
+    const t = truthRef.current || truth;
+    const out = zeros();
+    if (!t) return out;
+    KINDS.forEach((k) => {
+      out[k] = Math.max(0, Math.round((t[k] || 0) - (holdRef.current[k] || 0) - (pendRef.current[k] || 0)));
+    });
+    return out;
+  }, [server, local, truth, tick]);
   valRef.current = val;
 
   useEffect(() => {
+    if (server) return undefined;
     try {
-      localStorage.setItem(KEY, JSON.stringify(val));
+      localStorage.setItem(KEY, JSON.stringify(local));
     } catch (e) {
-      return;
+      return undefined;
     }
-  }, [val]);
+    return undefined;
+  }, [local, server]);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
+
+  const bump = useCallback(() => setTick((n) => n + 1), []);
+
+  const applyTruth = useCallback(
+    (obj) => {
+      if (!server || !obj) return;
+      const next = { ...(truthRef.current || zeros()) };
+      let changed = false;
+      KINDS.forEach((k) => {
+        if (typeof obj[k] === "number" && Number.isFinite(obj[k])) {
+          next[k] = obj[k];
+          pendRef.current[k] = 0;
+          changed = true;
+        }
+      });
+      if (!changed) return;
+      truthRef.current = next;
+      setTruth(next);
+      wlog("truth", JSON.stringify(obj), null, truthRef, holdRef, pendRef);
+    },
+    [server]
+  );
+
+  useEffect(() => {
+    if (!server) return undefined;
+    const off = server.on("balance", (b) => {
+      clearTimeout(truthTimer.current);
+      truthTimer.current = setTimeout(() => applyTruth(b), TRUTH_DELAY_MS);
+    });
+    return () => {
+      off();
+      clearTimeout(truthTimer.current);
+    };
+  }, [server, applyTruth]);
 
   const setTarget = useCallback((kind, el) => {
     targets.current[kind] = el;
   }, []);
 
-  const add = useCallback((kind, n) => {
-    setVal((v) => ({ ...v, [kind]: Math.max(0, (v[kind] || 0) + n) }));
-  }, []);
+  const add = useCallback(
+    (kind, n) => {
+      if (server) {
+        holdRef.current[kind] = Math.max(0, (holdRef.current[kind] || 0) - n);
+        bump();
+        wlog("award", kind, n, truthRef, holdRef, pendRef);
+        return;
+      }
+      setLocal((v) => ({ ...v, [kind]: Math.max(0, (v[kind] || 0) + n) }));
+    },
+    [server, bump]
+  );
 
-  const spend = useCallback((kind, n) => {
-    if ((valRef.current[kind] || 0) < n) return false;
-    const next = { ...valRef.current, [kind]: valRef.current[kind] - n };
-    valRef.current = next;
-    setVal(next);
-    return true;
-  }, []);
+  const spend = useCallback(
+    (kind, n) => {
+      if ((valRef.current[kind] || 0) < n) return false;
+      if (server) {
+        pendRef.current[kind] = (pendRef.current[kind] || 0) + n;
+        bump();
+        wlog("spend", kind, n, truthRef, holdRef, pendRef);
+        return true;
+      }
+      const next = { ...valRef.current, [kind]: valRef.current[kind] - n };
+      valRef.current = next;
+      setLocal(next);
+      return true;
+    },
+    [server, bump]
+  );
+
+  const unspend = useCallback(
+    (kind, n) => {
+      if (server) {
+        pendRef.current[kind] = Math.max(0, (pendRef.current[kind] || 0) - n);
+        bump();
+        wlog("unspend", kind, n, truthRef, holdRef, pendRef);
+        return;
+      }
+      setLocal((v) => ({ ...v, [kind]: (v[kind] || 0) + n }));
+    },
+    [server, bump]
+  );
+
+  const hold = useCallback(
+    (kind, n) => {
+      if (!server || !(n > 0)) return;
+      holdRef.current[kind] = (holdRef.current[kind] || 0) + n;
+      bump();
+      wlog("hold", kind, n, truthRef, holdRef, pendRef);
+    },
+    [server, bump]
+  );
+
+  const credit = useCallback(
+    (kind, n) => {
+      if (!server || !(n > 0)) return;
+      const next = { ...(truthRef.current || zeros()) };
+      next[kind] = (next[kind] || 0) + n;
+      truthRef.current = next;
+      holdRef.current[kind] = (holdRef.current[kind] || 0) + n;
+      setTruth(next);
+      wlog("credit", kind, n, truthRef, holdRef, pendRef);
+    },
+    [server]
+  );
+
+  const settle = useCallback(
+    (kind) => {
+      if (!server) return;
+      if (kind) holdRef.current[kind] = 0;
+      else holdRef.current = zeros();
+      bump();
+      wlog("settle", kind || "all", null, truthRef, holdRef, pendRef);
+    },
+    [server, bump]
+  );
 
   const award = useCallback(
     (kind, n, from) => {
@@ -168,7 +297,10 @@ export function WalletProvider({ children }) {
     [add]
   );
 
-  const api = { ...val, spend, award, add, setTarget };
+  const api = useMemo(
+    () => ({ ...val, server: !!server, ready: !server || !!truth, spend, unspend, award, add, hold, credit, settle, applyTruth, setTarget }),
+    [val, server, truth, spend, unspend, award, add, hold, credit, settle, applyTruth, setTarget]
+  );
 
   return (
     <Ctx.Provider value={api}>

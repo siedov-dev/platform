@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./PlayerRow.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const A = "/bonus-park/Ui_Icon_Bg_Up";
-const FIELD = "/bonus-park/Icn_Field";
+const A = PARK_ASSET + "/Ui_Icon_Bg_Up";
+const FIELD = PARK_ASSET + "/Icn_Field";
 const SLOTS = [0, 1, 2, 3, 4, 5];
 const SIDE = 3;
 const DEFAULT_FACE = `${A}/Avarat_Grey.png`;
@@ -41,10 +42,11 @@ const normalize = (list) =>
       id: p.id ?? p.userId ?? i,
       name: p.name || p.nickname || p.login || "Player_Name",
       face: p.avatar || p.face || p.photo || DEFAULT_FACE,
+      real: !!list[i],
     };
   });
 
-export default function PlayerRow({ players = [], subscribe, demo, icons = false }) {
+export default function PlayerRow({ players = [], subscribe, subscribeOpen, openEvent = null, onOpenShown, demo, icons = false, placeholders = true, ghostEmpty = false }) {
   const [list, setList] = useState(() => normalize(players));
   const [hot, setHot] = useState(null);
   const [open, setOpen] = useState(null);
@@ -62,17 +64,17 @@ export default function PlayerRow({ players = [], subscribe, demo, icons = false
     setList(next);
   }, [playersKey]);
 
-  useEffect(() => {
-    const show = (i, val) => {
-      clearTimeout(hideRef.current);
-      hotSlotRef.current = i;
-      setHot({ i, val, key: `${i}-${val}-${performance.now()}` });
-      hideRef.current = setTimeout(() => {
-        hotSlotRef.current = -1;
-        setHot(null);
-      }, SHOW_MS);
-    };
+  const show = (i, val) => {
+    clearTimeout(hideRef.current);
+    hotSlotRef.current = i;
+    setHot({ i, val, key: `${i}-${val}-${performance.now()}` });
+    hideRef.current = setTimeout(() => {
+      hotSlotRef.current = -1;
+      setHot(null);
+    }, SHOW_MS);
+  };
 
+  useEffect(() => {
     const push = (e) => {
       if (!e) return;
       const val = Number(e.amount ?? e.win ?? e.value ?? e.sum);
@@ -92,6 +94,7 @@ export default function PlayerRow({ players = [], subscribe, demo, icons = false
           id: e.id ?? next[i].id,
           name: e.name || next[i].name,
           face: e.avatar || e.face || next[i].face,
+          real: true,
         };
         listRef.current = next;
         setList(next);
@@ -101,20 +104,15 @@ export default function PlayerRow({ players = [], subscribe, demo, icons = false
 
     if (typeof subscribe === "function") {
       const off = subscribe(push);
-      window.parkPlayerWin = push;
       return () => {
         clearTimeout(hideRef.current);
-        delete window.parkPlayerWin;
         if (typeof off === "function") off();
       };
     }
 
-    window.parkPlayerWin = push;
-
     if (demo === false) {
       return () => {
         clearTimeout(hideRef.current);
-        delete window.parkPlayerWin;
       };
     }
 
@@ -128,39 +126,68 @@ export default function PlayerRow({ players = [], subscribe, demo, icons = false
     return () => {
       clearInterval(iv);
       clearTimeout(hideRef.current);
-      delete window.parkPlayerWin;
     };
   }, [subscribe, demo]);
+
+  const showOpen = (i, id, value) => {
+    const item = openById(id);
+    if (!item) return;
+    clearTimeout(openHideRef.current);
+    setOpen({ i, id: item.id, value, key: `${i}-${item.id}-${performance.now()}` });
+    openHideRef.current = setTimeout(() => setOpen(null), OPEN_SHOW_MS);
+  };
+
+  const pushOpen = (e) => {
+    if (!e) return;
+    const cur = listRef.current;
+    let i = -1;
+    if (e.id != null) i = cur.findIndex((p) => String(p.id) === String(e.id));
+    if (i < 0 && e.name) i = cur.findIndex((p) => p.name === e.name);
+    if (i < 0 && Number.isInteger(e.index)) i = e.index;
+    if ((i < 0 || i >= SLOTS.length) && e.name) {
+      i = cur.findIndex((p) => !p.real);
+      if (i < 0) {
+        i = rrRef.current % SLOTS.length;
+        rrRef.current += 1;
+      }
+      const next = cur.slice();
+      next[i] = { id: e.id ?? next[i].id, name: e.name, face: e.avatar || e.face || next[i].face, real: true };
+      listRef.current = next;
+      setList(next);
+    }
+    if (i < 0 || i >= SLOTS.length) return;
+    const kind = e.kind || e.game || e.icon;
+    if (kind === "cash") {
+      if (Number(e.value) > 0) show(i, Math.round(Number(e.value)));
+      return;
+    }
+    showOpen(i, kind, e.value);
+  };
+
+  useEffect(() => {
+    if (!icons || !openEvent) return undefined;
+    pushOpen(openEvent);
+    onOpenShown?.(openEvent.key);
+    return undefined;
+  }, [icons, openEvent]);
 
   useEffect(() => {
     if (!icons) {
       setOpen(null);
       return undefined;
     }
-    const showOpen = (i, id) => {
-      const item = openById(id) || OPENED[0];
-      clearTimeout(openHideRef.current);
-      setOpen({ i, id: item.id, key: `${i}-${item.id}-${performance.now()}` });
-      openHideRef.current = setTimeout(() => setOpen(null), OPEN_SHOW_MS);
-    };
 
-    const pushOpen = (e) => {
-      if (!e) return;
-      const cur = listRef.current;
-      let i = -1;
-      if (e.id != null) i = cur.findIndex((p) => String(p.id) === String(e.id));
-      if (i < 0 && e.name) i = cur.findIndex((p) => p.name === e.name);
-      if (i < 0 && Number.isInteger(e.index)) i = e.index;
-      if (i < 0 || i >= SLOTS.length) i = 0;
-      showOpen(i, e.kind || e.game || e.icon);
-    };
-
-    window.parkPlayerOpen = pushOpen;
+    if (typeof subscribeOpen === "function") {
+      const off = subscribeOpen(pushOpen);
+      return () => {
+        clearTimeout(openHideRef.current);
+        if (typeof off === "function") off();
+      };
+    }
 
     if (demo === false) {
       return () => {
         clearTimeout(openHideRef.current);
-        delete window.parkPlayerOpen;
       };
     }
 
@@ -180,16 +207,17 @@ export default function PlayerRow({ players = [], subscribe, demo, icons = false
       clearTimeout(start);
       clearInterval(iv);
       clearTimeout(openHideRef.current);
-      delete window.parkPlayerOpen;
     };
-  }, [icons, demo]);
+  }, [icons, demo, subscribeOpen]);
 
   const cell = (p, i) => {
+    if (!placeholders && !p.real) return null;
     const active = hot && hot.i === i;
     const opened = icons && open && open.i === i ? openById(open.id) : null;
     const lit = active || !!opened;
+    const ghost = ghostEmpty && !p.real;
     return (
-      <span key={p.id ?? i} className={`${styles.slot} ${lit ? styles.slotOn : ""}`}>
+      <span key={p.id ?? i} className={`${styles.slot} ${lit ? styles.slotOn : ""} ${ghost ? styles.slotGhost : ""}`}>
         {lit && <img className={styles.shine} src={`${A}/Avatar_Active_Shine_Fx.png`} alt="" draggable={false} />}
         <img className={styles.frame} src={`${A}/Bg_Avatar.png`} alt="" draggable={false} />
         <img

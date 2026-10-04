@@ -102,6 +102,12 @@
   height: 100%;
   pointer-events: none;
   animation: shineBakedPulse 2.6s ease-in-out infinite;
+  animation-name: none;
+}
+
+.shineOn .shineBaked {
+  animation-name: shineBakedPulse;
+  will-change: transform, opacity;
 }
 
 @keyframes shineBakedPulse {
@@ -188,9 +194,13 @@
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 0 5px rgba(var(--c1), 1), 0 0 11px rgba(var(--c3), 0.8);
-  animation-name: shineSpark;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
+}
+
+.shineOn .shineSpark {
+  animation-name: shineSpark;
+  will-change: transform, opacity;
 }
 
 @keyframes shineBreath {
@@ -242,12 +252,19 @@
   z-index: 4;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.42s cubic-bezier(0.3, 0, 0.7, 1);
+  visibility: hidden;
+  transition: opacity 0.42s cubic-bezier(0.3, 0, 0.7, 1), visibility 0s linear 0.42s;
+}
+
+.starsRun .stars,
+.moving .stars {
+  visibility: visible;
+  transition: opacity 0.42s cubic-bezier(0.3, 0, 0.7, 1), visibility 0s;
 }
 
 .moving .stars {
   opacity: 1;
-  transition: opacity 0.14s ease-out;
+  transition: opacity 0.14s ease-out, visibility 0s;
 }
 
 .won .icon,
@@ -292,10 +309,19 @@
   opacity: 0;
   transform-origin: 50% 50%;
   filter: drop-shadow(0 0 4px rgba(255, 214, 255, 0.9)) drop-shadow(0 0 9px rgba(255, 150, 240, 0.55));
-  will-change: transform, opacity;
+}
+
+.starsCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
 }
 
 .starsRun .star {
+  will-change: transform, opacity;
   animation-name: reelStar;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
@@ -697,6 +723,22 @@
   display: block;
 }
 
+.hatSheet {
+  aspect-ratio: 366 / 375;
+  background-image: url("/bonus-park/Hat_Spin/hat_sheet.png");
+  background-size: 500% 400%;
+  background-position: 0% 0%;
+  background-repeat: no-repeat;
+}
+
+.coinSheet {
+  aspect-ratio: 191 / 190;
+  background-image: url("/bonus-park/Coin_Spin/coin_sheet.png");
+  background-size: 600% 500%;
+  background-position: 0% 0%;
+  background-repeat: no-repeat;
+}
+
 .hatReturn {
   animation: hatReturn 0.5s linear both;
 }
@@ -751,6 +793,11 @@
 .winCellOff {
   opacity: 0;
   pointer-events: none;
+}
+
+.winCell:not(.winCellOff) .winSway,
+.winCell:not(.winCellOff) .winIcon {
+  will-change: transform, opacity;
 }
 
 .preHold {

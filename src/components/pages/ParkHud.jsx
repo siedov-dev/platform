@@ -1,13 +1,14 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useWallet } from "./parkWallet";
 import styles from "./ParkHud.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const A = "/bonus-park/Ui_Icon_Bg_Up";
+const A = PARK_ASSET + "/Ui_Icon_Bg_Up";
 
 const CURRENCIES = [
   { key: "coins", icon: "Icn_Coin_Front.png", plus: false },
   { key: "tickets", icon: "Icn_Tiket.png", plus: false },
-  { key: "cash", icon: "/bonus-park/Ui_Exchange_HUD/Icn_Currency.png", abs: true, plus: true },
+  { key: "cash", icon: PARK_ASSET + "/Ui_Exchange_HUD/Icn_Currency.png", abs: true, plus: true },
 ];
 
 const fmt = (n) => (n || 0).toLocaleString("ru-RU").replace(/ /g, " ");
@@ -63,16 +64,21 @@ function ChipVal({ value, plus }) {
     const num = numRef.current;
     if (!box || !num) return undefined;
     const apply = () => {
+      if (!box.isConnected) return;
       const cs = getComputedStyle(box);
       const avail = box.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
-      const need = num.scrollWidth;
-      setFit(need > 0 && avail > 0 ? Math.min(1, avail / need) : 1);
+      const k = num.offsetWidth ? num.getBoundingClientRect().width / num.offsetWidth : 1;
+      const range = document.createRange();
+      range.selectNodeContents(num);
+      const need = range.getBoundingClientRect().width / (k || 1);
+      if (!(need > 0) || !(avail > 0)) return;
+      setFit(Math.min(1, (avail * 0.97) / need));
     };
     apply();
     const ro = new ResizeObserver(apply);
     ro.observe(box);
     return () => ro.disconnect();
-  }, [label.length]);
+  }, [label.length, pop]);
 
   return (
     <span
@@ -131,10 +137,17 @@ export default function ParkHud({ values = {}, tickets = true, coinProgress = 0.
                   <circle className={styles.sealLine} cx="50" cy="50" r="44.8" />
                 </g>
               </svg>
+              <span ref={(el) => wallet?.setTarget(c.key, el)} className={styles.sealClip}>
+                <img className={styles.sealCoinImg} src={`${A}/${c.icon}`} alt="" draggable={false} />
+              </span>
+              <span className={styles.sealBorder} />
+            </span>
+          ) : c.key === "cash" ? (
+            <span className={`${styles.seal} ${styles.cashSeal}`}>
               <img
                 ref={(el) => wallet?.setTarget(c.key, el)}
                 className={styles.sealFace}
-                src={`${A}/${c.icon}`}
+                src={c.icon}
                 alt=""
                 draggable={false}
               />

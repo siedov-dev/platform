@@ -32,7 +32,7 @@ export default function usePopFrom(ref, from, ready = true) {
           easing: "cubic-bezier(0.2, 0.7, 0.3, 1)",
         },
         {
-          transform: "translate(0px, 0px) scale(1.04)",
+          transform: "translate(0px, 0px) scale(1)",
           opacity: 1,
           offset: 0.82,
           easing: "cubic-bezier(0.4, 0, 0.3, 1)",

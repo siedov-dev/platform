@@ -1,8 +1,9 @@
 import { useRef, useLayoutEffect, useState, useMemo } from "react";
 import styles from "./BonusParkPage.module.css";
 import { transformFor } from "./perspective";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const ASSET = "/bonus-park";
+const ASSET = PARK_ASSET;
 
 const IS_DROID = typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
 
@@ -112,8 +113,8 @@ export default function TileField({
                   : styles.cell
               }
               onClick={
-                !gone && onTileClick
-                  ? (e) => onTileClick(i, offset + i, e.currentTarget.getBoundingClientRect())
+                onTileClick
+                  ? (e) => onTileClick(i, offset + i, e.currentTarget.getBoundingClientRect(), gone)
                   : undefined
               }
             >
@@ -134,6 +135,18 @@ export default function TileField({
             transform: tileT.transform,
             transformOrigin: "0 0",
           }}
+        />
+      )}
+      {!selected && onTileClick && tileT && (
+        <div
+          className={styles.fieldHit}
+          style={{
+            width: `${tileT.gw}px`,
+            height: `${tileT.gh}px`,
+            transform: tileT.transform,
+            transformOrigin: "0 0",
+          }}
+          onClick={(e) => onTileClick(0, offset, e.currentTarget.getBoundingClientRect(), true)}
         />
       )}
       {taken && tileT && (

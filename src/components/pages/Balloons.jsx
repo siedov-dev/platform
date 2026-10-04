@@ -1,6 +1,7 @@
 import styles from "./Balloons.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const ASSET = "/bonus-park";
+const ASSET = PARK_ASSET;
 
 const ITEMS = [
   { src: "Baloon_Yellow.png", base: 1, len: 82, sway: 3.5, dur: 4.6, delay: 0.9 },

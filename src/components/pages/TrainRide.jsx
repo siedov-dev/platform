@@ -1,7 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import styles from "./TrainRide.module.css";
+import { PARK_ASSET } from "./parkAssetBase";
 
-const A = "/bonus-park/Train";
+const A = PARK_ASSET + "/Train";
 const MAX_CARS = 6;
 const HEAD_W = 12.3;
 const CAR_W = 9.9;

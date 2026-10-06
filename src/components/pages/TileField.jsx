@@ -45,6 +45,7 @@ export default function TileField({
   edge = 0,
   destroyed,
   marks,
+  pop,
   selected,
   taken,
   litTile,
@@ -103,6 +104,7 @@ export default function TileField({
           const r = Math.floor(i / cols);
           const c = i % cols;
           const gone = destroyed ? destroyed.has(offset + i) : false;
+          const popping = pop ? pop.has(offset + i) : false;
           const topAlive = r === 0 || !destroyed || !destroyed.has(offset + i - cols);
           return (
             <div
@@ -110,7 +112,7 @@ export default function TileField({
               className={
                 gone
                   ? `${styles.cell} ${styles.cellGone} ${topAlive ? styles.holeShade : ""}`
-                  : styles.cell
+                  : `${styles.cell} ${popping ? styles.cellPop : ""}`
               }
               onClick={
                 onTileClick

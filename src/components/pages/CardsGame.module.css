@@ -33,6 +33,42 @@
   border: 0;
   background: none;
   cursor: pointer;
+  perspective: 420px;
+}
+
+.cardInner {
+  position: relative;
+  display: block;
+  width: 100%;
+  transform-style: preserve-3d;
+  transition: none;
+}
+
+.cardFlip .cardInner {
+  transition: transform 640ms cubic-bezier(0.45, 0, 0.2, 1);
+  animation: cardLift 640ms cubic-bezier(0.45, 0, 0.2, 1) both;
+}
+
+.cardFront,
+.cardRear {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.cardRear {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+@keyframes cardLift {
+  0% { scale: 1; }
+  50% { scale: 1.09; }
+  100% { scale: 1; }
+}
+
+.badgeOff {
+  opacity: 0;
 }
 
 .cardAway {
@@ -59,6 +95,7 @@
   text-shadow: 0 0 2px #c62b12, 1.4px 0 0 #c62b12, -1.4px 0 0 #c62b12, 0 1.4px 0 #c62b12, 0 -1.4px 0 #c62b12,
     1px 1px 0 #c62b12, -1px 1px 0 #c62b12, 0 2.5px 3px rgba(0, 0, 0, 0.55);
   pointer-events: none;
+  transition: opacity 380ms ease;
 }
 
 .bigWrap {

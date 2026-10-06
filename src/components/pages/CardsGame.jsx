@@ -141,8 +141,14 @@ function buildDeck() {
 }
 
 const PICK_SEC = 15;
+const FLIP_STAGGER_MS = 14;
+const FLIP_MS = 640;
+const BADGE_FADE_MS = 380;
+const FLIP_TOTAL_MS = FLIP_MS + 54 * FLIP_STAGGER_MS;
 
 const KNOWN_CARDS = new Set(buildDeck().map((c) => c.img));
+
+const POPUP_ARM_MS = 600;
 
 const serverCardImg = (name) => {
   if (typeof name !== "string") return null;
@@ -206,9 +212,13 @@ export default function CardsGame({ onFinish }) {
       addRemote(m);
     });
     const offReset = sg.client.on("cards_reset", () => {
+      if (pickedRef.current) {
+        console.info("[park] карты: колода перемешана, жду раскрытие последней карты");
+        resetPendingRef.current = true;
+        return;
+      }
       console.info("[park] карты: колода перемешана");
-      setRemote({});
-      setOpened(new Set());
+      runFlipBack(null);
     });
     return () => {
       offOpen();
@@ -217,6 +227,14 @@ export default function CardsGame({ onFinish }) {
   }, [sg]);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
+
+  const armedRef = useRef(false);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      armedRef.current = true;
+    }, POPUP_ARM_MS);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     [`${A}/Shine_Card-Win.webp`, `${A}/Light_Fx_Card.webp`, MONEY].forEach((src) => {
@@ -241,6 +259,36 @@ export default function CardsGame({ onFinish }) {
     return () => cancelAnimationFrame(raf);
   }, [big]);
 
+  const [flipBack, setFlipBack] = useState(false);
+  const resetPendingRef = useRef(false);
+
+  const [badgesOff, setBadgesOff] = useState(false);
+  const [flipFaces, setFlipFaces] = useState({});
+  const remoteRef = useRef(remote);
+  remoteRef.current = remote;
+
+  const flipBusyRef = useRef(false);
+
+  const runFlipBack = (pts) => {
+    if (flipBusyRef.current) return;
+    flipBusyRef.current = true;
+    resetPendingRef.current = false;
+    setBadgesOff(true);
+    later(() => {
+      setFlipFaces({ ...remoteRef.current });
+      setFlipBack(true);
+      setRemote({});
+      setOpened(new Set());
+    }, BADGE_FADE_MS);
+    later(() => {
+      setFlipBack(false);
+      setBadgesOff(false);
+      setFlipFaces({});
+      flipBusyRef.current = false;
+    }, BADGE_FADE_MS + FLIP_TOTAL_MS + 60);
+    if (pts != null) later(() => onFinish?.(pts), BADGE_FADE_MS + FLIP_TOTAL_MS + 450);
+  };
+
   const finish = () => {
     setBig((cur) => {
       if (!cur) return cur;
@@ -251,7 +299,8 @@ export default function CardsGame({ onFinish }) {
         n.add(cur.idx);
         return n;
       });
-      later(() => onFinish?.(pts), 250);
+      if (resetPendingRef.current) later(() => runFlipBack(pts), 500);
+      else later(() => onFinish?.(pts), 250);
       return null;
     });
   };
@@ -305,7 +354,7 @@ export default function CardsGame({ onFinish }) {
   }, []);
 
   const flip = (idx, e) => {
-    if (big || opened.has(idx) || pickedRef.current) return;
+    if (!armedRef.current || big || opened.has(idx) || pickedRef.current) return;
     pickedRef.current = true;
     const el = boardRef.current;
     const b = el.getBoundingClientRect();
@@ -356,6 +405,7 @@ export default function CardsGame({ onFinish }) {
           if (e && e.code === "card_opened") {
             console.warn("[park] карты: позиция уже открыта", idx);
             pickedRef.current = false;
+            if (resetPendingRef.current) runFlipBack(null);
             return;
           }
           payload.card = deck[idx];
@@ -373,16 +423,23 @@ export default function CardsGame({ onFinish }) {
       <button
         key={idx}
         type="button"
-        className={`${styles.cardBtn} ${flying ? styles.cardAway : ""}`}
+        className={`${styles.cardBtn} ${flying ? styles.cardAway : ""} ${flipBack ? styles.cardFlip : ""}`}
         onClick={(e) => flip(idx, e)}
       >
-        <img
-          className={styles.cardImg}
-          src={`${A_GRID}/${isOpen ? card.img : BACK}`}
-          alt=""
-          draggable={false}
-        />
-        {isOpen && card.pts != null && <span className={styles.badge}>{card.pts}</span>}
+        <span
+          className={styles.cardInner}
+          style={{
+            transform: `rotateY(${isOpen ? 180 : 0}deg)`,
+            transitionDelay: flipBack ? `${idx * FLIP_STAGGER_MS}ms` : "0ms",
+            animationDelay: flipBack ? `${idx * FLIP_STAGGER_MS}ms` : "0ms",
+          }}
+        >
+          <img className={`${styles.cardImg} ${styles.cardFront}`} src={`${A_GRID}/${BACK}`} alt="" draggable={false} />
+          {(isOpen || flipFaces[idx]) && (
+            <img className={`${styles.cardImg} ${styles.cardRear}`} src={`${A_GRID}/${(flipFaces[idx] || card).img}`} alt="" draggable={false} />
+          )}
+        </span>
+        {isOpen && card.pts != null && <span className={`${styles.badge} ${badgesOff ? styles.badgeOff : ""}`}>{card.pts}</span>}
       </button>
     );
   };
@@ -397,7 +454,7 @@ export default function CardsGame({ onFinish }) {
       <div className={styles.lastRow}>{Array.from({ length: 6 }, (_, i) => renderCard(49 + i))}</div>
 
       {big && (
-        <div className={styles.bigWrap} onClick={close}>
+        <div className={styles.bigWrap}>
           {(landed || big.phase === "back") && (
             <>
               <TopBeam hostRef={boardRef} fade={fxCls} prize={big.card.pts} />

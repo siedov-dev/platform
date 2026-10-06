@@ -155,6 +155,28 @@ function JokerClip({ clip }) {
   );
 }
 
+const DOUBLE_TAP_MS = 350;
+
+function useDoubleTap(ref, onDouble) {
+  const cb = useRef(onDouble);
+  cb.current = onDouble;
+  useEffect(() => {
+    let last = 0;
+    const onTap = (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      const now = performance.now();
+      if (now - last < DOUBLE_TAP_MS) {
+        last = 0;
+        cb.current?.();
+        return;
+      }
+      last = now;
+    };
+    document.addEventListener("pointerdown", onTap, true);
+    return () => document.removeEventListener("pointerdown", onTap, true);
+  }, []);
+}
+
 function JokerStage({ seq, loopKey, onClip, onEnd }) {
   const boxRef = useRef(null);
   const vids = useRef({});
@@ -327,6 +349,16 @@ function JokerStage({ seq, loopKey, onClip, onEnd }) {
     if (v) v.loop = isLast(s.cur) && key === loopKey;
     if (key === loopKey && !isLast(s.cur)) advance();
   }, [seq, loopKey]);
+
+  useDoubleTap(boxRef, () => {
+    const s = st.current;
+    const key = s.seq[s.cur];
+    const v = vids.current[key];
+    if (s.adv || !v || v.loop || isLast(s.cur)) return;
+    console.info("[park] джокер: скип клипа", key);
+    v.pause();
+    advance();
+  });
 
   return <div ref={boxRef} className={styles.jokerStage} />;
 }
@@ -580,6 +612,16 @@ function CoinStage({ seq, onClip, onEnd }) {
     const v = vids.current[s.seq[s.cur]];
     if (v && (v.paused || COIN_LOOPS.has(s.seq[s.cur])) && !s.adv && !isLast(s.cur)) advance();
   }, [seq]);
+
+  useDoubleTap(boxRef, () => {
+    const s = st.current;
+    const key = s.seq[s.cur];
+    const v = vids.current[key];
+    if (s.adv || !v || COIN_LOOP_ALT[key] || isLast(s.cur)) return;
+    console.info("[park] монета: скип клипа", key);
+    v.pause();
+    advance();
+  });
 
   return <div ref={boxRef} className={styles.jokerStage} />;
 }
@@ -835,6 +877,16 @@ function FlipStage({ seq, onClip, onEnd }) {
     const v = vids.current[curKey()];
     if (v && (v.paused || FLIP_LOOPS.has(curKey())) && !s.adv && !isLast(s.cur)) advance();
   }, [seq]);
+
+  useDoubleTap(boxRef, () => {
+    const s = st.current;
+    const key = curKey();
+    const v = vids.current[key];
+    if (s.adv || !v || FLIP_LOOP_ALT[key] || isLast(s.cur)) return;
+    console.info("[park] орёл-решка: скип клипа", key);
+    v.pause();
+    advance();
+  });
 
   return <div ref={boxRef} className={styles.jokerStage} />;
 }

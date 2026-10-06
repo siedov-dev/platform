@@ -2670,3 +2670,91 @@
   box-shadow: 0 0 0 2.5px #e0b352, 0 0 0 4px #5b3d0d, 0 3px 8px rgba(0, 0, 0, 0.5);
   text-shadow: 0 2px 0 rgba(20, 20, 30, 0.9), 0 3px 4px rgba(0, 0, 0, 0.45);
 }
+
+.netBadge {
+  position: fixed;
+  left: 50%;
+  top: calc(var(--safe-top, 0px) + var(--crop-top, 0px) + var(--fr-v, 0px) + 6px);
+  z-index: 580;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(20, 10, 10, 0.86);
+  box-shadow: 0 0 0 1.5px #e4b84e, 0 0 0 3px #5a3708, 0 4px 10px rgba(0, 0, 0, 0.6);
+  font-family: "PyrSans", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f6e4b8;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.netDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ffb02e;
+  box-shadow: 0 0 8px rgba(255, 176, 46, 0.8);
+  animation: netPulse 1s ease-in-out infinite;
+}
+
+.netDotOff {
+  background: #ff3b5c;
+  box-shadow: 0 0 8px rgba(255, 59, 92, 0.8);
+  animation: none;
+}
+
+@keyframes netPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 4px 0 2px;
+}
+
+.loginInput {
+  width: 210px;
+  height: 42px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(10, 4, 20, 0.6);
+  box-shadow: 0 0 0 2px #e0b352, 0 0 0 3.5px #5b3d0d, inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  font-family: "PyrSans", system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff3c8;
+  outline: none;
+}
+
+.loginInput::placeholder {
+  color: rgba(246, 228, 184, 0.45);
+  font-weight: 600;
+}
+
+.loginErr {
+  font-family: "PyrSans", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ff6b7f;
+  text-shadow: 0 1px 0 rgba(60, 0, 10, 0.8);
+}
+
+.cellPop .tileImg {
+  animation: tilePop 460ms cubic-bezier(0.3, 1.4, 0.4, 1) both;
+}
+
+@keyframes tilePop {
+  0% { opacity: 0; transform: translateY(-14px) scale(0.6); }
+  60% { opacity: 1; transform: translateY(2px) scale(1.06); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}

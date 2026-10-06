@@ -1,6 +1,46 @@
 import { createContext, useContext } from "react";
 
-const DEFAULT_URL = "wss://api-go.splmn1.com/ws/conn";
+const DEFAULT_URL = "wss://test.splmn1.com/ws";
+const AUTH_KEY = "park.auth";
+
+export const parkAuth = () => {
+  const q = query();
+  if (q.get("login") && q.get("password")) return { login: q.get("login"), password: q.get("password") };
+  if (q.get("user_id") && q.get("token")) return { userId: q.get("user_id"), token: q.get("token") };
+  try {
+    const raw = localStorage.getItem(AUTH_KEY);
+    if (raw) {
+      const a = JSON.parse(raw);
+      if (a && ((a.login && a.password) || (a.userId && a.token))) return a;
+    }
+  } catch (e) {
+    return null;
+  }
+  if (import.meta.env.VITE_PARK_USER_ID && import.meta.env.VITE_PARK_TOKEN) return { userId: import.meta.env.VITE_PARK_USER_ID, token: import.meta.env.VITE_PARK_TOKEN };
+  return null;
+};
+
+export const saveParkAuth = (auth) => {
+  try {
+    localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
+  } catch (e) {
+    return;
+  }
+};
+
+export const clearParkAuth = () => {
+  try {
+    localStorage.removeItem(AUTH_KEY);
+  } catch (e) {
+    return;
+  }
+};
+
+let selfId = null;
+export const setParkSelfId = (id) => {
+  if (id != null) selfId = String(id);
+};
+export const parkSelfId = () => selfId || parkConfig().userId;
 const REQUEST_MS = 8000;
 const RETRY_MS = [1000, 2000, 4000, 8000, 15000];
 
@@ -29,11 +69,13 @@ const tabUserId = () => {
 
 export const parkConfig = () => {
   const q = query();
-  const userId = q.get("user_id") || import.meta.env.VITE_PARK_USER_ID || tabUserId();
+  const auth = parkAuth();
+  const userId = auth && auth.userId ? auth.userId : auth && auth.login ? auth.login : tabUserId();
   return {
     url: q.get("ws") || import.meta.env.VITE_PARK_WS_URL || DEFAULT_URL,
+    auth,
     userId,
-    token: q.get("token") || import.meta.env.VITE_PARK_TOKEN || `test-park-${userId}`,
+    token: auth && auth.token ? auth.token : `test-park-${userId}`,
   };
 };
 
@@ -65,8 +107,12 @@ export class ParkSocket {
     this.closed = false;
     clearTimeout(this.timer);
     if (this.ws) return;
-    const { url, userId, token } = this.cfg;
-    const full = `${url}${url.includes("?") ? "&" : "?"}user_id=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`;
+    const { url, userId, token, auth } = this.cfg;
+    const creds =
+      auth && auth.login
+        ? `login=${encodeURIComponent(auth.login)}&password=${encodeURIComponent(auth.password)}`
+        : `user_id=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`;
+    const full = `${url}${url.includes("?") ? "&" : "?"}${creds}`;
     this.setStatus("connecting");
     let ws;
     try {
@@ -91,6 +137,10 @@ export class ParkSocket {
       }
       if (ev.code === 4000) {
         this.setStatus("unauthorized");
+        return;
+      }
+      if (ev.code === 4002 || /busy|already/i.test(String(ev.reason || ""))) {
+        this.setStatus("busy");
         return;
       }
       this.scheduleRetry();

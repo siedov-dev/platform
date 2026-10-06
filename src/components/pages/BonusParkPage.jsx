@@ -20,7 +20,7 @@ import usePopFrom, { usePopTo } from "./usePopFrom";
 import { MINI_GAMES } from "./MiniGames";
 import CashWin from "./CashWin";
 import { WalletProvider, useWallet, centerOf } from "./parkWallet";
-import { ParkSocket, ParkServerContext, useParkServer, parkConfig, parkMode, parkServerEnabled } from "./parkSocket";
+import { ParkSocket, ParkServerContext, useParkServer, parkConfig, parkMode, parkServerEnabled, parkAuth, saveParkAuth, clearParkAuth, parkSelfId, setParkSelfId } from "./parkSocket";
 import styles from "./BonusParkPage.module.css";
 import { PARK_ASSET, PARK_DESK } from "./parkAssetBase";
 
@@ -95,6 +95,7 @@ const BANK_FLASH_MS = 720;
 const BANK_DROP_MS = 280;
 const SPIN_COST = 1;
 const CASH_SHOW_MS = 2200;
+const POPUP_ARM_MS = 600;
 const POP_OUT_MS = 420;
 
 const GAPS_KEY = "bonuspark.seam6";
@@ -881,7 +882,11 @@ function Overview({ onPick }) {
 }
 
 const IDLE_LEAVE_MS = 5 * 60 * 1000;
+const REFILL_START_MS = 400;
+const REFILL_ROW_MS = 90;
+const REFILL_POP_MS = 460;
 const REMOTE_DRAIN_MS = 1200;
+const BANK_REFILL_DELAY_MS = 1500;
 
 function GridGame({ onPopup, onZoomState, onCoinRing }) {
   const wallet = useWallet();
@@ -924,6 +929,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
   const [safes, setSafes] = useState(0);
   const [bank, setBank] = useState(SAFE_START);
   const [bankBase, setBankBase] = useState(SAFE_START);
+  const [bankDrain, setBankDrain] = useState(null);
   const bankRef = useRef(bank);
   bankRef.current = bank;
   const poolRef = useRef({});
@@ -978,18 +984,37 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
     setLit(null);
   }, [client, park?.sector]);
 
+  const autoLeaveRef = useRef(false);
+  const inflightRef = useRef(0);
+  const mySentCellsRef = useRef(new Set());
+  const openQueueRef = useRef(Promise.resolve());
+  const [flightTick, setFlightTick] = useState(0);
+
   const lastOpenRef = useRef(Date.now());
   useEffect(() => {
     if (!client || !park?.sector) return undefined;
     lastOpenRef.current = Date.now();
-    const iv = setInterval(() => {
+    const check = (why) => {
       if (Date.now() - lastOpenRef.current < IDLE_LEAVE_MS) return;
-      console.info("[park] 5 минут без плиток, выхожу с поля");
+      console.info("[park] 5 минут без плиток, выхожу с поля", why);
       setZoomZone(null);
       setLit(null);
       park.leaveSector?.();
-    }, 15000);
-    return () => clearInterval(iv);
+    };
+    const iv = setInterval(() => check("таймер"), 15000);
+    autoLeaveRef.current = false;
+    const onVisible = () => {
+      if (document.visibilityState === "visible") check("вернулись в приложение");
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    window.addEventListener("pageshow", onVisible);
+    return () => {
+      clearInterval(iv);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+      window.removeEventListener("pageshow", onVisible);
+    };
   }, [client, park?.sector]);
 
   const saveJson = (key, val) => {
@@ -1233,6 +1258,11 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
       .request({ action: "get_field" })
       .then((r) => {
         if (dead) return;
+        if (Array.isArray(r.cells) && r.cells.length === 0 && destroyed.size >= 20) {
+          refillRef.current("сервер вернул пустое поле");
+          return;
+        }
+        if (refillBusyRef.current) return;
         if (typeof r.energy === "number") setEnergy(Math.max(0, r.energy));
         if (typeof r.safe === "number") setSafes(Math.max(0, Math.min(SAFE_GOAL - 1, r.safe)));
         if (typeof r.safe_bank === "number" && typeof r.energy === "number") setBankBase(r.safe_bank - r.energy);
@@ -1251,24 +1281,8 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
       })
       .catch(() => {});
     const offReset = client.on("field_reset", () => {
-      console.info("[park] field_reset");
-      restartRef.current();
-      client
-        .request({ action: "get_field" })
-        .then((r) => {
-          if (dead || !Array.isArray(r.cells) || !r.cells.length) return;
-          const ids = new Set();
-          const mk = {};
-          r.cells.forEach((c) => {
-            ids.add(c.cell_id);
-            if (c.outcome === "money") mk[c.cell_id] = { kind: "money", value: c.value };
-            else if (c.outcome === "cash") mk[c.cell_id] = { kind: "cash", value: c.value };
-            else if (c.outcome === "game" && c.game) mk[c.cell_id] = { kind: "game", game: c.game };
-          });
-          setDestroyed(ids);
-          setMarks(mk);
-        })
-        .catch(() => {});
+      console.info("[park] field_reset: поле обновляется");
+      refillRef.current("field_reset");
     });
     const offState = client.on("field_state", (m) => remoteRef.current(m));
     const offBal = client.on("balance", (b) => {
@@ -1296,13 +1310,83 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
     };
   }, [client, park?.status, park?.sector]);
 
+  const [popIds, setPopIds] = useState(() => new Set());
+  const refillBusyRef = useRef(false);
+  const runRefill = (why) => {
+    if (refillBusyRef.current) return;
+    refillBusyRef.current = true;
+    console.info("[park] рефил поля:", why);
+    if (park?.sector) {
+      setZoomZone(null);
+      setLit(null);
+      park.leaveSector?.();
+    }
+    purpleFound.current = 0;
+    setMarks({});
+    const rows = new Map();
+    destroyed.forEach((id) => {
+      const f = FIELDS.find((x) => id >= x.offset && id < x.offset + x.cols * x.rows);
+      if (!f) return;
+      const row = f.rows - 1 - Math.floor((id - f.offset) / f.cols);
+      if (!rows.has(row)) rows.set(row, []);
+      rows.get(row).push(id);
+    });
+    const order = [...rows.keys()].sort((a, b) => a - b);
+    if (!order.length) {
+      refillBusyRef.current = false;
+      return;
+    }
+    order.forEach((row, i) => {
+      bankTimers.current.push(
+        setTimeout(() => {
+          const ids = rows.get(row);
+          setPopIds((p) => {
+            const next = new Set(p);
+            ids.forEach((id) => next.add(id));
+            return next;
+          });
+          setDestroyed((prev) => {
+            const next = new Set(prev);
+            ids.forEach((id) => next.delete(id));
+            return next;
+          });
+          if (i === order.length - 1) {
+            bankTimers.current.push(
+              setTimeout(() => {
+                setPopIds(new Set());
+                refillBusyRef.current = false;
+              }, REFILL_POP_MS + 100)
+            );
+          }
+        }, REFILL_START_MS + i * REFILL_ROW_MS)
+      );
+    });
+  };
+  const refillRef = useRef(runRefill);
+  refillRef.current = runRefill;
+
   const applyRemote = (m) => {
     if (!m || !client) return;
-    if (m.user_id != null && String(m.user_id) === String(park?.userId)) return;
+    if (m.user_id != null && String(m.user_id) === String(park?.userId)) {
+      const own = Number(m.cell_id);
+      if (Number.isInteger(own) && own >= 0) {
+        setDestroyed((prev) => {
+          if (prev.has(own)) return prev;
+          console.info("[park] своя плитка подтверждена сервером после задержки", own);
+          const next = new Set(prev);
+          next.add(own);
+          return next;
+        });
+        if (m.outcome === "money") setMarks((mk) => (mk[own] ? mk : { ...mk, [own]: { kind: "money", value: m.value || 0 } }));
+        else if (m.outcome === "cash") setMarks((mk) => (mk[own] ? mk : { ...mk, [own]: { kind: "cash", value: m.value || 0 } }));
+        else if (m.outcome === "game" && m.game) setMarks((mk) => (mk[own] ? mk : { ...mk, [own]: { kind: "game", game: m.game } }));
+      }
+      return;
+    }
     console.info("[park] field_state", JSON.stringify(m));
     const remoteBank = typeof m.safe === "number" && m.safe >= SAFE_GOAL;
     if (remoteBank) drainRemote();
-    else {
+    else if (!drainRef.current && !bankBusy.current) {
       if (typeof m.energy === "number") setEnergy(Math.max(0, m.energy));
       if (typeof m.safe === "number") setSafes(Math.max(0, Math.min(SAFE_GOAL - 1, m.safe)));
       if (typeof m.safe_bank === "number" && typeof m.energy === "number") setBankBase(m.safe_bank - m.energy);
@@ -1333,11 +1417,17 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
   const drainRef = useRef(false);
   const drainRemote = () => {
     if (drainRef.current) return;
+    if (tilePopup) {
+      console.info("[park] чужой банк ждёт закрытия попапа");
+      remoteDrainPendingRef.current = true;
+      return;
+    }
     drainRef.current = true;
     console.info("[park] чужой банк: сливаю колбы без анимации");
     setSafes(SAFE_GOAL - 1);
     setSafeFill(SAFE_GOAL);
     const total = energyRef.current;
+    setBankDrain(total);
     bankTimers.current.push(
       setTimeout(() => {
         const t0 = performance.now();
@@ -1353,6 +1443,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
           setSafes(0);
           setSafeFill(null);
           drainRef.current = false;
+          bankTimers.current.push(setTimeout(() => setBankDrain(null), BANK_REFILL_DELAY_MS));
         };
         step();
       }, BANK_HOLD_MS)
@@ -1373,6 +1464,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
       setCoinLive(false);
       setCoinDrop(false);
       if (client) wallet?.settle("coins");
+      bankTimers.current.push(setTimeout(() => setBankDrain(null), BANK_REFILL_DELAY_MS));
       bankTimers.current.push(
         setTimeout(() => {
           setBankFocus(false);
@@ -1424,19 +1516,31 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
       bankRaf.current = requestAnimationFrame(step);
     };
 
+    setBankDrain(total);
     setCoinLive(true);
     pour();
   };
 
   useEffect(() => {
     if (safes < SAFE_GOAL || bankBusy.current) return undefined;
+    if (tilePopup) {
+      console.info("[park] банк ждёт закрытия попапа");
+      return undefined;
+    }
     bankBusy.current = true;
     safeSum.current = 0;
     setLit(null);
     setBankFocus(true);
     bankTimers.current.push(setTimeout(runBank, BANK_HOLD_MS));
     return undefined;
-  }, [safes]);
+  }, [safes, tilePopup]);
+
+  const remoteDrainPendingRef = useRef(false);
+  useEffect(() => {
+    if (tilePopup || !remoteDrainPendingRef.current) return;
+    remoteDrainPendingRef.current = false;
+    drainRemote();
+  }, [tilePopup]);
 
   useEffect(
     () => () => {
@@ -1490,6 +1594,30 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
     };
   }, [coinFill]);
 
+  const isFieldFull = (f) => {
+    const size = f.cols * f.rows;
+    if (destroyed.size < size) return false;
+    for (let i = f.offset; i < f.offset + size; i += 1) if (!destroyed.has(i)) return false;
+    return true;
+  };
+
+  useEffect(() => {
+    if (!client || !park?.sector || autoLeaveRef.current) return undefined;
+    if (tilePopup || bankFocus || inflightRef.current > 0) return undefined;
+    const myField = FIELDS.find((f) => f.sector === Number(park.sector));
+    const full = myField ? isFieldFull(myField) : false;
+    const broke = !!wallet && wallet.tickets <= 0;
+    if (!full && !broke) return undefined;
+    const t = setTimeout(() => {
+      autoLeaveRef.current = true;
+      console.info("[park] выхожу с поля:", full ? "все плитки открыты" : "билеты кончились");
+      setZoomZone(null);
+      setLit(null);
+      park.leaveSector?.();
+    }, 1000);
+    return () => clearTimeout(t);
+  }, [client, park?.sector, destroyed, wallet?.tickets, tilePopup, bankFocus, flightTick]);
+
   const handleTileClick = (zoneKey, index, cellId, rect, gone = false) => {
     if (bankFocus) return;
     const popFrom = rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, w: rect.width } : null;
@@ -1499,7 +1627,17 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
         return;
       }
       if (client && !park?.sector) {
-        park?.joinSector?.(SECTOR_OF[zoneKey]);
+        const want = SECTOR_OF[zoneKey];
+        if (park?.sectors && (Number(park.sectors[String(want)]) || 0) > 0) {
+          console.warn("[park] поле", want, "занято, вход не отправляю");
+          return;
+        }
+        const fld = FIELDS.find((f) => f.key === zoneKey);
+        if (fld && isFieldFull(fld)) {
+          console.warn("[park] поле", want, "полностью открыто, вход не отправляю");
+          return;
+        }
+        park?.joinSector?.(want);
         return;
       }
       setZoomZone(zoneKey);
@@ -1512,6 +1650,10 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
       return;
     }
     if (client && park?.sector && SECTOR_OF[zoneKey] !== Number(park.sector)) return;
+    if (client && !client.open) {
+      console.info("[park] нет связи, плитку не трогаю");
+      return;
+    }
     let spentTicket = true;
     if (wallet && !wallet.spend("tickets", TILE_COST)) {
       if (client || wallet.cash < PAID_TRY_CASH) return;
@@ -1526,8 +1668,11 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
       });
       setLit(null);
       lastOpenRef.current = Date.now();
-      client
-        .request({ action: "open_cell", cell_id: cellId })
+      inflightRef.current += 1;
+      mySentCellsRef.current.add(cellId);
+      const queued = openQueueRef.current.then(() => client.request({ action: "open_cell", cell_id: cellId }));
+      openQueueRef.current = queued.catch(() => {});
+      queued
         .then((r) => {
           wallet?.applyTruth({ tickets: r.tickets });
           applyOutcome(zoneKey, cellId, rect, popFrom, r.outcome, r.value, r.game, r, false);
@@ -1536,11 +1681,43 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
           console.warn("[park] open_cell", cellId, e && e.code, e && e.message);
           wallet?.unspend("tickets", TILE_COST);
           if (e && e.code === "cell_already_open") return;
+          if (e && e.code === "timeout") {
+            console.info("[park] сервер не ответил вовремя, сверяю плитку", cellId, "через get_field");
+            const verify = (attempt) =>
+              client
+                .request({ action: "get_field" })
+                .then((r) => {
+                  const cell = Array.isArray(r.cells) ? r.cells.find((c) => Number(c.cell_id) === cellId) : null;
+                  if (cell) {
+                    if (cell.outcome === "money") setMarks((mk) => ({ ...mk, [cellId]: { kind: "money", value: cell.value || 0 } }));
+                    else if (cell.outcome === "cash") setMarks((mk) => ({ ...mk, [cellId]: { kind: "cash", value: cell.value || 0 } }));
+                    else if (cell.outcome === "game" && cell.game) setMarks((mk) => ({ ...mk, [cellId]: { kind: "game", game: cell.game } }));
+                    return;
+                  }
+                  if (attempt < 2) {
+                    setTimeout(() => verify(attempt + 1), 5000);
+                    return;
+                  }
+                  console.info("[park] плитка", cellId, "так и не открылась на сервере, возвращаю");
+                  setDestroyed((prev) => {
+                    const next = new Set(prev);
+                    next.delete(cellId);
+                    return next;
+                  });
+                })
+                .catch(() => {});
+            verify(1);
+            return;
+          }
           setDestroyed((prev) => {
             const next = new Set(prev);
             next.delete(cellId);
             return next;
           });
+        })
+        .finally(() => {
+          inflightRef.current = Math.max(0, inflightRef.current - 1);
+          if (inflightRef.current === 0) setFlightTick((t) => t + 1);
         });
       return;
     }
@@ -1829,7 +2006,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
       <Particles ref={particlesRef} />
       {hookOn && <div key={hookKey} className={styles.screenHook} />}
       {tilePopup?.type === "cash" && (
-        <GamePopup bare from={tilePopup.from} closing={!!tilePopup.closing} onClose={closeCash}>
+        <GamePopup bare tapClose from={tilePopup.from} closing={!!tilePopup.closing} onClose={closeCash}>
           <CashWin value={tilePopup.value} />
         </GamePopup>
       )}
@@ -1912,7 +2089,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
             tone="Yellow"
             icon="Icn_Energy_Yellow.png"
             fill={Math.min(1, energy / ENERGY_GOAL)}
-            label={client ? bankBase + energy : energy}
+            label={client ? (bankDrain != null ? (bankDrain > 0 ? Math.round(((bankBase + bankDrain) * energy) / bankDrain) : 0) : bankBase + energy) : energy}
             chipDy={-6.7}
             edit={edit}
             picked={sel && sel.kind === "flask" && sel.id === 0}
@@ -1963,7 +2140,8 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
             const highlighted = !zoomZone && selectedZone === f.key;
             const foreign = !!client && !!park?.sector && SECTOR_OF[f.key] !== Number(park.sector);
             const busyFree = !!client && !park?.sector && !!park?.sectors && (Number(park.sectors[String(SECTOR_OF[f.key])]) || 0) > 0;
-            const taken = TAKEN_FIELDS.has(f.key) || foreign || busyFree;
+            const full = !!client && !active && isFieldFull(f);
+            const taken = TAKEN_FIELDS.has(f.key) || foreign || busyFree || full;
             const interactive = (!zoomZone || active) && !taken;
             return (
               <TileField
@@ -1979,6 +2157,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
                 gapY={0}
                 scaleX={1 - gaps[f.key].w * 0.02}
                 scaleY={1 - gaps[f.key].d * 0.06}
+                pop={popIds}
                 destroyed={destroyed}
                 marks={marks}
                 selected={active}
@@ -2057,11 +2236,18 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
   );
 }
 
-export function GamePopup({ title, onClose, bare = false, closeBottom = false, from, closing = false, children }) {
+export function GamePopup({ title, onClose, bare = false, closeBottom = false, from, closing = false, tapClose = false, children }) {
   const boxRef = useRef(null);
   const fitRef = useRef(null);
   const [popFit, setPopFit] = useState(1);
   const [popReady, setPopReady] = useState(false);
+  const armedRef = useRef(false);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      armedRef.current = true;
+    }, POPUP_ARM_MS);
+    return () => clearTimeout(t);
+  }, []);
   usePopFrom(boxRef, from, (!bare || popReady) && !closing);
   usePopTo(boxRef, from, closing);
 
@@ -2107,7 +2293,12 @@ export function GamePopup({ title, onClose, bare = false, closeBottom = false, f
 
   if (bare) {
     return (
-      <div className={`${styles.popupOverlay} ${styles.popupBare} ${closing ? styles.popupFade : ""}`}>
+      <div
+        className={`${styles.popupOverlay} ${styles.popupBare} ${closing ? styles.popupFade : ""}`}
+        onClick={() => {
+          if (tapClose && armedRef.current) onClose?.();
+        }}
+      >
         <div
           ref={fitRef}
           className={styles.bareFit}
@@ -2116,7 +2307,7 @@ export function GamePopup({ title, onClose, bare = false, closeBottom = false, f
             visibility: popReady ? undefined : "hidden",
           }}
         >
-          <div ref={boxRef} className={styles.bareBody} onClick={(e) => e.stopPropagation()}>
+          <div ref={boxRef} className={styles.bareBody}>
             {children}
           </div>
         </div>
@@ -2707,7 +2898,16 @@ export function UpperPark({ provider = false }) {
     );
   };
 
-  useEffect(() => () => rideTimers.current.forEach(clearTimeout), []);
+  useEffect(
+    () => () => {
+      rideTimers.current.forEach(clearTimeout);
+      if (client) {
+        console.info("[park] верхний парк закрыт, снимаю удержание монет");
+        wallet?.settle("coins");
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (!ridesPending.current) return;
@@ -2902,6 +3102,7 @@ export function UpperPark({ provider = false }) {
     if (pay > 0) {
       unpaidRef.current = pay;
       const shown = WIN_NUMS.includes(pay);
+      if (!shown) console.warn("[park] выплата", pay, "без картинки числа, монеты начислены, цифра не показана; есть только", WIN_NUMS.join(","));
       if (shown) winTimers.current.push(setTimeout(() => setWinPay(pay), WIN_NUM_IN));
       winTimers.current.push(
         setTimeout(() => {
@@ -3165,7 +3366,7 @@ export function UpperPark({ provider = false }) {
 const FOUNTAIN_K = 2.2;
 
 const OPEN_KIND = { coinhand: "joker", coinflip: "joker", matches: "joker", cards: "cards", pyramid: "pyramid", wheel: "wheel" };
-const PARKS_BUILD = "2026-10-04b";
+const PARKS_BUILD = "2026-10-08c";
 
 const VIEW_BY_PAGE = { parkmap: "overview", parktop: "park", parkbot: "grid" };
 const PAGE_BY_VIEW = { overview: "parkmap", park: "parktop", grid: "parkbot" };
@@ -3178,8 +3379,13 @@ const startView = () => {
 export default function BonusParkPage() {
   const { navigate } = useApp();
   const [popupOpen, setPopupOpen] = useState(false);
-  const [client] = useState(() => (parkServerEnabled() ? new ParkSocket(parkConfig()) : null));
+  const [needLogin, setNeedLogin] = useState(() => parkServerEnabled() && !parkAuth());
+  const [sessionBusy, setSessionBusy] = useState(false);
+  const [client] = useState(() => (parkServerEnabled() && parkAuth() ? new ParkSocket(parkConfig()) : null));
+  const [loginErr, setLoginErr] = useState("");
   const [srv, setSrv] = useState({ status: "idle", balance: null, sector: null, players: [], sectors: null });
+  const wasOpenRef = useRef(false);
+  const retriedRef = useRef(false);
 
   useEffect(() => {
     console.info("[park] parks build", PARKS_BUILD);
@@ -3188,28 +3394,42 @@ export default function BonusParkPage() {
   useEffect(() => {
     if (!client) return undefined;
     const offS = client.on("status", (st) => {
+      if (st === "open") wasOpenRef.current = true;
+      if (st === "retry") retriedRef.current = true;
+      if (st === "busy") {
+        console.warn("[park] сервер отбил вход: аккаунт уже занят другим соединением");
+        setSessionBusy(true);
+        client.close();
+      }
+      if (st === "unauthorized" && parkAuth() && parkAuth().login) {
+        clearParkAuth();
+        setLoginErr("Wrong login or password");
+        setNeedLogin(true);
+      }
       setSrv((v) => ({ ...v, status: st }));
       if (st !== "open") {
-        if (st === "closed" || st === "retry" || st === "unauthorized") {
-          setSrv((v) => {
-            if (v.sector) console.info("[park] связь потеряна, отвязываюсь от поля", v.sector);
-            return v.sector ? { ...v, sector: null } : v;
-          });
-        }
+        if (st === "unauthorized") setSrv((v) => (v.sector ? { ...v, sector: null } : v));
+        else if (st === "retry") console.info("[park] связь потеряна, поле держу до ответа lobby после реконнекта");
         return;
       }
       client
         .request({ action: "lobby" })
-        .then((r) =>
+        .then((r) => {
+          if (r.user_id != null) setParkSelfId(r.user_id);
+          else if (r.me != null) setParkSelfId(r.me);
+          const meId = String(parkSelfId());
+          const mine = Array.isArray(r.players) ? r.players.find((pl) => String(pl.user_id) === meId) : null;
+          const fromPlayers = mine && mine.sector != null ? mine.sector : null;
+          if (r.sector == null && fromPlayers != null) console.info("[park] lobby: sector null, но в players я на поле", fromPlayers, "— считаю себя привязанным");
           setSrv((v) => ({
             ...v,
-            sector: r.sector !== undefined ? r.sector : v.sector,
+            sector: r.sector != null ? r.sector : fromPlayers != null ? fromPlayers : r.sector !== undefined ? r.sector : v.sector,
             sectors: r.sectors && typeof r.sectors === "object" ? r.sectors : v.sectors,
             players: Array.isArray(r.players)
               ? r.players.map((pl) => ({ id: `u${pl.user_id}`, name: pl.name, avatar: pl.avatar || "" }))
               : v.players,
-          }))
-        )
+          }));
+        })
         .catch(() => {});
       client
         .request({ action: "get_balance" })
@@ -3234,7 +3454,7 @@ export default function BonusParkPage() {
     const offX = client.on("sectors", onSectors);
     const onSeen = (m) => {
       if (!m || m.user_id == null) return;
-      if (String(m.user_id) === String(parkConfig().userId)) return;
+      if (String(m.user_id) === String(parkSelfId())) return;
       const id = `u${m.user_id}`;
       setSrv((v) => {
         if (v.players.some((p) => p.id === id)) return v;
@@ -3257,7 +3477,7 @@ export default function BonusParkPage() {
   }, [client]);
 
   const joinSector = useCallback(
-    (sector) => {
+    (sector, retried = false) => {
       if (!client) return Promise.resolve(null);
       console.info("[park] join_sector", sector);
       return client
@@ -3274,7 +3494,15 @@ export default function BonusParkPage() {
           return r;
         })
         .catch((e) => {
-          console.warn("[park] join_sector", sector, e && e.code);
+          const code = e && e.code;
+          console.warn("[park] join_sector", sector, code);
+          if (!retried && (code === "already_joined" || code === "sector_taken")) {
+            console.info("[park] сервер считает меня привязанным, освобождаю старое место и пробую снова");
+            return client
+              .request({ action: "leave_sector" })
+              .catch(() => null)
+              .then(() => joinSector(sector, true));
+          }
           client
             .request({ action: "lobby" })
             .then((r) => setSrv((v) => ({ ...v, sector: r.sector ?? v.sector, sectors: r.sectors || v.sectors })))
@@ -3308,6 +3536,9 @@ export default function BonusParkPage() {
   }, [client]);
 
   const [leaveAsk, setLeaveAsk] = useState(false);
+  useEffect(() => {
+    if (popupOpen && leaveAsk) setLeaveAsk(false);
+  }, [popupOpen, leaveAsk]);
 
   const serverCtx = useMemo(
     () =>
@@ -3319,7 +3550,7 @@ export default function BonusParkPage() {
             sector: srv.sector,
             players: srv.players,
             sectors: srv.sectors,
-            userId: parkConfig().userId,
+            userId: parkSelfId(),
             joinSector,
             leaveSector,
           }
@@ -3330,7 +3561,7 @@ export default function BonusParkPage() {
     (push) =>
       client
         ? client.on("player_win", (m) => {
-            if (m && m.user_id != null && String(m.user_id) === String(parkConfig().userId)) return;
+            if (m && m.user_id != null && String(m.user_id) === String(parkSelfId())) return;
             push({ id: `u${m.user_id}`, name: m.name, avatar: m.avatar, amount: m.prize ?? m.amount ?? m.win });
           })
         : undefined,
@@ -3360,7 +3591,7 @@ export default function BonusParkPage() {
     };
     const off = client.on("field_state", (m) => {
       if (!m || m.user_id == null) return;
-      if (String(m.user_id) === String(parkConfig().userId)) return;
+      if (String(m.user_id) === String(parkSelfId())) return;
       const cellId = Number(m.cell_id);
       if (!Number.isInteger(cellId) || cellId < 0) return;
       if (m.outcome !== "game" && m.outcome !== "cash") {
@@ -3501,7 +3732,7 @@ export default function BonusParkPage() {
       {!popupOpen && view !== "overview" && (
         <PlayerRow
           icons={view === "grid"}
-          players={client ? srv.players.filter((p) => p.id !== `u${parkConfig().userId}`) : []}
+          players={client ? srv.players.filter((p) => p.id !== `u${parkSelfId()}`) : []}
           subscribe={client ? subscribeWins : undefined}
           openEvent={client ? openEvent : null}
           onOpenShown={client ? openShown : undefined}
@@ -3533,7 +3764,60 @@ export default function BonusParkPage() {
         </button>
       )}
 
-      {leaveAsk && (
+      {sessionBusy && (
+        <div className={styles.leaveOverlay}>
+          <div className={styles.leaveBox}>
+            <ParkPopupFrame title="Account busy">
+              <div className={styles.leaveText}>This account is already open on another device or tab.</div>
+              <div className={styles.leaveRow}>
+                <button type="button" className={styles.leaveBtn} onClick={() => window.location.reload()}>
+                  Retry
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.leaveBtn} ${styles.leaveBtnNo}`}
+                  onClick={() => {
+                    clearParkAuth();
+                    window.location.reload();
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            </ParkPopupFrame>
+          </div>
+        </div>
+      )}
+
+      {needLogin && (
+        <div className={styles.leaveOverlay}>
+          <div className={styles.leaveBox}>
+            <ParkPopupFrame title="Login">
+              <form
+                className={styles.loginForm}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  const login = String(fd.get("login") || "").trim();
+                  const password = String(fd.get("password") || "");
+                  if (!login || !password) return;
+                  saveParkAuth({ login, password });
+                  window.location.reload();
+                }}
+              >
+                <input className={styles.loginInput} name="login" placeholder="Login" autoComplete="username" autoCapitalize="none" />
+                <input className={styles.loginInput} name="password" type="password" placeholder="Password" autoComplete="current-password" />
+                {loginErr && <div className={styles.loginErr}>{loginErr}</div>}
+                <button type="submit" className={styles.leaveBtn}>
+                  Enter
+                </button>
+              </form>
+            </ParkPopupFrame>
+          </div>
+        </div>
+      )}
+
+      {leaveAsk && !popupOpen && (
         <div className={styles.leaveOverlay} onClick={() => setLeaveAsk(false)}>
           <div className={styles.leaveBox} onClick={(e) => e.stopPropagation()}>
             <ParkPopupFrame title="Leave field">
@@ -3556,6 +3840,13 @@ export default function BonusParkPage() {
               </div>
             </ParkPopupFrame>
           </div>
+        </div>
+      )}
+
+      {client && (srv.status === "retry" || srv.status === "unauthorized" || (srv.status === "connecting" && retriedRef.current)) && (
+        <div className={styles.netBadge}>
+          <span className={`${styles.netDot} ${srv.status === "unauthorized" ? styles.netDotOff : ""}`} />
+          <span>{srv.status === "unauthorized" ? "No access" : wasOpenRef.current ? "Reconnecting…" : "Connecting to server…"}</span>
         </div>
       )}
 

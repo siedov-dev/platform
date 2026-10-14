@@ -41,14 +41,14 @@ function useServerRound(game, active) {
   const play = async (payload) => {
     if (!sg) return null;
     const gid = startRef.current ? await startRef.current : null;
-    if (!gid) return null;
+    if (!gid) return { fail: "no_game" };
     try {
       const r = await sg.play(gid, payload);
       if (r && typeof r.cash === "number") wallet?.applyTruth({ cash: r.cash });
       if (r && typeof r.tickets === "number") wallet?.applyTruth({ tickets: r.tickets });
       return r;
     } catch (e) {
-      return null;
+      return { fail: (e && e.code) || "error" };
     }
   };
   return { on: !!sg, play, wallet };
@@ -58,7 +58,10 @@ async function resolve5050(round, choice, forced) {
   if ((!round || !round.on) && typeof forced === "boolean") return forced;
   if (!round || !round.on) return play5050();
   const r = await round.play({ choice });
-  if (!r || typeof r.win !== "boolean") return play5050();
+  if (!r || r.fail || typeof r.win !== "boolean") {
+    console.warn("[park] джокер: сервер не дал результат, закрываю без приза:", r && r.fail ? r.fail : "нет результата");
+    return null;
+  }
   if (r.win && r.prize > 0) round.wallet?.hold("cash", r.prize);
   return r.win;
 }
@@ -959,6 +962,10 @@ function CoinFlip({ onFinish, forced }) {
     if (video) setSeq((s) => [...s, "coinDown", "toss", "spin", "catch"]);
     else setFlipping(true);
     const [isWin] = await Promise.all([resolve5050(round, side === "heads" ? 0 : 1, forced), delay(video ? 450 : 1300)]);
+    if (isWin == null) {
+      onFinish?.(null);
+      return;
+    }
     const shown = isWin ? side : side === "heads" ? "tails" : "heads";
     setWin(isWin);
     setLanded(shown);
@@ -1065,6 +1072,10 @@ function CoinHand({ onFinish, forced }) {
     setPhase("chosen");
     if (video) setSeq((s) => [...s, i === 0 ? "loopA" : "loopB"]);
     const [isWin] = await Promise.all([resolve5050(round, i, forced), delay(450)]);
+    if (isWin == null) {
+      onFinish?.(null);
+      return;
+    }
     setWin(isWin);
     const hand = isWin ? i : 1 - i;
     setCoinHand(hand);
@@ -1164,6 +1175,10 @@ function Matches({ onFinish, forced }) {
     setPicked(i);
     setPhase("chosen");
     const [isWin] = await Promise.all([resolve5050(round, i, forced), delay(450)]);
+    if (isWin == null) {
+      onFinish?.(null);
+      return;
+    }
     setWin(isWin);
     if (video) {
       setSeq((s) => [...s, ...MATCH_BRANCH[i === 0 ? "left" : "right"][isWin ? "win" : "lose"]]);
@@ -1370,8 +1385,14 @@ function Wheel({ onFinish, forced }) {
     const t = setTimeout(async () => {
       if (cancelled) return;
       setSpinning(true);
+      const asked = await ask;
+      if (!asked && roundRef.current && roundRef.current.on) {
+        console.warn("[park] колесо: сервер не дал сектор, закрываю без приза");
+        onFinish?.(null);
+        return;
+      }
       const got =
-        (await ask) ||
+        asked ||
         (typeof forced === "number"
           ? cabinForPrize({ id: 1 + Math.floor(Math.random() * 8), tickets: forced })
           : { id: 1 + Math.floor(Math.random() * 8) });

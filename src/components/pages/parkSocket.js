@@ -50,7 +50,7 @@ export const parkMode = () => query().get("mode") || "";
 
 export const parkServerEnabled = () => {
   const m = parkMode();
-  return m !== "provider";
+  return m !== "provider" && m !== "local";
 };
 
 const TAB_KEY = "park.userId";

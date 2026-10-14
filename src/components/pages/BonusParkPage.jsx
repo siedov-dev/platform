@@ -26,7 +26,7 @@ import { PARK_ASSET, PARK_DESK } from "./parkAssetBase";
 
 const ASSET = PARK_ASSET;
 
-const ENERGY_GOAL = 500;
+const ENERGY_GOAL = 100;
 const SAFE_GOAL = 4;
 
 const AUTO_HOLD_MS = 1355;
@@ -94,6 +94,8 @@ const BANK_MIN_MS = 460;
 const BANK_FLASH_MS = 720;
 const BANK_DROP_MS = 280;
 const SPIN_COST = 1;
+const BET_OUT_MS = 260;
+const BET_LOCKED = new Set([100]);
 const CASH_SHOW_MS = 2200;
 const POPUP_ARM_MS = 600;
 const POP_OUT_MS = 420;
@@ -439,6 +441,9 @@ const GLOW_SYMBOL = "coin";
 const RIDE_PERIOD = { wheel: 3, carousel: 3 };
 
 const RIDE_RUN_MS = 9000;
+const RIDE_SOUND = { carousel: `${ASSET}/CAROUSEL.wav`, wheel: `${ASSET}/FERRIS_WHEEL.wav` };
+const RIDE_FADE_MS = 500;
+const ALWAYS_CRYSTAL = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("crystal") === "1";
 
 function loadJson(key, fallback) {
   try {
@@ -490,11 +495,28 @@ function loadDeco(key, defaults) {
   });
 }
 
-function ParkDecor({ storeKey, defaults }) {
+function ParkDecor({ storeKey, defaults, hatOn = false, onHat, hatPulse = 0 }) {
   const [items, setItems] = useState(() => loadDeco(storeKey, defaults));
   const [edit, setEdit] = useState(false);
   const [sel, setSel] = useState(null);
   const layerRef = useRef(null);
+  const hatRef = useRef(null);
+  const hatPress = () => {
+    const el = hatRef.current;
+    if (!el || !el.animate) return;
+    el.animate(
+      [
+        { transform: "scale(1)" },
+        { transform: "scale(0.92)", offset: 0.35 },
+        { transform: "scale(1.03)", offset: 0.72 },
+        { transform: "scale(1)" },
+      ],
+      { duration: 300, easing: "ease-out" }
+    );
+  };
+  useEffect(() => {
+    if (hatPulse) hatPress();
+  }, [hatPulse]);
 
   useEffect(() => {
     const onEdit = (e) => setEdit(!!e.detail);
@@ -573,11 +595,26 @@ function ParkDecor({ storeKey, defaults }) {
       {items.map((it, i) => (
         <span
           key={it.id}
-          className={`${styles.decoItem} ${edit ? styles.decoItemEdit : ""} ${sel === it.id ? styles.decoItemOn : ""}`}
+          className={`${styles.decoItem} ${edit ? styles.decoItemEdit : ""} ${sel === it.id ? styles.decoItemOn : ""} ${it.id === "hat" && onHat ? styles.goldHat : ""} ${it.id === "hat" && hatOn ? styles.goldHatOn : ""}`}
           style={{ left: `${it.x}%`, top: `${it.y}%`, width: `${it.w}%`, zIndex: i + 1 }}
+          ref={it.id === "hat" ? hatRef : undefined}
           onPointerDown={startDrag(it.id, "move")}
+          onClick={
+            it.id === "hat" && onHat && !edit
+              ? () => {
+                  hatPress();
+                  onHat();
+                }
+              : undefined
+          }
         >
           <img className={styles.decoImg} src={it.src} alt="" draggable={false} />
+          {it.id === "hat" && onHat && (
+            <span className={styles.hatClip} style={{ WebkitMaskImage: `url(${it.src})`, maskImage: `url(${it.src})` }}>
+              <img className={styles.hatShine} src={`${ASSET}/spin_button/Btn_Spin_Light.png`} alt="" draggable={false} />
+              <img className={styles.hatStar} src={`${ASSET}/spin_button/Star_hat.png`} alt="" draggable={false} />
+            </span>
+          )}
           {edit && <span className={styles.decoHandle} onPointerDown={startDrag(it.id, "size")} />}
           {edit && <span className={styles.decoTag}>{it.id}</span>}
         </span>
@@ -930,6 +967,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
   const [bank, setBank] = useState(SAFE_START);
   const [bankBase, setBankBase] = useState(SAFE_START);
   const [bankDrain, setBankDrain] = useState(null);
+  const yellowShown = client ? (bankDrain != null ? (bankDrain > 0 ? Math.round(((bankBase + bankDrain) * energy) / bankDrain) : 0) : bankBase + energy) : energy;
   const bankRef = useRef(bank);
   bankRef.current = bank;
   const poolRef = useRef({});
@@ -1905,6 +1943,7 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
     const at = centerOf('[class*="bareBody"]') || pop?.from;
     closePopup();
     if (!pop || !pop.game) return;
+    if (res == null) return;
     const id = pop.game.id;
     if (JOKERS.has(id)) {
       if (res) wallet?.award("cash", JOKER_PAY, at);
@@ -2088,8 +2127,8 @@ function GridGame({ onPopup, onZoomState, onCoinRing }) {
             w={flask.w}
             tone="Yellow"
             icon="Icn_Energy_Yellow.png"
-            fill={Math.min(1, energy / ENERGY_GOAL)}
-            label={client ? (bankDrain != null ? (bankDrain > 0 ? Math.round(((bankBase + bankDrain) * energy) / bankDrain) : 0) : bankBase + energy) : energy}
+            fill={Math.min(1, yellowShown / ENERGY_GOAL)}
+            label={yellowShown}
             chipDy={-6.7}
             edit={edit}
             picked={sel && sel.kind === "flask" && sel.id === 0}
@@ -2714,6 +2753,53 @@ export function UpperPark({ provider = false }) {
   const ridesPending = useRef(false);
   const [rides, setRides] = useState({ carousel: false, wheel: false });
   const rideTimers = useRef([]);
+  const wheelTimers = useRef([]);
+  const rideAudio = useRef({});
+  const rideFade = useRef({});
+  useEffect(() => {
+    const made = {};
+    Object.keys(RIDE_SOUND).forEach((k) => {
+      const a = new Audio(RIDE_SOUND[k]);
+      a.preload = "auto";
+      a.loop = false;
+      made[k] = a;
+    });
+    rideAudio.current = made;
+    return () => {
+      Object.values(made).forEach((a) => {
+        a.pause();
+        a.removeAttribute("src");
+        a.load();
+      });
+      Object.values(rideFade.current).forEach(clearInterval);
+    };
+  }, []);
+  const playRide = (key) => {
+    const a = rideAudio.current[key];
+    if (!a) return;
+    clearInterval(rideFade.current[key]);
+    a.volume = 1;
+    a.currentTime = 0;
+    console.info("[park] звук:", key, "старт");
+    a.play().catch(() => {});
+  };
+  const stopRide = (key) => {
+    const a = rideAudio.current[key];
+    if (!a || a.paused) return;
+    clearInterval(rideFade.current[key]);
+    const t0 = performance.now();
+    console.info("[park] звук:", key, "стоп");
+    rideFade.current[key] = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / RIDE_FADE_MS);
+      a.volume = 1 - k;
+      if (k >= 1) {
+        clearInterval(rideFade.current[key]);
+        a.pause();
+        a.currentTime = 0;
+        a.volume = 1;
+      }
+    }, 40);
+  };
   const trainRef = useRef(null);
   const prizeIdx = useRef(0);
   const wheelIdx = useRef(0);
@@ -2836,6 +2922,7 @@ export function UpperPark({ provider = false }) {
     if (!fromServer) prizeIdx.current += 1;
     setCarStop(pickStop(CAR_STOP_AT[prize]));
     setRides({ carousel: true, wheel: false });
+    playRide("carousel");
     for (let i = 0; i < CRYSTAL_ORDER.length; i += 1) {
       rideTimers.current.push(
         setTimeout(() => setKeysGot((n) => Math.max(0, Math.min(n, CRYSTAL_ORDER.length - 1 - i))), 700 + i * 650)
@@ -2863,13 +2950,14 @@ export function UpperPark({ provider = false }) {
     carsRef.current = 0;
     setWheelStop(WHEEL_STOP_AT[prize]);
     setRides((r) => ({ ...r, wheel: true }));
+    playRide("wheel");
     const finishRide = () => {
       if (client) bonusRef.current = null;
       foreignRef.current = false;
       rideBusyRef.current = false;
       applyParkState();
     };
-    rideTimers.current.push(
+    wheelTimers.current.push(
       setTimeout(() => {
         wheelDone.current = () => {
           wheelDone.current = null;
@@ -2877,13 +2965,13 @@ export function UpperPark({ provider = false }) {
             finishRide();
             return;
           }
-          rideTimers.current.push(
+          wheelTimers.current.push(
             setTimeout(() => {
               setSalute(prize);
-              rideTimers.current.push(
+              wheelTimers.current.push(
                 setTimeout(() => wallet?.award("coins", prize, centerOf('[class*="saluteCoin"]')), 1500)
               );
-              rideTimers.current.push(
+              wheelTimers.current.push(
                 setTimeout(() => {
                   setSalute(null);
                   if (client) wallet?.settle("coins");
@@ -2901,6 +2989,7 @@ export function UpperPark({ provider = false }) {
   useEffect(
     () => () => {
       rideTimers.current.forEach(clearTimeout);
+      wheelTimers.current.forEach(clearTimeout);
       if (client) {
         console.info("[park] верхний парк закрыт, снимаю удержание монет");
         wallet?.settle("coins");
@@ -3004,6 +3093,7 @@ export function UpperPark({ provider = false }) {
   };
 
   const rollResult = () => {
+    if (ALWAYS_CRYSTAL && !client) return COMBOS[COMBOS.length - 1].build();
     if (demoRef.current) {
       const item = DEMO_SEQ[demoStep.current % DEMO_SEQ.length];
       demoStep.current += 1;
@@ -3019,6 +3109,33 @@ export function UpperPark({ provider = false }) {
   };
 
   const [auto, setAuto] = useState(false);
+  const [betOpen, setBetOpen] = useState(false);
+  const [betClosing, setBetClosing] = useState(false);
+  const [bet, setBet] = useState(1);
+  const [hatPulse, setHatPulse] = useState(0);
+  const betTimer = useRef(0);
+  useEffect(() => () => clearTimeout(betTimer.current), []);
+  const closeBet = () => {
+    if (!betOpen || betClosing) return;
+    setBetClosing(true);
+    clearTimeout(betTimer.current);
+    betTimer.current = setTimeout(() => {
+      setBetOpen(false);
+      setBetClosing(false);
+    }, BET_OUT_MS);
+  };
+  const toggleBet = () => {
+    if (betOpen) closeBet();
+    else setBetOpen(true);
+  };
+  const betBoxRef = useRef(null);
+  const onBetOverlay = (e) => {
+    const hat = document.querySelector("[class*='goldHat']");
+    const onHat = !!hat && document.elementsFromPoint(e.clientX, e.clientY).includes(hat);
+    if (!onHat && betBoxRef.current && betBoxRef.current.contains(e.target)) return;
+    if (onHat) setHatPulse((v) => v + 1);
+    closeBet();
+  };
 
   const doSpin = () => {
     if (spinning) {
@@ -3164,7 +3281,7 @@ export function UpperPark({ provider = false }) {
       >
         <img className={styles.uparkBg} src={`${ASSET}/Up_Bg_3.webp`} alt="Park" draggable={false} />
       <div className={`${styles.uparkInner} ${styles.uparkPinOn}`}>
-        <ParkDecor storeKey={DECO_UP_KEY} defaults={DEFAULT_DECO_UP} />
+        <ParkDecor storeKey={DECO_UP_KEY} defaults={DEFAULT_DECO_UP} hatOn={betOpen && !betClosing} onHat={toggleBet} hatPulse={hatPulse} />
         <TrainRide ref={trainRef} onDeparted={onTrainDeparted} />
         {winPay && (
           <span
@@ -3200,7 +3317,10 @@ export function UpperPark({ provider = false }) {
         <FerrisSprite
           spin={rides.wheel}
           stopAt={wheelStop}
-          onStopped={() => wheelDone.current?.()}
+          onStopped={() => {
+            stopRide("wheel");
+            wheelDone.current?.();
+          }}
           preload={keysGot > 0}
           period={RIDE_PERIOD.wheel}
           className={styles.uparkWheel}
@@ -3216,7 +3336,10 @@ export function UpperPark({ provider = false }) {
         <CarouselSprite
           spin={rides.carousel}
           stopAt={carStop}
-          onStopped={() => carDone.current?.()}
+          onStopped={() => {
+            stopRide("carousel");
+            carDone.current?.();
+          }}
           preload={keysGot > 0}
           period={RIDE_PERIOD.carousel}
           className={styles.uparkWheel}
@@ -3359,6 +3482,30 @@ export function UpperPark({ provider = false }) {
           <img className={styles.saluteNum} src={`${ASSET}/Win_Num_T/Win_Number_${salute}.png`} alt="" draggable={false} />
         </div>
       )}
+      {betOpen && (
+        <div className={styles.betOverlay} onClick={onBetOverlay}>
+          <div ref={betBoxRef} className={`${styles.betBox} ${betClosing ? styles.betBoxOut : ""}`}>
+            <ParkPopupFrame title="Bet">
+              <div className={styles.betRow}>
+                {[1, 10, 100].map((v) => {
+                  const locked = BET_LOCKED.has(v);
+                  return (
+                    <button
+                      key={v}
+                      type="button"
+                      className={`${styles.betBtn} ${bet === v ? styles.betBtnOn : ""} ${locked ? styles.betBtnOff : ""}`}
+                      disabled={locked}
+                      onClick={locked ? undefined : () => setBet(v)}
+                    >
+                      x{v}
+                    </button>
+                  );
+                })}
+              </div>
+            </ParkPopupFrame>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -3366,7 +3513,7 @@ export function UpperPark({ provider = false }) {
 const FOUNTAIN_K = 2.2;
 
 const OPEN_KIND = { coinhand: "joker", coinflip: "joker", matches: "joker", cards: "cards", pyramid: "pyramid", wheel: "wheel" };
-const PARKS_BUILD = "2026-10-08c";
+const PARKS_BUILD = "2026-10-10b";
 
 const VIEW_BY_PAGE = { parkmap: "overview", parktop: "park", parkbot: "grid" };
 const PAGE_BY_VIEW = { overview: "parkmap", park: "parktop", grid: "parkbot" };

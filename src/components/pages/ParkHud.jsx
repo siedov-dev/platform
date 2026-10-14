@@ -97,11 +97,12 @@ function ChipVal({ value, plus }) {
   );
 }
 
-export default function ParkHud({ values = {}, tickets = true, coinProgress = 0.69, onProfile, onInfo, onPlus }) {
+export default function ParkHud({ values = {}, tickets = true, coinProgress = 0.69, ticketProgress = 0.75, onProfile, onInfo, onPlus }) {
   const wallet = useWallet();
   const shown = wallet ? { coins: wallet.coins, tickets: wallet.tickets, cash: wallet.cash } : values;
   const list = tickets ? CURRENCIES : CURRENCIES.filter((c) => c.key !== "tickets");
   const dash = (281.49 * (1 - Math.max(0, Math.min(1, coinProgress)))).toFixed(2);
+  const tdash = (281.49 * (1 - Math.max(0, Math.min(1, ticketProgress)))).toFixed(2);
 
   return (
     <div className={styles.hud}>
@@ -140,6 +141,30 @@ export default function ParkHud({ values = {}, tickets = true, coinProgress = 0.
               <span ref={(el) => wallet?.setTarget(c.key, el)} className={styles.sealClip}>
                 <img className={styles.sealCoinImg} src={`${A}/${c.icon}`} alt="" draggable={false} />
               </span>
+              <span className={styles.sealBorder} />
+            </span>
+          ) : c.key === "tickets" ? (
+            <span className={`${styles.seal} ${styles.ticketSeal}`}>
+              <svg className={styles.sealRing} viewBox="0 0 100 100" aria-hidden="true">
+                <g
+                  transform="rotate(-90 50 50)"
+                  fill="none"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray="281.49"
+                  strokeDashoffset={tdash}
+                >
+                  <circle className={styles.sealHalo} cx="50" cy="50" r="44.8" />
+                  <circle className={styles.sealLine} cx="50" cy="50" r="44.8" />
+                </g>
+              </svg>
+              <img
+                ref={(el) => wallet?.setTarget(c.key, el)}
+                className={styles.sealFace}
+                src={`${A}/${c.icon}`}
+                alt=""
+                draggable={false}
+              />
               <span className={styles.sealBorder} />
             </span>
           ) : c.key === "cash" ? (

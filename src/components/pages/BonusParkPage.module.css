@@ -2758,3 +2758,182 @@
   60% { opacity: 1; transform: translateY(2px) scale(1.06); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+.goldHat {
+  pointer-events: auto;
+  cursor: pointer;
+  transform-origin: 50% 78%;
+  transition: filter 0.25s ease;
+}
+
+.goldHatOn {
+  filter: drop-shadow(0 0 7px rgba(255, 226, 140, 0.95)) drop-shadow(0 0 16px rgba(255, 196, 70, 0.6));
+}
+
+.hatClip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.hatShine {
+  position: absolute;
+  left: 0;
+  top: -18%;
+  height: 136%;
+  width: 34%;
+  object-fit: fill;
+  opacity: 0;
+  transform: translateX(320%);
+  animation: hatSweep 4.9s cubic-bezier(0.42, 0, 0.4, 1) 1.6s infinite;
+}
+
+@keyframes hatSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(320%);
+  }
+  13% {
+    opacity: 0.8;
+  }
+  56% {
+    opacity: 0.8;
+  }
+  69% {
+    opacity: 0;
+    transform: translateX(-190%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-190%);
+  }
+}
+
+.hatStar {
+  position: absolute;
+  left: 64%;
+  top: 16%;
+  width: 24%;
+  opacity: 0;
+  filter: brightness(1.3);
+  transform: translate(-50%, -50%) scale(0.35) rotate(-35deg);
+  animation: spinSpark 4.9s ease-out 1.6s infinite;
+}
+
+.betOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+}
+
+.betBox {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--crop-top, 0px) + var(--fr-v, 0px) + var(--scene-h) * 0.7);
+  bottom: calc(100% - var(--crop-top, 0px) - var(--fr-v, 0px) - var(--scene-h) + 6px);
+  width: calc(var(--scene-w) - 20px);
+  max-width: 360px;
+  display: flex;
+  align-items: center;
+  margin-left: calc((var(--scene-w) - 20px) / -2);
+  transform-origin: 50% 100%;
+  animation: betIn 0.46s cubic-bezier(0.2, 1.25, 0.4, 1) both;
+}
+
+.betBox > * {
+  width: 100%;
+}
+
+@keyframes betIn {
+  0% {
+    opacity: 0;
+    transform: translateY(70px) scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.betBoxOut {
+  animation: betOut 0.26s cubic-bezier(0.5, 0, 0.85, 0.45) both;
+  pointer-events: none;
+}
+
+@keyframes betOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(70px) scale(0.6);
+  }
+}
+
+.betRow {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 10px 0 6px;
+}
+
+.betBtn {
+  position: relative;
+  width: 78px;
+  height: 44px;
+  padding: 0 0 2px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #a7e04f 0%, #6db320 46%, #3f7d0e 100%);
+  box-shadow: 0 0 0 2.5px #e0b352, 0 0 0 4px #5b3d0d, 0 3px 8px rgba(0, 0, 0, 0.5);
+  font-family: "PyrSans", system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(30, 70, 10, 0.85), 0 3px 4px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+
+.betBtn::after {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 8%;
+  height: 40%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+}
+
+.betBtn:active {
+  background: linear-gradient(180deg, #8fc63d 0%, #5a9a18 46%, #32680a 100%);
+}
+
+.betBtnOff,
+.betBtnOff:active {
+  background: linear-gradient(180deg, #9a9aa6 0%, #6d6d7a 46%, #4b4b57 100%);
+  box-shadow: 0 0 0 2.5px #b8933f, 0 0 0 4px #5b3d0d, 0 3px 8px rgba(0, 0, 0, 0.5);
+  color: #e4e4e8;
+  text-shadow: 0 2px 0 rgba(35, 35, 45, 0.85), 0 3px 4px rgba(0, 0, 0, 0.45);
+  cursor: default;
+  pointer-events: none;
+}
+
+.betBtnOn {
+  background: linear-gradient(180deg, #c363e8 0%, #8e21bb 46%, #5f0c84 100%);
+  box-shadow: 0 0 0 2.5px #e0b352, 0 0 0 4px #5b3d0d, 0 0 14px rgba(190, 90, 240, 0.6),
+    0 3px 8px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(74, 8, 100, 0.9), 0 3px 4px rgba(0, 0, 0, 0.45);
+}
+
+.betBtnOn:active {
+  background: linear-gradient(180deg, #a84fcc 0%, #76189e 46%, #4c0969 100%);
+}

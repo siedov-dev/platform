@@ -1,94 +1,161 @@
 import * as THREE from "three";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 const W = 390;
-const H = 640;
+const H = 800;
 const TAU = Math.PI * 2;
+const A = "/bonus-park";
+const CNT = `${A}/Counter/Counter`;
+const WB = `${A}/Wheel_Bg`;
 
-const LAYOUT = {
-  barrel: { x: 195, y: 120, len: 190, r: 52 },
-  rows: [
-    { label: "BURGER COST", y: 268, groups: [{ x: 48, w: 58, h: 60, reels: [8] }, { x: 118, w: 156, h: 60, reels: [10, 10, 10] }] },
-    { label: "REPEAT INGREDIENTS", y: 418, groups: [{ x: 40, w: 58, h: 60, reels: [8] }, { x: 110, w: 184, h: 60, reels: [10, 10, 10, 10] }] },
-  ],
-};
+const INGREDIENTS = ["bun_wheel", "salad_wheel", "tomato_wheel", "Chees_Wheel", "cutlet_wheel", "onion_wheel", "sauce_Wheel"];
+
+const BARREL = { img: { w: 466, h: 466 }, x: 35, y: 0, w: 320, win: { x0: 100, x1: 366, y0: 88, y1: 362 }, shadow: { w: 276, h: 266 } };
+
+const ROWS = [
+  {
+    img: `${CNT}/Counter_bg_Up.png`, iw: 656, ih: 337, x: 25, y: 326, w: 340, win: { y0: 114, y1: 302 }, label: "COST",
+    groups: [
+      { key: "costX", x0: 123, x1: 202, reels: [8], cell: "Counter_S", arc: 0.49, digit: { h: 0.84, w: 0.66 } },
+      { key: "costD", x0: 254, x1: 537, reels: [10, 10, 10], cell: "Counter_L", arc: 0.49, digit: { h: 0.84, w: 0.64 } },
+    ],
+  },
+  {
+    img: `${CNT}/Counter_bg.png`, iw: 675, ih: 351, x: 25, y: 516, w: 340, win: { y0: 115, y1: 303 }, label: "REPEAT",
+    groups: [
+      { key: "repeatX", x0: 122, x1: 218, reels: [8], cell: "Counter_L", arc: 0.49, digit: { h: 0.84, w: 0.64 } },
+      { key: "repeatD", x0: 250, x1: 555, reels: [10, 10, 10, 10], cell: "Counter_S", arc: 0.49, digit: { h: 0.84, w: 0.68 } },
+    ],
+  },
+];
 
 const stage = document.getElementById("stage");
+const art = document.getElementById("art");
+const over = document.getElementById("over");
 const ui = document.getElementById("ui");
 const canvas = document.getElementById("gl");
 const spinBtn = document.getElementById("spin");
 const resultEl = document.getElementById("result");
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, premultipliedAlpha: true });
 renderer.setPixelRatio(Math.min(2.5, window.devicePixelRatio || 1));
 renderer.localClippingEnabled = true;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.92;
+renderer.setClearColor(0x000000, 0);
 
 const scene = new THREE.Scene();
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-
 const camera = new THREE.OrthographicCamera(0, W, 0, -H, -2000, 2000);
 camera.position.set(0, 0, 600);
 camera.lookAt(0, 0, 0);
 
-scene.add(new THREE.AmbientLight(0xfff1d6, 0.55));
-const key = new THREE.DirectionalLight(0xfff4de, 1.4);
-key.position.set(-120, 300, 500);
-scene.add(key);
-const rim = new THREE.DirectionalLight(0xffd27a, 0.5);
-rim.position.set(200, -200, 300);
-scene.add(rim);
+const loadImg = (src) =>
+  new Promise((res, rej) => {
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = () => rej(new Error(src));
+    im.src = src;
+  });
 
-const gold = new THREE.MeshStandardMaterial({ color: 0xe0b24a, metalness: 1, roughness: 0.28 });
-const goldDark = new THREE.MeshStandardMaterial({ color: 0x8a5a14, metalness: 1, roughness: 0.4 });
-const teal = new THREE.MeshPhysicalMaterial({ color: 0x13b39a, metalness: 0.15, roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.08, emissive: 0x064e43, emissiveIntensity: 0.5, transmission: 0.1, thickness: 2 });
-const ruby = new THREE.MeshPhysicalMaterial({ color: 0xd3142c, metalness: 0.15, roughness: 0.12, clearcoat: 1, emissive: 0x4a0410, emissiveIntensity: 0.5 });
+function addImg(host, src, cls, style) {
+  const im = document.createElement("img");
+  im.src = src;
+  im.className = cls;
+  im.draggable = false;
+  Object.assign(im.style, style);
+  host.appendChild(im);
+  return im;
+}
 
-function digitTexture(n, arc, len) {
-  const k = Math.min(6, 360 / Math.max(arc, len));
+function addPlus(style, group) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "plus";
+  btn.textContent = "+1";
+  Object.assign(btn.style, style);
+  btn.addEventListener("click", () => increment(group.reels, performance.now()));
+  ui.appendChild(btn);
+  return btn;
+}
+
+function inkStops(ref, count) {
+  const c = document.createElement("canvas");
+  c.width = ref.width;
+  c.height = ref.height;
+  const ctx = c.getContext("2d");
+  ctx.drawImage(ref, 0, 0);
+  const d = ctx.getImageData(0, 0, c.width, c.height).data;
+  const stops = [];
+  for (let k = 0; k < count; k += 1) {
+    const y = Math.round((k / (count - 1)) * (c.height - 1));
+    let r = 0, g = 0, b = 0, m = 0;
+    for (let dy = -2; dy <= 2; dy += 1) {
+      const yy = Math.min(c.height - 1, Math.max(0, y + dy));
+      for (let x = 0; x < c.width; x += 1) {
+        const i = (yy * c.width + x) * 4;
+        if (d[i + 3] > 230) {
+          r += d[i];
+          g += d[i + 1];
+          b += d[i + 2];
+          m += 1;
+        }
+      }
+    }
+    if (m) stops.push([k / (count - 1), `rgb(${Math.round(r / m)}, ${Math.round(g / m)}, ${Math.round(b / m)})`]);
+  }
+  return stops;
+}
+
+function zeroImage(w, h, ref) {
+  const big = document.createElement("canvas");
+  big.width = w * 2;
+  big.height = h * 2;
+  const bc = big.getContext("2d");
+  bc.font = `900 ${h * 1.3}px "Times New Roman", Georgia, serif`;
+  bc.textAlign = "center";
+  bc.textBaseline = "middle";
+  bc.fillStyle = "#000";
+  bc.fillText("0", w, h);
+  const data = bc.getImageData(0, 0, big.width, big.height).data;
+  let x0 = big.width, x1 = 0, y0 = big.height, y1 = 0;
+  for (let y = 0; y < big.height; y += 1) {
+    for (let x = 0; x < big.width; x += 1) {
+      if (data[(y * big.width + x) * 4 + 3] > 40) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+    }
+  }
+  const gw = x1 - x0 + 1;
+  const gh = y1 - y0 + 1;
+  const c = document.createElement("canvas");
+  c.width = gw;
+  c.height = gh;
+  const ctx = c.getContext("2d");
+  ctx.font = bc.font;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const ink = ctx.createLinearGradient(0, 0, 0, gh);
+  const stops = ref ? inkStops(ref, 9) : [[0, "#5a2a14"], [0.55, "#3f1808"], [1, "#2a0e04"]];
+  stops.forEach(([k, col]) => ink.addColorStop(k, col));
+  ctx.fillStyle = ink;
+  ctx.fillText("0", w - x0, h - y0);
+  return c;
+}
+
+function makeTexture(n, arc, len, draw) {
+  const k = Math.min(6, 400 / Math.max(arc, len));
   const cellW = Math.round(arc * k);
   const cellH = Math.round(len * k);
   const c = document.createElement("canvas");
   c.width = n * cellW;
   c.height = cellH;
   const ctx = c.getContext("2d");
-  const base = ctx.createLinearGradient(0, 0, 0, cellH);
-  base.addColorStop(0, "#efe2c2");
-  base.addColorStop(0.5, "#fff8e4");
-  base.addColorStop(1, "#e9d8b4");
-  ctx.fillStyle = base;
-  ctx.fillRect(0, 0, c.width, c.height);
   for (let i = 0; i < n; i += 1) {
-    const x0 = i * cellW;
-    ctx.strokeStyle = "rgba(120, 85, 30, 0.22)";
-    ctx.lineWidth = Math.max(2, cellW * 0.02);
-    ctx.beginPath();
-    ctx.moveTo(x0 + 0.5, 0);
-    ctx.lineTo(x0 + 0.5, cellH);
-    ctx.stroke();
     ctx.save();
-    ctx.translate(x0 + cellW / 2, cellH / 2);
+    ctx.translate(i * cellW + cellW / 2, cellH / 2);
     ctx.rotate(Math.PI / 2);
-    const size = Math.min(cellW * 0.9, cellH * 1.25);
-    ctx.font = `900 ${size}px "Arial Black", Arial, sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.lineJoin = "round";
-    ctx.lineWidth = size * 0.1;
-    ctx.strokeStyle = "rgba(255,255,255,0.75)";
-    ctx.strokeText(String(i), 0, size * 0.04 + size * 0.03);
-    ctx.lineWidth = size * 0.06;
-    ctx.strokeStyle = "#1a1612";
-    ctx.strokeText(String(i), 0, size * 0.04);
-    const ink = ctx.createLinearGradient(0, -size / 2, 0, size / 2);
-    ink.addColorStop(0, "#5a5048");
-    ink.addColorStop(0.45, "#1e1a16");
-    ink.addColorStop(1, "#000");
-    ctx.fillStyle = ink;
-    ctx.fillText(String(i), 0, size * 0.04);
+    draw(ctx, i, cellH, cellW);
     ctx.restore();
   }
   const tex = new THREE.CanvasTexture(c);
@@ -101,13 +168,13 @@ function digitTexture(n, arc, len) {
 const reels = [];
 const GROUPS = [];
 
-function makeReel({ cx, cy, len, r, n, clipTop, clipBottom }) {
+function makeReel({ cx, cy, len, r, n, tex, clipTop, clipBottom }) {
   const group = new THREE.Group();
   group.position.set(cx, -cy, 0);
   group.rotation.z = Math.PI / 2;
   const planes = clipTop != null ? [new THREE.Plane(new THREE.Vector3(0, -1, 0), clipTop), new THREE.Plane(new THREE.Vector3(0, 1, 0), -clipBottom)] : [];
-  const mat = new THREE.MeshStandardMaterial({ map: digitTexture(n, (TAU * r) / n, len), roughness: 0.42, metalness: 0.05, clippingPlanes: planes });
-  const geo = new THREE.CylinderGeometry(r, r, len, 96, 1, true);
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, clippingPlanes: planes, side: THREE.FrontSide });
+  const geo = new THREE.CylinderGeometry(r, r, len, 128, 1, true);
   const mesh = new THREE.Mesh(geo, mat);
   group.add(mesh);
   scene.add(group);
@@ -123,99 +190,62 @@ function angleFor(reel, digit) {
   return -TAU * ((digit + 0.5) / reel.n);
 }
 
-function addPlus(style, group) {
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "plus";
-  btn.textContent = "+1";
-  Object.assign(btn.style, style);
-  btn.addEventListener("click", () => increment(group.reels, performance.now()));
-  ui.appendChild(btn);
-  return btn;
-}
+async function build() {
+  const [ingr, nums] = await Promise.all([
+    Promise.all(INGREDIENTS.map((f) => loadImg(`${WB}/${f}.png`))),
+    Promise.all([1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => loadImg(`${CNT}/Number_${d}.png`))),
+  ]);
+  nums.unshift(zeroImage(96, 140, nums[7]));
 
-function addEl(cls, style, text) {
-  const el = document.createElement("div");
-  el.className = cls;
-  Object.assign(el.style, style);
-  if (text) el.textContent = text;
-  ui.appendChild(el);
-  return el;
-}
-
-const b = LAYOUT.barrel;
-const barrel = makeReel({ cx: b.x, cy: b.y, len: b.len, r: b.r, n: 10 });
-GROUPS.push({ label: "BARREL", reels: [barrel] });
-{
-  const m = barrel.mesh;
-  const capGeo = new THREE.CylinderGeometry(b.r * 1.08, b.r * 1.08, 8, 64);
-  const bandGeo = new THREE.TorusGeometry(b.r * 1.02, 3.2, 16, 96);
-  [-1, 1].forEach((s) => {
-    const cap = new THREE.Mesh(capGeo, gold);
-    cap.position.y = s * (b.len / 2 + 4);
-    m.add(cap);
-    const band = new THREE.Mesh(bandGeo, goldDark);
-    band.rotation.x = Math.PI / 2;
-    band.position.y = s * (b.len / 2 - 6);
-    m.add(band);
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(b.r * 0.55, b.r * 0.75, 18, 48), gold);
-    hub.position.y = s * (b.len / 2 + 17);
-    m.add(hub);
-    const crown = new THREE.Group();
-    crown.position.y = s * (b.len / 2 + 30);
-    const gemCount = 8;
-    for (let i = 0; i < gemCount; i += 1) {
-      const a = (i / gemCount) * TAU;
-      const gem = new THREE.Mesh(new THREE.OctahedronGeometry(8, 0), i % 4 === 0 ? ruby : teal);
-      gem.position.set(Math.sin(a) * b.r * 0.6, 0, Math.cos(a) * b.r * 0.6);
-      gem.rotation.set(0, a, 0);
-      gem.scale.set(1, 0.6, 1.5);
-      crown.add(gem);
-      const prong = new THREE.Mesh(new THREE.TorusGeometry(9, 1.5, 8, 24), gold);
-      prong.position.copy(gem.position);
-      prong.rotation.set(0, a, 0);
-      crown.add(prong);
-    }
-    const big = new THREE.Mesh(new THREE.OctahedronGeometry(17, 0), teal);
-    big.scale.set(1.1, 0.75, 1.1);
-    big.position.y = s * 12;
-    crown.add(big);
-    const bigRing = new THREE.Mesh(new THREE.TorusGeometry(17, 2.6, 10, 40), gold);
-    bigRing.rotation.x = Math.PI / 2;
-    bigRing.position.y = s * 6;
-    crown.add(bigRing);
-    m.add(crown);
+  const b = BARREL;
+  const s = b.w / b.img.w;
+  addImg(art, `${WB}/Wheel_Bg.png`, "art", { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px` });
+  const win = { x: b.x + b.win.x0 * s, y: b.y + b.win.y0 * s, w: (b.win.x1 - b.win.x0) * s, h: (b.win.y1 - b.win.y0) * s };
+  const r = win.h / 2;
+  const len = win.w;
+  const n = ingr.length;
+  const arc = (TAU * r) / n;
+  const tex = makeTexture(n, arc, len, (ctx, i, cw, ch) => {
+    const im = ingr[i];
+    const flat = im.width / im.height > 1.8;
+    const sc = Math.min((cw * (flat ? 0.7 : 0.62)) / im.width, (ch * 0.96) / im.height);
+    ctx.drawImage(im, (-im.width * sc) / 2, (-im.height * sc) / 2, im.width * sc, im.height * sc);
   });
-}
+  const barrel = makeReel({ cx: win.x + win.w / 2, cy: win.y + win.h / 2, len, r, n, tex, clipTop: -win.y, clipBottom: -(win.y + win.h) });
+  GROUPS.push({ label: "BARREL", reels: [barrel] });
+  const sh = { w: b.shadow.w * s, h: b.shadow.h * s };
+  addImg(over, `${WB}/over_Shadow copy.png`, "over", { left: `${win.x + win.w / 2 - sh.w / 2}px`, top: `${win.y + win.h / 2 - sh.h / 2}px`, width: `${sh.w}px`, height: `${sh.h}px`, opacity: "0.9" });
+  addPlus({ left: `${win.x + win.w / 2 - 22}px`, top: `${b.y + b.w - 36}px` }, GROUPS[0]);
 
-addEl("bar", { left: `${b.x - b.len / 2 + 6}px`, top: `${b.y - b.r - 10}px`, width: `${b.len - 12}px`, height: "8px" });
-addEl("bar", { left: `${b.x - b.len / 2 + 6}px`, top: `${b.y + b.r + 2}px`, width: `${b.len - 12}px`, height: "8px" });
-addPlus({ left: `${b.x - 20}px`, top: `${b.y + b.r + 22}px` }, GROUPS[0]);
-
-LAYOUT.rows.forEach((row) => {
-  addEl("plate", { left: "95px", top: `${row.y - 52}px`, width: "200px", height: "24px" }, row.label);
-  row.groups.forEach((g) => {
-    const top = row.y - g.h / 2;
-    addEl("frame", { left: `${g.x}px`, top: `${top}px`, width: `${g.w}px`, height: `${g.h}px` });
-    const colW = g.w / g.reels.length;
-    const grp = { label: row.label.split(" ")[0] + (g.reels.length > 1 ? "" : "-X"), reels: [] };
-    g.reels.forEach((n, i) => {
-      const cx = g.x + colW * (i + 0.5);
-      const cellArc = g.h / 1.12;
-      const r = (n * cellArc) / TAU;
-      grp.reels.push(makeReel({ cx, cy: row.y, len: colW - 6, r, n, clipTop: -top, clipBottom: -(top + g.h) }));
-      if (i > 0) addEl("sep", { left: `${g.x + colW * i - 1.5}px`, top: `${top + 3}px`, height: `${g.h - 6}px` });
+  ROWS.forEach((row) => {
+    const k = row.w / row.iw;
+    addImg(art, row.img, "art", { left: `${row.x}px`, top: `${row.y}px`, width: `${row.w}px` });
+    const top = row.y + row.win.y0 * k;
+    const h = (row.win.y1 - row.win.y0) * k;
+    row.groups.forEach((g) => {
+      const gx = row.x + g.x0 * k;
+      const gw = (g.x1 - g.x0) * k;
+      const colW = gw / g.reels.length;
+      const grp = { label: row.label + (g.reels.length > 1 ? "" : "-X"), reels: [] };
+      g.reels.forEach((cnt, i) => {
+        const cx = gx + colW * (i + 0.5);
+        addImg(art, `${CNT}/${g.cell}.png`, `art cell ${g.key}`, { left: `${gx + colW * i}px`, top: `${top}px`, width: `${colW}px`, height: `${h}px` });
+        const cellArc = h * g.arc;
+        const rr = (cnt * cellArc) / TAU;
+        const digitTex = makeTexture(cnt, cellArc, colW, (ctx, d, cw, ch) => {
+          const im = nums[d];
+          const sc = Math.min((ch * g.digit.h) / im.height, (cw * g.digit.w) / im.width);
+          ctx.drawImage(im, (-im.width * sc) / 2, (-im.height * sc) / 2, im.width * sc, im.height * sc);
+        });
+        grp.reels.push(makeReel({ cx, cy: top + h / 2, len: colW - 2, r: rr, n: cnt, tex: digitTex, clipTop: -top, clipBottom: -(top + h) }));
+      });
+      GROUPS.push(grp);
+      addPlus({ left: `${gx + gw / 2 - 22}px`, top: `${top + h + 10}px` }, grp);
     });
-    GROUPS.push(grp);
-    addPlus({ left: `${g.x + g.w / 2 - 20}px`, top: `${top + g.h + 12}px` }, grp);
-    const gl = addEl("gem", { left: `${g.x - 5}px`, top: `${top + g.h / 2 - 5}px` });
-    gl.style.setProperty("--g", "#1dd3b0");
-    gl.style.setProperty("--gd", "#0b5d4d");
-    const gr = addEl("gem", { left: `${g.x + g.w - 6}px`, top: `${top + g.h / 2 - 5}px` });
-    gr.style.setProperty("--g", "#ff3b5c");
-    gr.style.setProperty("--gd", "#6e0a1c");
   });
-});
+
+  requestAnimationFrame(tick);
+}
 
 const MOVE_MS = 3000;
 
@@ -255,7 +285,7 @@ function startSpin() {
 }
 
 function readout() {
-  return GROUPS.map((g) => g.label + " " + g.reels.map((r) => r.digit).join("")).join("   ");
+  return GROUPS.map((g) => g.label + " " + g.reels.map((r) => (g.label === "BARREL" ? INGREDIENTS[r.digit].split("_")[0] : r.digit)).join("")).join("   ");
 }
 
 function tick(now) {
@@ -294,4 +324,6 @@ window.burgerSpin = startSpin;
 window.burgerPlus = (i) => increment(GROUPS[i].reels, performance.now());
 window.burgerRead = readout;
 fit();
-requestAnimationFrame(tick);
+build().catch((e) => {
+  resultEl.textContent = "load error: " + e.message;
+});

@@ -160,6 +160,8 @@ const serverCardImg = (name) => {
 export default function CardsGame({ onFinish }) {
   const [deck] = useState(buildDeck);
   const [opened, setOpened] = useState(() => new Set());
+  const openedRef = useRef(opened);
+  openedRef.current = opened;
   const [big, setBig] = useState(null);
   const boardRef = useRef(null);
   const flyerRef = useRef(null);
@@ -332,6 +334,7 @@ export default function CardsGame({ onFinish }) {
 
   const [left, setLeft] = useState(PICK_SEC);
   const pickedRef = useRef(false);
+  const expiredRef = useRef(false);
 
   useEffect(() => {
     const iv = setInterval(() => {
@@ -339,10 +342,12 @@ export default function CardsGame({ onFinish }) {
         if (pickedRef.current) return sec;
         if (sec <= 1) {
           clearInterval(iv);
+          expiredRef.current = true;
           if (!pickedRef.current) {
             const host = boardRef.current;
             const btns = host ? [...host.querySelectorAll("[class*=cardBtn]")] : [];
-            const pick = btns[Math.floor(Math.random() * btns.length)];
+            const free = btns.filter((b, i) => !openedRef.current.has(i));
+            const pick = free[Math.floor(Math.random() * free.length)];
             if (pick) pick.click();
           }
           return 0;
@@ -392,24 +397,36 @@ export default function CardsGame({ onFinish }) {
     }
     (async () => {
       const gid = startRef.current ? await startRef.current : null;
-      if (gid) {
-        try {
-          const r = await sg.play(gid, { choice: idx });
-          if (r && typeof r.cash === "number") wallet?.applyTruth({ cash: r.cash });
-          if (r && typeof r.prize === "number") {
-            const img = serverCardImg(r.card) || deck.find((c) => c.pts === r.prize)?.img || payload.card.img;
-            payload.card = { img, pts: r.prize };
-            if (r.prize > 0) wallet?.hold("cash", r.prize);
-          }
-        } catch (e) {
-          if (e && e.code === "card_opened") {
-            console.warn("[park] карты: позиция уже открыта", idx);
-            pickedRef.current = false;
-            if (resetPendingRef.current) runFlipBack(null);
-            return;
-          }
-          payload.card = deck[idx];
+      if (!gid) {
+        console.warn("[park] карты: игра на сервере не началась, закрываю без приза");
+        later(() => onFinish?.(0), 250);
+        return;
+      }
+      try {
+        const r = await sg.play(gid, { choice: idx });
+        if (r && typeof r.cash === "number") wallet?.applyTruth({ cash: r.cash });
+        if (r && typeof r.prize === "number") {
+          const img = serverCardImg(r.card) || deck.find((c) => c.pts === r.prize)?.img || payload.card.img;
+          payload.card = { img, pts: r.prize };
+          if (r.prize > 0) wallet?.hold("cash", r.prize);
         }
+      } catch (e) {
+        const code = e && e.code;
+        if (code === "card_opened") {
+          console.warn("[park] карты: позиция уже открыта", idx);
+          pickedRef.current = false;
+          if (resetPendingRef.current) runFlipBack(null);
+          return;
+        }
+        if (code === "game_timeout" || code === "game_not_active" || code === "game_not_found") {
+          console.warn("[park] карты: игра на сервере закрыта, закрываю без приза:", code);
+          later(() => onFinish?.(0), 250);
+          return;
+        }
+        console.warn("[park] карты: сервер не ответил на выбор, можно выбрать снова:", code);
+        pickedRef.current = false;
+        if (expiredRef.current) later(() => onFinish?.(0), 250);
+        return;
       }
       show();
     })();

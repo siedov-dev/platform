@@ -4,6 +4,7 @@
   display: none;
   pointer-events: none;
   z-index: 70;
+  will-change: transform;
   --t: var(--frx-t, 15px);
   --v: var(--frx-v, 15px);
   --band: 26px;

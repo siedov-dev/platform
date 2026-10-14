@@ -30,6 +30,7 @@ const TIMER_SEC = 10;
 const SPIN_BASE = 21;
 
 const rollIndex = () => POOL[Math.floor(Math.random() * POOL.length)];
+const FATAL = new Set(["game_timeout", "game_not_active", "game_not_found"]);
 
 export default function PyramidGame({ onFinish }) {
   const boardRef = useRef(null);
@@ -67,15 +68,33 @@ export default function PyramidGame({ onFinish }) {
   const serverStep = async (step) => {
     if (!sg) return null;
     const gid = startRef.current ? await startRef.current : null;
-    if (!gid) return null;
+    if (!gid) return { fail: "no_game" };
     try {
       const r = await sg.play(gid, { step });
       if (r && typeof r.cash === "number") wallet?.applyTruth({ cash: r.cash });
       if (r && r.done && r.prize > 0) wallet?.hold("cash", r.prize);
       return r;
     } catch (e) {
-      return null;
+      return { fail: (e && e.code) || "error" };
     }
+  };
+
+  const closeNoPrize = (why) => {
+    if (takenRef.current) return;
+    takenRef.current = true;
+    setTimerOn(false);
+    console.warn("[park] пирамида: сервер не дал результат, закрываю без приза:", why);
+    timers.current.push(setTimeout(() => onFinish?.(null), 250));
+  };
+
+  const serverFail = (r, what) => {
+    if (!r || !r.fail) return false;
+    if (r.fail === "no_game" || FATAL.has(r.fail)) {
+      closeNoPrize(r.fail);
+      return true;
+    }
+    console.warn(`[park] пирамида: сервер не ответил на ${what}, можно нажать снова:`, r.fail);
+    return true;
   };
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
@@ -104,6 +123,10 @@ export default function PyramidGame({ onFinish }) {
     if (sg) {
       busyRef.current = true;
       serverStep("take").then(async (r) => {
+        if (serverFail(r, "take")) {
+          busyRef.current = false;
+          return;
+        }
         let res = r;
         if (res && res.status === "ok" && res.done !== true) {
           console.warn("[park] пирамида: сервер не завершил игру по take, жду его авто-завершение", JSON.stringify(res));
@@ -137,6 +160,10 @@ export default function PyramidGame({ onFinish }) {
           if (activeRef.current == null) {
             if (sg) {
               serverStep("roll").then((r) => {
+                if (r && r.fail) {
+                  closeNoPrize(r.fail);
+                  return;
+                }
                 const at = r && r.item ? PRIZES.findIndex((pz) => pz.id === r.item) : -1;
                 const idx = at >= 0 ? at : rollIndex();
                 activeRef.current = idx;
@@ -168,6 +195,11 @@ export default function PyramidGame({ onFinish }) {
       setRolling(true);
       serverStep("roll").then((r) => {
         busyRef.current = false;
+        if (serverFail(r, "крутку")) {
+          setRolling(false);
+          if (!takenRef.current) setTimerOn(true);
+          return;
+        }
         const idx = r && r.item ? PRIZES.findIndex((p) => p.id === r.item) : -1;
         const prize = r && r.done && typeof r.prize === "number" ? r.prize : null;
         const left = r && typeof r.rolls_left === "number" ? r.rolls_left : picks - 1;
